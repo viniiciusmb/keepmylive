@@ -1869,5 +1869,34 @@
   });
 </script>
 
+
+<script>
+  // Repassa todos os parametros de URL para os links do checkout
+  (function() {
+    var checkoutBase = "https://checkout.perfectpay.com.br/pay/PPU38CQBTEA";
+
+    function appendParams(url) {
+      var search = window.location.search;
+      if (!search) return url;
+      // Se o link ja tem parametros, adiciona com & , senao com ?
+      return url + (url.indexOf('?') >= 0 ? '&' : '?') + search.slice(1);
+    }
+
+    function updateLinks() {
+      var links = document.querySelectorAll('a[href*="perfectpay.com.br"]');
+      links.forEach(function(link) {
+        link.href = appendParams(checkoutBase);
+      });
+    }
+
+    // Roda quando o DOM carregar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateLinks);
+    } else {
+      updateLinks();
+    }
+  })();
+</script>
+
 </body>
 </html>
