@@ -442,6 +442,32 @@
     text-transform: uppercase;
   }
 
+
+  .game-img-wrap {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    aspect-ratio: 1/1;
+    background: #0e0e0e;
+  }
+
+  .game-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s;
+  }
+
+  .game-card:hover .game-img-wrap img {
+    transform: scale(1.04);
+  }
+
+  .game-card {
+    flex-direction: column;
+  }
+
   /* ── FEATURES ── */
   .features-split {
     display: grid;
@@ -828,7 +854,7 @@
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
 
-  <div class="badge">🔥 Acesso vitalício por R$27,90</div>
+  <div class="badge">🔥 Por apenas R$27,90</div>
 
   <h1>Deixa o jogo rodar. <span class="accent">O dinheiro chega sozinho.</span></h1>
 
@@ -1310,13 +1336,13 @@
       <div class="step-icon">💳</div>
       <div class="step-num">01</div>
       <h3>Compre o acesso</h3>
-      <p>R$27,90 uma única vez. Você recebe tudo no e-mail na hora — login, tutorial e acesso imediato aos jogos.</p>
+      <p>R$27,90 uma única vez. Você recebe tudo no e-mail na hora — login e acesso imediato aos jogos.</p>
     </div>
     <div class="step">
       <div class="step-icon">⚡</div>
       <div class="step-num">02</div>
       <h3>Configure em 10 minutos</h3>
-      <p>Tutorial passo a passo em português. Você conecta o jogo ao TikTok e já está pronto. Sem complicação nenhuma.</p>
+      <p>É simples. Você conecta o jogo ao TikTok e já está pronto. Sem complicação nenhuma.</p>
     </div>
     <div class="step">
       <div class="step-icon">📱</div>
@@ -1510,53 +1536,46 @@
 
   <div class="games-grid">
     <div class="game-card">
-      <div class="game-emoji">🏔️</div>
+      <div class="game-img-wrap">
+        <img src="imagens/jogo1.png" alt="Territory War">
+      </div>
       <div class="game-info">
-        <h4>Escalada da Montanha</h4>
-        <p>Espectadores mandam presentes para ajudar ou atrapalhar o personagem na subida.</p>
-        <span class="game-tag">Alto engajamento</span>
+        <h4>Territory War</h4>
+        <p>Espectadores escolhem um território e mandam presentes para conquistar o mapa. Puro caos e diversão.</p>
+        <span class="game-tag">🏆 Competitivo</span>
       </div>
     </div>
     <div class="game-card">
-      <div class="game-emoji">🐟</div>
+      <div class="game-img-wrap">
+        <img src="imagens/jogo2.png" alt="Travel Station">
+      </div>
       <div class="game-info">
-        <h4>Peixe Sobrevivente</h4>
-        <p>Você é um peixe tentando crescer. O público spawna inimigos ou comida com presentes.</p>
-        <span class="game-tag">Muito divertido</span>
+        <h4>Travel Station</h4>
+        <p>Espectadores embarcam num avião com curtidas e presentes. Quem mandar mais vai mais longe.</p>
+        <span class="game-tag">✈️ Alto engajamento</span>
       </div>
     </div>
     <div class="game-card">
-      <div class="game-emoji">🧱</div>
+      <div class="game-img-wrap">
+        <img src="imagens/jogo3.png" alt="Woman vs Man">
+      </div>
       <div class="game-info">
-        <h4>Arena de Blocos</h4>
-        <p>Empilha blocos até o topo. Espectadores ativam TNTs para dificultar com presentes.</p>
-        <span class="game-tag">Presentes explosivos</span>
+        <h4>Woman vs Man</h4>
+        <p>Time feminino vs masculino. O público escolhe seu lado e manda presentes para vencer a batalha.</p>
+        <span class="game-tag">⚔️ Viral</span>
       </div>
     </div>
     <div class="game-card">
-      <div class="game-emoji">👻</div>
+      <div class="game-img-wrap">
+        <img src="imagens/jogo4.png" alt="League War">
+      </div>
       <div class="game-info">
-        <h4>Fuga do Terror</h4>
-        <p>Jogo de terror onde o público invoca monstros ou itens de ajuda durante a live.</p>
-        <span class="game-tag">Gera reações</span>
+        <h4>League War</h4>
+        <p>Ligas se enfrentam em batalha épica. Cada presente move os guerreiros e decide o vencedor.</p>
+        <span class="game-tag">🔥 Muito divertido</span>
       </div>
     </div>
-    <div class="game-card">
-      <div class="game-emoji">🏆</div>
-      <div class="game-info">
-        <h4>Caminho do Rei</h4>
-        <p>Espectadores aparecem na tela e disputam para chegar ao final e virar "Rei da Live".</p>
-        <span class="game-tag">Viral no TikTok</span>
-      </div>
-    </div>
-    <div class="game-card">
-      <div class="game-emoji">⚔️</div>
-      <div class="game-info">
-        <h4>Arena dos Avatares</h4>
-        <p>Batalha entre avatares dos espectadores. Quem manda mais presentes vence a rodada.</p>
-        <span class="game-tag">Competitivo</span>
-      </div>
-    </div>
+  </div>
   </div>
 </section>
 
@@ -1586,15 +1605,15 @@
         <div class="feature-item">
           <div class="feature-check">✓</div>
           <div class="feature-text">
-            <h4>Sem mensalidade — nunca</h4>
+            <h4>Sem mensalidade, nunca</h4>
             <p>R$27,90 uma vez. Outros cobram R$30–R$60 por mês. Aqui você paga uma vez e usa para sempre.</p>
           </div>
         </div>
         <div class="feature-item">
           <div class="feature-check">✓</div>
           <div class="feature-text">
-            <h4>Tutorial em 10 minutos, em PT-BR</h4>
-            <p>Suporte completo em português. Se travar em qualquer etapa, tem alguém pra te ajudar.</p>
+            <h4>Suporte disponível</h4>
+            <p>Se travar em qualquer etapa, tem alguém pra te ajudar a configurar tudo.</p>
           </div>
         </div>
       </div>
@@ -1649,8 +1668,94 @@
   <h2>Tudo isso por<br><span class="accent">R$ 27,90 uma vez</span></h2>
   <p class="section-sub" style="margin: 14px auto 0;">Sem mensalidade. Sem renovação automática. Sem pegadinha. Pagou, é seu para sempre.</p>
 
+  <!-- VAGAS -->
+  <div class="vacancy-box">
+    <div class="vacancy-top">
+      <span class="vacancy-fire">🔒</span>
+      <span class="vacancy-title">Vagas limitadas por conta da concorrência</span>
+    </div>
+    <p class="vacancy-desc">Estamos limitando o acesso para que cada usuário consiga faturar de verdade — sem saturar o mercado. Quando todo mundo tem acesso, ninguém ganha.</p>
+    <div class="vacancy-bar-wrap">
+      <div class="vacancy-bar-track">
+        <div class="vacancy-bar-fill"></div>
+      </div>
+      <div class="vacancy-numbers">
+        <span class="vacancy-used">80 vagas preenchidas</span>
+        <span class="vacancy-left">⚠️ Apenas <strong>20 restantes</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .vacancy-box {
+      max-width: 500px;
+      margin: 40px auto 0;
+      background: rgba(255,45,107,0.06);
+      border: 1px solid rgba(255,45,107,0.3);
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+    }
+
+    .vacancy-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .vacancy-fire { font-size: 1.3rem; }
+
+    .vacancy-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--pink);
+    }
+
+    .vacancy-desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .vacancy-bar-track {
+      background: rgba(255,255,255,0.08);
+      border-radius: 50px;
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .vacancy-bar-fill {
+      height: 100%;
+      width: 80%;
+      background: linear-gradient(90deg, var(--pink), #ff8fab);
+      border-radius: 50px;
+      animation: fillBar 1.5s ease both;
+    }
+
+    @keyframes fillBar {
+      from { width: 0%; }
+      to   { width: 80%; }
+    }
+
+    .vacancy-numbers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .vacancy-used { color: var(--muted); }
+
+    .vacancy-left {
+      color: var(--pink);
+      font-weight: 600;
+    }
+  </style>
+
   <div class="price-card">
-    <div class="price-label">🔥 Acesso Vitalício</div>
+    <div class="price-label">🔥 Oferta Especial</div>
 
     <div class="price-amount">
       <span class="currency">R$</span>27,90
@@ -1662,8 +1767,8 @@
       <div class="price-feat"><span class="tick">✓</span><span>Média de 2.000 diamantes por live</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Todos os jogos interativos desbloqueados</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Novos jogos incluídos automaticamente</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Tutorial passo a passo em português</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade — nunca mais paga nada</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Suporte para configurar tudo</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade, sem renovação, sem pegadinha</span></div>
     </div>
 
     <a href="#" class="btn-buy">🚀 Comprar por R$27,90 agora</a>
@@ -1690,7 +1795,7 @@
       <div class="faq-q" onclick="toggleFaq(this)">
         Funciona no celular? <span class="arrow">+</span>
       </div>
-      <div class="faq-a">Depende do jogo. A maioria funciona via PC com TikTok Live Studio. Alguns jogos simples funcionam direto pelo celular. O tutorial completo explica tudo passo a passo.</div>
+      <div class="faq-a">Depende do jogo. A maioria funciona via PC com TikTok Live Studio. Alguns jogos simples funcionam direto pelo celular. O suporte te ajuda a configurar tudo.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
@@ -1708,7 +1813,7 @@
       <div class="faq-q" onclick="toggleFaq(this)">
         O acesso é liberado na hora? <span class="arrow">+</span>
       </div>
-      <div class="faq-a">Sim. Logo após a confirmação do pagamento você recebe o acesso no e-mail que cadastrou. O tutorial completo de configuração também é enviado junto.</div>
+      <div class="faq-a">Sim. Logo após a confirmação do pagamento você recebe o acesso no e-mail que cadastrou. O acesso é enviado junto com as instruções de configuração.</div>
     </div>
   </div>
 </section>
