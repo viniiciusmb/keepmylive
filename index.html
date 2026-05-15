@@ -891,6 +891,137 @@
   </div>
 </div>
 
+
+<!-- EARNINGS SECTION -->
+<section id="ganhos-rapidos" style="padding-top: 0;">
+  <div class="earnings-banner">
+    <div class="eb-left">
+      <div class="section-label" style="margin-bottom:8px;">Quanto você pode ganhar</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);">Ganhos reais em<br><span class="accent">cada fase da sua jornada</span></h2>
+    </div>
+    <div class="eb-cards">
+      <div class="eb-card">
+        <div class="eb-phase">Semanas 1 – 3</div>
+        <div class="eb-range">R$50 – R$100</div>
+        <div class="eb-label">por dia</div>
+        <div class="eb-desc">Público ainda aquecendo, primeiros seguidores chegando e os diamantes já rolando.</div>
+      </div>
+      <div class="eb-arrow">→</div>
+      <div class="eb-card eb-card-highlight">
+        <div class="eb-phase">Quando aquece</div>
+        <div class="eb-range">R$200<span style="font-size:1.2rem;">+</span></div>
+        <div class="eb-label">por dia</div>
+        <div class="eb-desc">Público fidelizado, mais seguidores, o algoritmo te empurra e os presentes disparam.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .earnings-banner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 48px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 48px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .earnings-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink), var(--pink-light));
+  }
+
+  .earnings-banner::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(255,45,107,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .eb-cards {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .eb-card {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+
+  .eb-card:hover { border-color: rgba(255,45,107,0.2); }
+
+  .eb-card-highlight {
+    background: rgba(255,45,107,0.06);
+    border-color: rgba(255,45,107,0.3);
+  }
+
+  .eb-card-highlight:hover { border-color: rgba(255,45,107,0.5); }
+
+  .eb-phase {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .eb-range {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--pink);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .eb-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .eb-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .eb-arrow {
+    font-size: 1.5rem;
+    color: var(--pink);
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 768px) {
+    .earnings-banner {
+      grid-template-columns: 1fr;
+      padding: 32px 24px;
+      gap: 28px;
+    }
+    .eb-cards { flex-direction: column; }
+    .eb-arrow { transform: rotate(90deg); }
+  }
+</style>
+
 <!-- DEMO VIDEOS -->
 <section id="demo" style="padding-top:0;">
   <div class="section-label">Demonstração</div>
