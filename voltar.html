@@ -13,12 +13,16 @@
     color: #fff;
     font-family: 'Plus Jakarta Sans', sans-serif;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+    padding: 40px 24px;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  @media (min-height: 750px) {
+    body { align-items: center; }
   }
 
   body::before {
@@ -226,17 +230,17 @@
 
   <div class="alert-icon">⚠️</div>
 
-  <div class="last-badge">⚡ Última vaga disponível</div>
+  <div class="last-badge">⚡ Atenção</div>
 
-  <h1>Espera.<br>Você está prestes a perder<br><span class="pink">a última vaga.</span></h1>
+  <h1 style="font-size:clamp(2.8rem,8vw,4rem); letter-spacing:-2px; margin-bottom:12px;"><span class="pink">Última</span> Vaga</h1>
 
-  <p class="sub">
-    <strong>99 pessoas já estão dentro</strong> — ganhando diamantes enquanto o jogo roda sozinho. 
-    Existe apenas <strong>1 vaga restante</strong> neste lote. 
-    Se você fechar essa página, ela vai para outra pessoa.
-    <br><br>
-    O próximo lote só abre em <strong>Setembro de 2026</strong> — e por <strong>R$197,90</strong>.
+  <p style="font-size:1rem; color:rgba(255,255,255,0.6); line-height:1.65; margin-bottom:24px;">
+    Você está prestes a perder a <strong style="color:#fff">última vaga disponível</strong> neste lote. 
+    Assim que fechar essa página, ela vai para outra pessoa — e o próximo lote só abre em 
+    <strong style="color:#fff">Setembro de 2026</strong> por <strong style="color:#FF2D6B">R$197,90</strong>.
   </p>
+
+
 
   <!-- Social proof -->
   <div class="social-proof">
