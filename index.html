@@ -1028,6 +1028,53 @@
   @media (max-width: 768px) {
     .blue-ocean-box { padding: 18px 20px; }
   }
+
+  /* MILLION FOLLOWERS BOX */
+  .million-box {
+    background: linear-gradient(135deg, rgba(255,184,0,0.08), rgba(255,45,107,0.06));
+    border: 1px solid rgba(255,184,0,0.35);
+    border-radius: 16px;
+    padding: 22px 20px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .million-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #FFB800, var(--pink));
+  }
+
+  .million-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #FFB800;
+    margin-bottom: 10px;
+  }
+
+  .million-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 10px;
+  }
+
+  .million-title span {
+    color: #FFB800;
+  }
+
+  .million-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
 </style>
 </head>
 <body>
@@ -1069,7 +1116,7 @@
   <h1>O único jeito de ganhar<br><span class="accent">dinheiro 100% automático</span><br>hoje em dia</h1>
 
   <p class="hero-sub">
-    Qualquer pessoa pode abrir uma live interativa no TikTok e receber diamantes enquanto o jogo roda sozinho. Média de <strong style="color:#fff">2.000 diamantes por live</strong>. Sem fazer nada. Literalmente.
+    Qualquer pessoa pode abrir uma live interativa no TikTok e receber diamantes enquanto o jogo roda sozinho. Média de <strong style="color:#fff">5.000 diamantes por dia</strong> — equivalente a <strong style="color:#fff">~R$140 diários</strong>. Sem fazer nada. Literalmente.
   </p>
 
   <div class="blue-ocean-box">
@@ -1093,8 +1140,8 @@
       <div class="stat-label">pessoa pode começar agora</div>
     </div>
     <div class="stat">
-      <div class="stat-num">~2.000</div>
-      <div class="stat-label">diamantes por live em média</div>
+      <div class="stat-num">~5.000</div>
+      <div class="stat-label">diamantes por dia (~R$140)</div>
     </div>
     <div class="stat">
       <div class="stat-num">R$27,90</div>
@@ -1123,7 +1170,7 @@
         <div class="eb-phase">Quando aquece</div>
         <div class="eb-range">R$200<span style="font-size:1.2rem;">+</span></div>
         <div class="eb-label">por dia</div>
-        <div class="eb-desc">Público fidelizado, mais seguidores, o algoritmo te empurra e os presentes disparam.</div>
+        <div class="eb-desc">Público fidelizado, mais seguidores, o algoritmo te empurra. 5.000+ diamantes por dia — ~R$140 ou mais entrando todo dia.</div>
       </div>
     </div>
   </div>
@@ -1355,10 +1402,10 @@
       </div>
       <div class="dc-divider"></div>
       <div class="dc-rate">
-        <span class="dc-diamonds">2.000 💎</span>
+        <span class="dc-diamonds">5.000 💎</span>
         <span class="dc-arrow">→</span>
-        <span class="dc-money">≈ US$ 10,00</span>
-        <span class="dc-brl">~ R$ 56,00</span>
+        <span class="dc-money">≈ US$ 25,00</span>
+        <span class="dc-brl">~ R$ 140,00 🔥 média diária</span>
       </div>
       <div class="dc-divider"></div>
       <div class="dc-rate dc-rate-highlight">
@@ -1368,7 +1415,7 @@
         <span class="dc-brl">~ R$ 140,00</span>
       </div>
     </div>
-    <div class="dc-note">* Média de 2.000 💎 por live = ~R$56 por sessão rodando sozinho</div>
+    <div class="dc-note">* Média de 5.000 💎 por dia = ~R$140 diários rodando sozinho</div>
   </div>
 </section>
 
@@ -1705,7 +1752,7 @@
       <div class="step-icon">💎</div>
       <div class="step-num">04</div>
       <h3>Recebe diamantes</h3>
-      <p>A média é de 2.000 diamantes por live. O público manda presentes para interagir com o jogo — e você embolsa tudo.</p>
+      <p>A média é de 5.000 diamantes por dia — cerca de R$140 diários. O público manda presentes para interagir com o jogo e você embolsa tudo.</p>
     </div>
   </div>
 </section>
@@ -1744,8 +1791,8 @@
         <span class="period-sub">fase de aceleração</span>
       </div>
       <div class="growth-stat">
-        <span class="gstat-num accent-text">~2.000</span>
-        <span class="gstat-sub">diamantes por live</span>
+        <span class="gstat-num accent-text">~5.000</span>
+        <span class="gstat-sub">diamantes/dia (~R$140)</span>
       </div>
       <div class="growth-stat">
         <span class="gstat-num accent-text">+500</span>
@@ -1949,8 +1996,8 @@
         <div class="feature-item">
           <div class="feature-check">✓</div>
           <div class="feature-text">
-            <h4>Média de 2.000 diamantes por live</h4>
-            <p>O jogo prende o público. Quanto mais ficam, mais mandam. 2.000 diamantes por sessão rodando sozinho — sem você fazer nada.</p>
+            <h4>Média de 5.000 diamantes por dia</h4>
+            <p>O jogo prende o público. Quanto mais ficam, mais mandam. ~R$140 por dia rodando sozinho — sem você fazer nada.</p>
           </div>
         </div>
         <div class="feature-item">
@@ -2133,14 +2180,21 @@
 
     <div class="price-features">
       <div class="price-feat"><span class="tick">✓</span><span>Qualquer pessoa, qualquer conta, começa hoje</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Média de 2.000 diamantes por live</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Média de 5.000 💎 por dia (~R$140 diários)</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Todos os jogos interativos desbloqueados</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Novos jogos incluídos automaticamente</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Suporte para configurar tudo</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade, sem renovação, sem pegadinha</span></div>
     </div>
 
-    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="btn-buy">🚀 Comprar por R$27,90 agora</a>
+    <!-- MILLION FOLLOWERS BONUS -->
+    <div class="million-box">
+      <div class="million-badge">🏆 BÔNUS EXCLUSIVO — AO COMPRAR AGORA</div>
+      <div class="million-title">Concorra a uma conta TikTok<br>com <span>1.000.000</span> de seguidores</div>
+      <p class="million-desc">Todo comprador desta oferta entra automaticamente no sorteio de uma conta verificada com 1 milhão de seguidores no TikTok. Imagine abrir sua live já com 1M de pessoas te acompanhando.</p>
+    </div>
+
+    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="btn-buy">🚀 Comprar e concorrer ao 1M agora</a>
 
     <div class="price-guarantee">
       🔒 Pagamento seguro · Acesso imediato após confirmação
@@ -2176,7 +2230,7 @@
       <div class="faq-q" onclick="toggleFaq(this)">
         Quanto dá em média por live? <span class="arrow">+</span>
       </div>
-      <div class="faq-a">A média é de 2.000 diamantes por live. O valor exato em reais depende da taxa de conversão do TikTok no momento do saque, mas é uma renda real que chega enquanto o jogo roda sozinho.</div>
+      <div class="faq-a">A média é de 5.000 diamantes por dia, o equivalente a ~R$140. Uma renda real que chega enquanto o jogo roda sozinho — sem você fazer absolutamente nada.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
