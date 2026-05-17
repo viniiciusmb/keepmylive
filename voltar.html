@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espera — Última Vaga</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0A0A0A;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(255,45,107,0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .card {
+    max-width: 520px;
+    width: 100%;
+    background: #141414;
+    border: 1px solid rgba(255,45,107,0.3);
+    border-radius: 28px;
+    padding: 48px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #FF2D6B, #FF5C8A);
+  }
+
+  /* Pulsing alert icon */
+  .alert-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255,45,107,0.1);
+    border: 2px solid rgba(255,45,107,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 24px;
+    animation: pulse-ring 1.5s infinite;
+  }
+
+  @keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(255,45,107,0.4); }
+    70%  { box-shadow: 0 0 0 16px rgba(255,45,107,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,45,107,0); }
+  }
+
+  .last-badge {
+    display: inline-block;
+    background: rgba(255,45,107,0.12);
+    border: 1px solid rgba(255,45,107,0.35);
+    color: #FF2D6B;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+  }
+
+  h1 .pink { color: #FF2D6B; }
+
+  .sub {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+    margin-bottom: 28px;
+  }
+
+  .sub strong { color: #fff; }
+
+  /* People joining bar */
+  .social-proof {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+  }
+
+  .avatars {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #141414;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-left: -8px;
+    background: #222;
+  }
+
+  .avatar:first-child { margin-left: 0; }
+
+  .sp-text {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+  }
+
+  .sp-text strong { color: #fff; }
+
+  /* Timer */
+  .timer-box {
+    background: rgba(255,45,107,0.06);
+    border: 1px solid rgba(255,45,107,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  #backTimer {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #FF2D6B;
+  }
+
+  /* CTA */
+  .btn-cta {
+    display: block;
+    width: 100%;
+    background: #FF2D6B;
+    color: #fff;
+    border: none;
+    padding: 20px;
+    border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.05rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    box-shadow: 0 0 40px rgba(255,45,107,0.35);
+    margin-bottom: 14px;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-cta:hover {
+    background: #FF5C8A;
+    transform: translateY(-2px);
+    box-shadow: 0 0 60px rgba(255,45,107,0.5);
+  }
+
+  .btn-skip {
+    display: block;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.25);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: center;
+    padding: 6px;
+  }
+
+  .btn-skip:hover { color: rgba(255,255,255,0.4); }
+
+  .guarantee {
+    margin-top: 20px;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="alert-icon">⚠️</div>
+
+  <div class="last-badge">⚡ Última vaga disponível</div>
+
+  <h1>Espera.<br>Você está prestes a perder<br><span class="pink">a última vaga.</span></h1>
+
+  <p class="sub">
+    <strong>99 pessoas já estão dentro</strong> — ganhando diamantes enquanto o jogo roda sozinho. 
+    Existe apenas <strong>1 vaga restante</strong> neste lote. 
+    Se você fechar essa página, ela vai para outra pessoa.
+    <br><br>
+    O próximo lote só abre em <strong>Setembro de 2026</strong> — e por <strong>R$197,90</strong>.
+  </p>
+
+  <!-- Social proof -->
+  <div class="social-proof">
+    <div class="avatars">
+      <div class="avatar">👤</div>
+      <div class="avatar">👤</div>
+      <div class="avatar">👤</div>
+      <div class="avatar">👤</div>
+    </div>
+    <div class="sp-text">
+      <strong>99 pessoas</strong> já garantiram o acesso e estão faturando agora. Você é o próximo — ou perde a vaga.
+    </div>
+  </div>
+
+  <!-- Countdown -->
+  <div class="timer-box">
+    ⏱️ Sua vaga expira em: <span id="backTimer">05:00</span>
+  </div>
+
+  <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" class="btn-cta" target="_blank">
+    🔒 Garantir minha última vaga agora
+  </a>
+
+  <button class="btn-skip" onclick="window.history.back()">
+    Não quero — prefiro perder a oportunidade
+  </button>
+
+  <div class="guarantee">🔒 Pagamento seguro · Acesso imediato</div>
+
+</div>
+
+<script>
+  // 5 minute countdown
+  (function() {
+    var total = 5 * 60;
+    var el = document.getElementById('backTimer');
+
+    var stored = sessionStorage.getItem('backTimerEnd');
+    var endTime;
+    if (stored) {
+      endTime = parseInt(stored);
+    } else {
+      endTime = Date.now() + total * 1000;
+      sessionStorage.setItem('backTimerEnd', endTime);
+    }
+
+    function update() {
+      var remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      var m = Math.floor(remaining / 60);
+      var s = remaining % 60;
+      el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+      if (remaining <= 0) {
+        el.textContent = 'EXPIRADO';
+        el.style.color = '#ff4444';
+        clearInterval(iv);
+      }
+    }
+
+    update();
+    var iv = setInterval(update, 1000);
+  })();
+
+  // UTM passthrough
+  (function() {
+    var search = window.location.search;
+    if (!search) return;
+    var btn = document.querySelector('.btn-cta');
+    if (btn) btn.href = btn.href + (btn.href.indexOf('?') >= 0 ? '&' : '?') + search.slice(1);
+  })();
+</script>
+
+</body>
+</html>
