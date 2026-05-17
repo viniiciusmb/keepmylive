@@ -838,6 +838,196 @@
     section { padding: 70px 20px; }
     .price-card { padding: 36px 24px; }
   }
+
+  /* ── NAV DROPDOWN ── */
+  .nav-dropdown-wrap {
+    position: relative;
+  }
+
+  .nav-dropdown-btn {
+    background: rgba(255,255,255,0.06);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-dropdown-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .nav-dropdown-btn.open {
+    background: rgba(255,45,107,0.1);
+    border-color: rgba(255,45,107,0.3);
+    color: var(--pink);
+  }
+
+  .nav-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    background: rgba(15,15,15,0.97);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 8px;
+    min-width: 200px;
+    z-index: 200;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    animation: fadeUp 0.2s ease both;
+  }
+
+  .nav-dropdown-menu.open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nav-dropdown-menu a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 12px 16px;
+    border-radius: 10px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .nav-dropdown-menu a:hover {
+    background: rgba(255,45,107,0.08);
+    color: var(--text);
+  }
+
+  /* Hide desktop nav links on mobile since dropdown handles it */
+  @media (min-width: 769px) {
+    .nav-dropdown-wrap { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .nav-links { display: none !important; }
+    .nav-dropdown-wrap { display: block; }
+  }
+
+  /* VACANCY URGENCY */
+  .vacancy-urgency {
+    margin-top: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .vu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .vu-item strong { color: var(--text); }
+
+  .vu-icon { font-size: 1rem; flex-shrink: 0; }
+
+  #vacancyTimer {
+    color: var(--pink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+  }
+
+  .vu-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* ORIGINAL PRICE */
+  .price-original {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .po-de {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .po-old {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--pink);
+    text-decoration-thickness: 2px;
+    opacity: 0.6;
+  }
+
+  .po-arrow {
+    font-size: 1.1rem;
+    color: var(--pink);
+    opacity: 0.7;
+  }
+
+  .po-por {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 480px) {
+    .vu-divider { display: none; }
+    .vacancy-urgency { flex-direction: column; align-items: flex-start; gap: 8px; }
+  }
+
+  /* BLUE OCEAN BOX */
+  .blue-ocean-box {
+    margin-top: 28px;
+    background: rgba(77,159,255,0.05);
+    border: 1px solid rgba(77,159,255,0.2);
+    border-radius: 18px;
+    padding: 22px 28px;
+    max-width: 580px;
+    text-align: left;
+    animation: fadeUp 0.7s 0.35s ease both;
+  }
+
+  .bo-badge {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #4D9FFF;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .bo-text {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .bo-text strong { color: #4D9FFF; }
+
+  @media (max-width: 768px) {
+    .blue-ocean-box { padding: 18px 20px; }
+  }
 </style>
 </head>
 <body>
@@ -854,7 +1044,19 @@
     <li><a href="#preco">Preço</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
-  <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="nav-cta">Comprar agora</a>
+
+  <!-- Dropdown menu button -->
+  <div class="nav-dropdown-wrap">
+    <button class="nav-dropdown-btn" onclick="toggleNavMenu(this)">
+      Menu ▾
+    </button>
+    <div class="nav-dropdown-menu" id="navDropdown">
+      <a href="#como-funciona" onclick="closeNavMenu()">Como funciona</a>
+      <a href="#jogos" onclick="closeNavMenu()">Jogos</a>
+      <a href="#preco" onclick="closeNavMenu()">Preço</a>
+      <a href="#faq" onclick="closeNavMenu()">FAQ</a>
+    </div>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -862,23 +1064,33 @@
   <div class="hero-glow"></div>
   <div class="hero-glow2"></div>
 
-  <div class="badge">🔥 Por apenas R$27,90</div>
+  <div class="badge">🔥 Enquanto você lê isso, alguém está ganhando</div>
 
-  <h1>Deixa o jogo rodar. <span class="accent">O dinheiro chega sozinho.</span></h1>
+  <h1>O único jeito de ganhar<br><span class="accent">dinheiro 100% automático</span><br>hoje em dia</h1>
 
   <p class="hero-sub">
-    Abre a live, coloca o jogo na tela e vai fazer o que quiser. O público se diverte interagindo e te manda presentes enquanto isso. Média de <strong style="color:#fff">2.000 diamantes por live</strong> — e você precisa de apenas 50 seguidores pra começar.
+    Qualquer pessoa pode abrir uma live interativa no TikTok e receber diamantes enquanto o jogo roda sozinho. Média de <strong style="color:#fff">2.000 diamantes por live</strong>. Sem fazer nada. Literalmente.
   </p>
 
+  <div class="blue-ocean-box">
+    <div class="bo-badge">🌊 Mar azul — quase ninguém está fazendo isso</div>
+    <p class="bo-text">
+      Enquanto milhares de pessoas brigam por atenção criando conteúdo, 
+      <strong>uma minoria silenciosa abre a live, liga o jogo e vai dormir</strong> — 
+      e acorda com dinheiro na conta. O mercado de lives interativas no TikTok 
+      ainda está no início no Brasil. <strong style="color:#fff">Quem entrar agora vai colher 
+      muito mais do que quem entrar daqui a 6 meses.</strong>
+    </p>
+  </div>
+
   <div class="hero-actions">
-    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="btn-primary">🚀 Quero começar agora</a>
     <a href="#como-funciona" class="btn-ghost">Como funciona →</a>
   </div>
 
   <div class="stats-bar">
     <div class="stat">
-      <div class="stat-num">50</div>
-      <div class="stat-label">seguidores para começar</div>
+      <div class="stat-num">Qualquer</div>
+      <div class="stat-label">pessoa pode começar agora</div>
     </div>
     <div class="stat">
       <div class="stat-num">~2.000</div>
@@ -897,7 +1109,7 @@
   <div class="earnings-banner">
     <div class="eb-left">
       <div class="section-label" style="margin-bottom:8px;">Quanto você pode ganhar</div>
-      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);">Ganhos reais em<br><span class="accent">cada fase da sua jornada</span></h2>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.4rem);">Dinheiro real em<br><span class="accent">cada fase — sem exceção</span></h2>
     </div>
     <div class="eb-cards">
       <div class="eb-card">
@@ -1468,14 +1680,14 @@
 <section id="como-funciona">
   <div class="section-label">Como funciona</div>
   <h2>Mais simples do que<br><span class="accent">você imagina</span></h2>
-  <p class="section-sub">Não precisa saber de tecnologia. Não precisa de câmera. Não precisa de roteiro. Literalmente qualquer pessoa consegue configurar em menos de 10 minutos.</p>
+  <p class="section-sub">Não precisa de seguidores, não precisa de câmera, não precisa de roteiro. Se você tem um TikTok, você pode começar hoje. É isso.</p>
 
   <div class="steps">
     <div class="step">
       <div class="step-icon">💳</div>
       <div class="step-num">01</div>
       <h3>Compre o acesso</h3>
-      <p>R$27,90 uma única vez. Você recebe tudo no e-mail na hora — login e acesso imediato aos jogos.</p>
+      <p>R$27,90 uma única vez. Acesso na hora. Sem burocracia, sem espera, sem mensalidade.</p>
     </div>
     <div class="step">
       <div class="step-icon">⚡</div>
@@ -1558,7 +1770,7 @@
     <div class="ease-card">
       <div class="ease-icon">🤖</div>
       <h4>Deixe o jogo trabalhar por você</h4>
-      <p>O jogo entretém o público, gera interações e atrai presentes — enquanto você não faz nada.</p>
+      <p>O jogo faz tudo. Entretém, engaja, atrai presentes. Você só precisa ter deixado ele ligado.</p>
     </div>
   </div>
 </section>
@@ -1723,22 +1935,22 @@
   <div class="features-split">
     <div>
       <div class="section-label">Por que a KeepLive</div>
-      <h2>Começa com<br><span class="accent">50 seguidores</span></h2>
-      <p class="section-sub">Enquanto outras plataformas exigem 1.000 seguidores, aqui você começa a ganhar muito antes. Conta nova, conta pequena — não importa.</p>
+      <h2>Funciona para<br><span class="accent">qualquer pessoa</span></h2>
+      <p class="section-sub">Conta nova, conta pequena, conta grande — não importa. Se você tem TikTok, tem tudo que precisa para começar a receber diamantes hoje.</p>
 
       <div class="features-list">
         <div class="feature-item">
           <div class="feature-check">✓</div>
           <div class="feature-text">
-            <h4>Só 50 seguidores para começar</h4>
-            <p>Não precisa ter uma conta grande. Com 50 seguidores você já libera a live e começa a receber diamantes.</p>
+            <h4>Qualquer pessoa pode começar</h4>
+            <p>Conta nova ou antiga, poucos ou muitos seguidores — o jogo funciona e os diamantes chegam. Ponto final.</p>
           </div>
         </div>
         <div class="feature-item">
           <div class="feature-check">✓</div>
           <div class="feature-text">
             <h4>Média de 2.000 diamantes por live</h4>
-            <p>O jogo prende o público na tela. Quanto mais tempo ficam, mais presentes mandam. A média está em 2k diamantes por sessão.</p>
+            <p>O jogo prende o público. Quanto mais ficam, mais mandam. 2.000 diamantes por sessão rodando sozinho — sem você fazer nada.</p>
           </div>
         </div>
         <div class="feature-item">
@@ -1763,7 +1975,7 @@
         <div class="dot dot-r"></div>
         <div class="dot dot-y"></div>
         <div class="dot dot-g"></div>
-        <span class="mockup-title">TikTok Live — Escalada da Montanha</span>
+        <span class="mockup-title">TikTok Live — Jogo rodando, dinheiro entrando</span>
       </div>
 
       <div class="mockup-live">
@@ -1804,8 +2016,8 @@
 <!-- PREÇO -->
 <section id="preco" style="text-align:center;">
   <div class="section-label">Oferta</div>
-  <h2>Tudo isso por<br><span class="accent">R$ 27,90 uma vez</span></h2>
-  <p class="section-sub" style="margin: 14px auto 0;">Sem mensalidade. Sem renovação automática. Sem pegadinha. Pagou, é seu para sempre.</p>
+  <h2>Pare de deixar<br><span class="accent">dinheiro na mesa</span></h2>
+  <p class="section-sub" style="margin: 14px auto 0;">R$27,90 uma vez. Sem mensalidade. Sem renovação. Enquanto você hesita, outros já estão recebendo diamantes.</p>
 
   <!-- VAGAS -->
   <div class="vacancy-box">
@@ -1813,14 +2025,25 @@
       <span class="vacancy-fire">🔒</span>
       <span class="vacancy-title">Vagas limitadas por conta da concorrência</span>
     </div>
-    <p class="vacancy-desc">Estamos limitando o acesso para que cada usuário consiga faturar de verdade — sem saturar o mercado. Quando todo mundo tem acesso, ninguém ganha.</p>
+    <p class="vacancy-desc">Estamos limitando o acesso para proteger quem já está dentro. Quando muita gente usa o mesmo mercado, os ganhos caem. Aqui só entra quem vai usar de verdade.</p>
     <div class="vacancy-bar-wrap">
       <div class="vacancy-bar-track">
         <div class="vacancy-bar-fill"></div>
       </div>
       <div class="vacancy-numbers">
-        <span class="vacancy-used">80 vagas preenchidas</span>
-        <span class="vacancy-left">⚠️ Apenas <strong>20 restantes</strong></span>
+        <span class="vacancy-used">95 vagas preenchidas</span>
+        <span class="vacancy-left">⚠️ Apenas <strong>5 restantes</strong></span>
+      </div>
+    </div>
+    <div class="vacancy-urgency">
+      <div class="vu-item">
+        <span class="vu-icon">⏱️</span>
+        <span class="vu-text">Estimativa para esgotar: <strong id="vacancyTimer">20:00</strong></span>
+      </div>
+      <div class="vu-divider"></div>
+      <div class="vu-item">
+        <span class="vu-icon">📅</span>
+        <span class="vu-text">Próximo lote: <strong>Setembro 2026</strong> por <strong style="color:var(--pink)">R$197,90</strong></span>
       </div>
     </div>
   </div>
@@ -1868,7 +2091,7 @@
 
     .vacancy-bar-fill {
       height: 100%;
-      width: 80%;
+      width: 95%;
       background: linear-gradient(90deg, var(--pink), #ff8fab);
       border-radius: 50px;
       animation: fillBar 1.5s ease both;
@@ -1876,7 +2099,7 @@
 
     @keyframes fillBar {
       from { width: 0%; }
-      to   { width: 80%; }
+      to   { width: 95%; }
     }
 
     .vacancy-numbers {
@@ -1894,7 +2117,14 @@
   </style>
 
   <div class="price-card">
-    <div class="price-label">🔥 Oferta Especial</div>
+    <div class="price-label">🔥 Oferta Especial — Apenas 5 vagas</div>
+
+    <div class="price-original">
+      <span class="po-de">De</span>
+      <span class="po-old">R$67,90</span>
+      <span class="po-arrow">→</span>
+      <span class="po-por">por apenas</span>
+    </div>
 
     <div class="price-amount">
       <span class="currency">R$</span>27,90
@@ -1902,7 +2132,7 @@
     <div class="price-once">por apenas • acesso imediato</div>
 
     <div class="price-features">
-      <div class="price-feat"><span class="tick">✓</span><span>Começa com apenas 50 seguidores</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Qualquer pessoa, qualquer conta, começa hoje</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Média de 2.000 diamantes por live</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Todos os jogos interativos desbloqueados</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Novos jogos incluídos automaticamente</span></div>
@@ -1938,9 +2168,9 @@
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
-        Preciso de quantos seguidores? <span class="arrow">+</span>
+        Preciso de muitos seguidores? <span class="arrow">+</span>
       </div>
-      <div class="faq-a">Só 50 seguidores. O TikTok libera a função de live a partir de 50 seguidores — muito menos do que a maioria das pessoas imagina. Você pode começar agora com uma conta nova.</div>
+      <div class="faq-a">Qualquer quantidade de seguidores. O TikTok libera a função de live para contas com seguidores suficientes — e a maioria das pessoas já tem. Você provavelmente pode começar agora mesmo.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
@@ -1960,10 +2190,10 @@
 <!-- FOOTER CTA -->
 <div style="text-align:center; padding: 0 24px 80px;">
   <h2 style="font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:800; letter-spacing:-1px;">
-    50 seguidores. 10 minutos.<br><span style="color:var(--pink)">Já tá gerando diamantes.</span>
+    Qualquer pessoa. 10 minutos.<br><span style="color:var(--pink)">Já tá gerando diamantes.</span>
   </h2>
   <p style="color:var(--muted); margin: 16px auto 32px; max-width:420px; font-size:1rem; line-height:1.6;">
-    Sem aparecer na câmera. Sem criar conteúdo. Sem complicação. R$27,90 uma vez, para sempre.
+    Sem seguidores mínimos. Sem câmera. Sem conteúdo. Sem desculpa. R$27,90 uma vez e o jogo trabalha por você.
   </p>
   <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="btn-primary" style="font-size:1.05rem; padding:18px 44px;">
     🚀 Garantir meu acesso agora
@@ -2029,5 +2259,64 @@
   })();
 </script>
 
+<script>
+  function toggleNavMenu(btn) {
+    const menu = document.getElementById('navDropdown');
+    const isOpen = menu.classList.contains('open');
+    if (isOpen) {
+      menu.classList.remove('open');
+      btn.classList.remove('open');
+    } else {
+      menu.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+
+  function closeNavMenu() {
+    const menu = document.getElementById('navDropdown');
+    const btn = document.querySelector('.nav-dropdown-btn');
+    menu.classList.remove('open');
+    if (btn) btn.classList.remove('open');
+  }
+
+  // Close when clicking outside
+  document.addEventListener('click', function(e) {
+    const wrap = document.querySelector('.nav-dropdown-wrap');
+    if (wrap && !wrap.contains(e.target)) closeNavMenu();
+  });
+</script>
+<script>
+  // Countdown timer — 20 minutes
+  (function() {
+    var total = 20 * 60; // 20 minutes in seconds
+    var el = document.getElementById('vacancyTimer');
+    if (!el) return;
+
+    // Persist across page reloads using sessionStorage
+    var stored = sessionStorage.getItem('vacancyEnd');
+    var endTime;
+    if (stored) {
+      endTime = parseInt(stored);
+    } else {
+      endTime = Date.now() + total * 1000;
+      sessionStorage.setItem('vacancyEnd', endTime);
+    }
+
+    function update() {
+      var remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+      var m = Math.floor(remaining / 60);
+      var s = remaining % 60;
+      el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+      if (remaining <= 0) {
+        el.textContent = 'ESGOTADO';
+        el.style.color = '#ff4444';
+        clearInterval(interval);
+      }
+    }
+
+    update();
+    var interval = setInterval(update, 1000);
+  })();
+</script>
 </body>
 </html>
