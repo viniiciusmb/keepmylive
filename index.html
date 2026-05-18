@@ -2078,8 +2078,8 @@
         <div class="vacancy-bar-fill"></div>
       </div>
       <div class="vacancy-numbers">
-        <span class="vacancy-used">95 vagas preenchidas</span>
-        <span class="vacancy-left">⚠️ Apenas <strong>5 restantes</strong></span>
+        <span class="vacancy-used">96 vagas preenchidas</span>
+        <span class="vacancy-left">⚠️ Apenas <strong>4 restantes</strong></span>
       </div>
     </div>
     <div class="vacancy-urgency">
@@ -2138,7 +2138,7 @@
 
     .vacancy-bar-fill {
       height: 100%;
-      width: 95%;
+      width: 96%;
       background: linear-gradient(90deg, var(--pink), #ff8fab);
       border-radius: 50px;
       animation: fillBar 1.5s ease both;
@@ -2146,7 +2146,7 @@
 
     @keyframes fillBar {
       from { width: 0%; }
-      to   { width: 95%; }
+      to   { width: 96%; }
     }
 
     .vacancy-numbers {
@@ -2164,7 +2164,7 @@
   </style>
 
   <div class="price-card">
-    <div class="price-label">🔥 Oferta Especial — Apenas 5 vagas</div>
+    <div class="price-label">🔥 Oferta Especial — Apenas 4 vagas</div>
 
     <div class="price-original">
       <span class="po-de">De</span>
@@ -2372,5 +2372,137 @@
     var interval = setInterval(update, 1000);
   })();
 </script>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toastNotif" class="toast-notif">
+  <div class="toast-avatar">MS</div>
+  <div class="toast-content">
+    <div class="toast-name">Matheus Solano</div>
+    <div class="toast-msg">acabou de adquirir acesso aos jogos</div>
+    <div class="toast-warn">⚠️ Restam apenas <strong>4 vagas</strong></div>
+  </div>
+  <button class="toast-close" onclick="document.getElementById('toastNotif').classList.remove('show')">✕</button>
+</div>
+
+<style>
+  .toast-notif {
+    position: fixed;
+    bottom: 28px;
+    left: 28px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255,45,107,0.35);
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    max-width: 320px;
+    z-index: 9999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,45,107,0.1);
+    transform: translateY(120px);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .toast-notif.show {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .toast-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF2D6B, #FF5C8A);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .toast-content {
+    flex: 1;
+  }
+
+  .toast-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+
+  .toast-msg {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 6px;
+  }
+
+  .toast-warn {
+    font-size: 0.78rem;
+    color: #FF2D6B;
+    font-weight: 600;
+  }
+
+  .toast-warn strong {
+    color: #FF2D6B;
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.25);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 2px;
+    transition: color 0.2s;
+  }
+
+  .toast-close:hover { color: rgba(255,255,255,0.5); }
+
+  @media (max-width: 480px) {
+    .toast-notif { left: 16px; right: 16px; max-width: none; bottom: 16px; }
+  }
+</style>
+
+<script>
+  // Show toast when user reaches the price section
+  (function() {
+    var shown = false;
+    var priceSection = document.getElementById('preco');
+    if (!priceSection) return;
+
+    var toastObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !shown) {
+          shown = true;
+          setTimeout(function() {
+            var toast = document.getElementById('toastNotif');
+            if (toast) {
+              toast.classList.add('show');
+              // Auto-hide after 6 seconds
+              setTimeout(function() {
+                toast.classList.remove('show');
+              }, 6000);
+            }
+          }, 800);
+          toastObserver.disconnect();
+        }
+      });
+    }, { threshold: 0.3 });
+
+    toastObserver.observe(priceSection);
+  })();
+</script>
+
 </body>
 </html>
