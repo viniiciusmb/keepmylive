@@ -32,7 +32,7 @@
 
   /* ── TOP BAR ── */
   .top-bar {
-    background: var(--pink);
+    background: #00C48C;
     text-align: center;
     padding: 10px 20px;
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -483,6 +483,142 @@
     background: var(--border);
   }
 
+
+  /* CONFIRMATION BOX */
+  .confirm-banner {
+    background: rgba(0,196,140,0.08);
+    border: 1px solid rgba(0,196,140,0.3);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .confirm-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .confirm-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #00C48C;
+    margin-bottom: 6px;
+  }
+
+  .confirm-body {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+  }
+
+  .confirm-body strong { color: #fff; }
+  .confirm-body a { color: #00C48C; text-decoration: underline; }
+
+  /* ALREADY BOUGHT NOTICE */
+  .already-notice {
+    background: rgba(255,184,0,0.06);
+    border: 1px solid rgba(255,184,0,0.2);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 32px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  .already-notice strong { color: #FFB800; }
+
+  /* LOGIN SECTION */
+  .login-section {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    text-align: center;
+  }
+
+  .login-card {
+    background: var(--card);
+    border: 1px solid rgba(0,196,140,0.3);
+    border-radius: 24px;
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00C48C, #00e6a8);
+  }
+
+  .login-badge {
+    display: inline-block;
+    background: rgba(0,196,140,0.1);
+    color: #00C48C;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 16px;
+    border-radius: 50px;
+    margin-bottom: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .login-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .login-sub {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .btn-login {
+    display: block;
+    width: 100%;
+    background: #00C48C;
+    color: #fff;
+    border: none;
+    padding: 18px;
+    border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+    box-shadow: 0 0 30px rgba(0,196,140,0.3);
+  }
+
+  .btn-login:hover {
+    background: #00e6a8;
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(0,196,140,0.4);
+  }
+
+  .login-note {
+    margin-top: 16px;
+    font-size: 0.78rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     h1 { letter-spacing: -0.5px; }
@@ -498,16 +634,33 @@
 
 <!-- TOP BAR -->
 <div class="top-bar">
-  ⚡ OFERTA EXCLUSIVA — Disponível apenas agora <span>· Não aparece em nenhum outro lugar</span>
+  ✅ Acesso confirmado! <span>· Seu login está disponível no final desta página</span>
 </div>
 
 <!-- HERO -->
 <div class="hero">
   <div class="glow"></div>
 
-  <div class="wait-badge">Espera! Temos uma oferta especial para você</div>
+  <!-- Confirmation -->
+  <div class="confirm-banner">
+    <div class="confirm-icon">🎮</div>
+    <div>
+      <div class="confirm-title">Parabéns! Seu acesso aos jogos interativos está confirmado.</div>
+      <div class="confirm-body">
+        Você já faz parte do grupo que vai ganhar dinheiro enquanto o jogo roda sozinho.<br>
+        <strong>Seu login está disponível no final desta página</strong> — mas antes, confira uma oferta que vai multiplicar seus ganhos.
+      </div>
+    </div>
+  </div>
 
-  <p class="hero-eyebrow">Você acabou de garantir acesso aos jogos interativos.</p>
+  <!-- Already bought notice -->
+  <div class="already-notice">
+    ℹ️ Se você <strong>já adquiriu</strong> a oferta abaixo anteriormente, <strong>desconsidere e role até o final</strong> para acessar seu login.
+  </div>
+
+  <div class="wait-badge">⚡ Oferta exclusiva — disponível apenas agora</div>
+
+  <p class="hero-eyebrow">Você está dentro. Agora multiplique seus ganhos.</p>
   <p style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.9rem; font-weight:700; color:var(--pink); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:16px; margin-top:-8px;">Faça o que poucos fazem e ganhe o que poucos ganham</p>
 
   <h1>
@@ -517,9 +670,9 @@
   </h1>
 
   <p class="hero-sub">
-    A IA cria os vídeos, escolhe os produtos e distribui o conteúdo por você. 
-    Você só aprova e publica. Sem aparecer na câmera, sem estoque, sem esforço pesado — 
-    e com potencial de R$3.000 por mês de comissões no TikTok Shop.
+    Os jogos interativos já vão te gerar diamantes nas lives. 
+    Agora imagine também receber comissões do TikTok Shop enquanto a IA cria os vídeos por você. 
+    <strong style="color:#fff">Duas fontes de renda automática. Um único TikTok.</strong>
   </p>
 </div>
 
@@ -729,8 +882,8 @@
       ✅ SIM! Quero o TikTok Shop com IA por R$37,90
     </a>
 
-    <a href="#" class="btn-no" id="btn-nao">
-      Não, prefiro deixar esse dinheiro na mesa
+    <a href="#acesso" class="btn-no" id="btn-nao">
+      Não, prefiro — levar apenas o acesso aos jogos
     </a>
 
     <div class="guarantee">
@@ -755,7 +908,7 @@
       // btn-nao redireciona para página de obrigado
       document.getElementById('btn-nao').onclick = function(e) {
         e.preventDefault();
-        window.location.href = '#obrigado';
+        window.location.href = '#acesso';
       };
     }
 
@@ -766,6 +919,34 @@
     }
   })();
 </script>
+
+
+<!-- LOGIN SECTION -->
+<div class="login-section" id="acesso">
+  <div style="height:1px; background:var(--border); margin-bottom:60px;"></div>
+
+  <div class="section-label" style="margin-bottom:8px;">Seu acesso</div>
+  <h2 style="margin-bottom:8px; font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(1.8rem,3vw,2.4rem); font-weight:800; letter-spacing:-1px;">
+    Acesse agora seus<br><span style="color:#00C48C">jogos interativos</span>
+  </h2>
+  <p style="color:var(--muted); font-size:0.95rem; margin-bottom:36px; line-height:1.6;">
+    Clique no botão abaixo para fazer login e acessar todos os jogos. Use o e-mail que você cadastrou na compra.
+  </p>
+
+  <div class="login-card">
+    <div class="login-badge">✅ Acesso liberado</div>
+    <div class="login-title">Tudo pronto para você começar</div>
+    <p class="login-sub">
+      Faça login com o e-mail cadastrado na compra. Em instantes você já estará configurando seu primeiro jogo interativo.
+    </p>
+    <a href="https://keepmy.live/login" target="_blank" class="btn-login">
+      🎮 Acessar meus jogos agora
+    </a>
+    <p class="login-note">
+      Não encontrou o e-mail? Verifique a caixa de spam ou entre em contato com o suporte.
+    </p>
+  </div>
+</div>
 
 </body>
 </html>
