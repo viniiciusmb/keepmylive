@@ -853,7 +853,7 @@
       <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.05rem; font-weight:800; color:#fff; line-height:1.3; letter-spacing:-0.3px;">Isso que acontece no seu ecossistema<br><span style="color:#FFB800;">24 hrs por dia</span> depois de implementar<br>todas as fontes de renda</div>
     </div>
     <div class="funnel-canvas-wrap">
-      <canvas id="funnelCanvas" width="400" height="520"></canvas>
+      <canvas id="funnelCanvas" style="display:block;width:100%;"></canvas>
     </div>
     <div class="funnel-label">sua conta</div>
     <div class="funnel-legend">
@@ -1331,11 +1331,24 @@
       ctx.font = p.size + 'px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(255,255,255,1)';
       ctx.fillText(p.e, 0, 0);
       ctx.restore();
     }
 
     function frame(ts) {
+      // Keep canvas resolution in sync with its CSS display size
+      var rect = canvas.parentElement.getBoundingClientRect();
+      var dpr = window.devicePixelRatio || 1;
+      var displayW = Math.floor(rect.width);
+      if (canvas.width !== displayW * dpr || canvas._lastDpr !== dpr) {
+        canvas.width  = displayW * dpr;
+        canvas.height = Math.round(H * (displayW / W) * dpr);
+        canvas.style.width  = displayW + 'px';
+        canvas.style.height = Math.round(H * (displayW / W)) + 'px';
+        canvas._lastDpr = dpr;
+        ctx.scale(dpr * (displayW / W), dpr * (displayW / W));
+      }
       ctx.clearRect(0,0,W,H);
       drawFunnel();
 
