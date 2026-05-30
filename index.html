@@ -9,36 +9,6 @@
   a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
   document.head.appendChild(a);
 </script>
-  <!-- Contify Tracker -->
-<script>
-(function(){
-  var TID="7ba5a3a00f97a3a4";
-  var EP="https://kerxbkggbyjjbmtntbmk.supabase.co/functions/v1/track-event";
-  var SK="lpa_sid";
-  var sid=sessionStorage.getItem(SK);
-  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(SK,sid);}
-  var q=new URLSearchParams(location.search);
-  var start=Date.now();
-  function send(type,extra){
-    try{
-      fetch(EP,{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,
-        body:JSON.stringify(Object.assign({
-          tracking_id:TID,session_id:sid,event_type:type,
-          utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),
-          device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?"mobile":"desktop"),
-          page_url:location.href,referrer:document.referrer
-        },extra||{}))});
-    }catch(e){}
-  }
-  send("pageview");
-  document.addEventListener("click",function(ev){
-    var el=ev.target&&ev.target.closest&&ev.target.closest("[data-contify]");
-    if(el){send("click",{utm_campaign:el.getAttribute("data-contify")});}
-  },true);
-  var hb=setInterval(function(){send("heartbeat",{duration_ms:Date.now()-start});},30000);
-  window.addEventListener("beforeunload",function(){clearInterval(hb);send("leave",{duration_ms:Date.now()-start});});
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KeepLive — Jogos Interativos para TikTok Live</title>
@@ -1105,6 +1075,15 @@
     color: var(--muted);
     line-height: 1.6;
   }
+
+  /* SPACING BETWEEN SECTIONS IN PRICE AREA */
+  #ranking {
+    padding-top: 60px !important;
+    padding-bottom: 60px !important;
+  }
+  .price-section > * + * {
+    margin-top: 48px;
+  }
 </style>
 </head>
 <body>
@@ -2094,13 +2073,14 @@
 <section id="preco" style="text-align:center;">
   <div class="section-label">Oferta</div>
   <h2>Pare de deixar<br><span class="accent">dinheiro na mesa</span></h2>
-  <p class="section-sub" style="margin: 14px auto 0;">R$37,90 uma vez. Sem mensalidade. Sem renovação. Enquanto você hesita, outros já estão recebendo diamantes.</p>
+  <p class="section-sub" style="margin: 14px auto 0;">Acesso imediato. Sem mensalidade. Sem renovação. Enquanto você hesita, outros já estão recebendo diamantes.</p>
+  <div style="height:20px;"></div>
 
   <!-- VAGAS -->
   <div class="vacancy-box">
     <div class="vacancy-top">
       <span class="vacancy-fire">🔒</span>
-      <span class="vacancy-title">Vagas limitadas por conta da concorrência</span>
+      <span class="vacancy-title">Acessos limitados por conta da concorrência</span>
     </div>
     <p class="vacancy-desc">Estamos limitando o acesso para proteger quem já está dentro. Quando muita gente usa o mesmo mercado, os ganhos caem. Aqui só entra quem vai usar de verdade.</p>
     <div class="vacancy-bar-wrap">
@@ -2108,8 +2088,8 @@
         <div class="vacancy-bar-fill"></div>
       </div>
       <div class="vacancy-numbers">
-        <span class="vacancy-used">96 vagas preenchidas</span>
-        <span class="vacancy-left">⚠️ Apenas <strong>4 restantes</strong></span>
+        <span class="vacancy-used">97 acessos ativados</span>
+        <span class="vacancy-left">⚠️ Apenas <strong>3 acessos restantes</strong></span>
       </div>
     </div>
     <div class="vacancy-urgency">
@@ -2120,7 +2100,7 @@
       <div class="vu-divider"></div>
       <div class="vu-item">
         <span class="vu-icon">📅</span>
-        <span class="vu-text">Próximo lote: <strong>Setembro 2026</strong> por <strong style="color:var(--pink)">R$197,90</strong></span>
+        <span class="vu-text">Próximos acessos: <strong>Janeiro 2027</strong> por <strong style="color:var(--pink)">R$197,90</strong></span>
       </div>
     </div>
   </div>
@@ -2129,6 +2109,7 @@
     .vacancy-box {
       max-width: 500px;
       margin: 40px auto 0;
+      margin-bottom: 0;
       background: rgba(255,45,107,0.06);
       border: 1px solid rgba(255,45,107,0.3);
       border-radius: 20px;
@@ -2193,8 +2174,373 @@
     }
   </style>
 
+
+<!-- RANKING SECTION -->
+<section id="ranking" style="padding-top:56px; padding-bottom:56px;">
+  <div class="section-label">🏆 Ranking — Maio 2025</div>
+  <h2 style="margin-bottom:8px;">Top 10 usuários que fizeram<br>mais <span class="accent">diamantes em maio</span></h2>
+  <p class="section-sub" style="margin-bottom:28px;">Resultados reais de usuários KeepLive. Ranking final do mês de maio.</p>
+
+  <div class="rank-table">
+    <div class="rank-header">
+      <span>#</span>
+      <span>Usuário</span>
+      <span>Diamantes em Maio</span>
+    </div>
+      <div class="rank-row" style="background:rgba(255,45,107,0.04);"><span class="rank-medal">🥇</span><div class="rank-info"><div class="rank-handle">Ana Lima</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 482.391</div></div>
+      <div class="rank-row" style=""><span class="rank-medal">🥈</span><div class="rank-info"><div class="rank-handle">Carlos Mendes</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 461.708</div></div>
+      <div class="rank-row" style=""><span class="rank-medal">🥉</span><div class="rank-info"><div class="rank-handle">Juliana Costa</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 438.254</div></div>
+      <div class="rank-row" style=""><span class="rank-num">4</span><div class="rank-info"><div class="rank-handle">Rafael Torres</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 419.087</div></div>
+      <div class="rank-row" style=""><span class="rank-num">5</span><div class="rank-info"><div class="rank-handle">Fernanda Souza</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 396.543</div></div>
+      <div class="rank-row" style=""><span class="rank-num">6</span><div class="rank-info"><div class="rank-handle">Henrique Neto</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 374.812</div></div>
+      <div class="rank-row" style=""><span class="rank-num">7</span><div class="rank-info"><div class="rank-handle">Larissa Moura</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 351.629</div></div>
+      <div class="rank-row" style=""><span class="rank-num">8</span><div class="rank-info"><div class="rank-handle">Bruno Alves</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 332.947</div></div>
+      <div class="rank-row" style=""><span class="rank-num">9</span><div class="rank-info"><div class="rank-handle">Thayna Reis</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 314.183</div></div>
+      <div class="rank-row" style=""><span class="rank-num">10</span><div class="rank-info"><div class="rank-handle">Mateus Silva</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 297.456</div></div>
+    </div>
+
+</section>
+
+<!-- RANKING POPUP -->
+<div id="rankingPopup" class="popup-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="popup-box">
+    <div class="popup-header">
+      <div>
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pink);margin-bottom:4px;">Ranking Completo</div>
+        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:800;">Top 97 — Diamantes em Maio 2025</div>
+      </div>
+      <button class="popup-close" onclick="document.getElementById('rankingPopup').classList.remove('open')">✕</button>
+    </div>
+    <div class="popup-list">
+      <div class="popup-row"><span class="popup-rank">1</span><div class="popup-info"><div class="popup-handle">@top_45</div><div class="popup-name">Bruno Alves</div></div><div class="popup-diamonds">💎 98.158</div></div>
+<div class="popup-row"><span class="popup-rank">2</span><div class="popup-info"><div class="popup-handle">@night_oficial_02</div><div class="popup-name">Renata Araujo</div></div><div class="popup-diamonds">💎 97.869</div></div>
+<div class="popup-row"><span class="popup-rank">3</span><div class="popup-info"><div class="popup-handle">@show_21</div><div class="popup-name">Larissa Alves</div></div><div class="popup-diamonds">💎 97.152</div></div>
+<div class="popup-row"><span class="popup-rank">4</span><div class="popup-info"><div class="popup-handle">@show_br_04</div><div class="popup-name">Natalia Rocha</div></div><div class="popup-diamonds">💎 96.394</div></div>
+<div class="popup-row"><span class="popup-rank">5</span><div class="popup-info"><div class="popup-handle">@vivo_45</div><div class="popup-name">Guilherme Barros</div></div><div class="popup-diamonds">💎 96.188</div></div>
+<div class="popup-row"><span class="popup-rank">6</span><div class="popup-info"><div class="popup-handle">@fire_ao_vivo_06</div><div class="popup-name">Giovanna Pereira</div></div><div class="popup-diamonds">💎 95.829</div></div>
+<div class="popup-row"><span class="popup-rank">7</span><div class="popup-info"><div class="popup-handle">@queen_58</div><div class="popup-name">Rafael Carvalho</div></div><div class="popup-diamonds">💎 95.277</div></div>
+<div class="popup-row"><span class="popup-rank">8</span><div class="popup-info"><div class="popup-handle">@show123_08</div><div class="popup-name">Thiago Mendes</div></div><div class="popup-diamonds">💎 94.528</div></div>
+<div class="popup-row"><span class="popup-rank">9</span><div class="popup-info"><div class="popup-handle">@tiktok_47</div><div class="popup-name">Mariana Rocha</div></div><div class="popup-diamonds">💎 93.695</div></div>
+<div class="popup-row"><span class="popup-rank">10</span><div class="popup-info"><div class="popup-handle">@neon_tiktok_10</div><div class="popup-name">Natalia Oliveira</div></div><div class="popup-diamonds">💎 93.449</div></div>
+<div class="popup-row"><span class="popup-rank">11</span><div class="popup-info"><div class="popup-handle">@top_live_11</div><div class="popup-name">Juliana Barros</div></div><div class="popup-diamonds">💎 93.011</div></div>
+<div class="popup-row"><span class="popup-rank">12</span><div class="popup-info"><div class="popup-handle">@moon_68</div><div class="popup-name">Leticia Campos</div></div><div class="popup-diamonds">💎 92.438</div></div>
+<div class="popup-row"><span class="popup-rank">13</span><div class="popup-info"><div class="popup-handle">@gamer_95</div><div class="popup-name">Thayna Monteiro</div></div><div class="popup-diamonds">💎 91.539</div></div>
+<div class="popup-row"><span class="popup-rank">14</span><div class="popup-info"><div class="popup-handle">@top_oficial_14</div><div class="popup-name">Henrique Araujo</div></div><div class="popup-diamonds">💎 91.089</div></div>
+<div class="popup-row"><span class="popup-rank">15</span><div class="popup-info"><div class="popup-handle">@gamer_91</div><div class="popup-name">Natalia Araujo</div></div><div class="popup-diamonds">💎 90.665</div></div>
+<div class="popup-row"><span class="popup-rank">16</span><div class="popup-info"><div class="popup-handle">@top_tiktok_16</div><div class="popup-name">Isabela Santos</div></div><div class="popup-diamonds">💎 90.231</div></div>
+<div class="popup-row"><span class="popup-rank">17</span><div class="popup-info"><div class="popup-handle">@moon_br_17</div><div class="popup-name">Camila Pereira</div></div><div class="popup-diamonds">💎 89.964</div></div>
+<div class="popup-row"><span class="popup-rank">18</span><div class="popup-info"><div class="popup-handle">@queen2024_18</div><div class="popup-name">Giovanna Costa</div></div><div class="popup-diamonds">💎 89.093</div></div>
+<div class="popup-row"><span class="popup-rank">19</span><div class="popup-info"><div class="popup-handle">@ao_vivo_real_19</div><div class="popup-name">Leticia Mendes</div></div><div class="popup-diamonds">💎 88.747</div></div>
+<div class="popup-row"><span class="popup-rank">20</span><div class="popup-info"><div class="popup-handle">@king_81</div><div class="popup-name">Gabriel Pereira</div></div><div class="popup-diamonds">💎 87.949</div></div>
+<div class="popup-row"><span class="popup-rank">21</span><div class="popup-info"><div class="popup-handle">@vivo_38</div><div class="popup-name">Fernanda Nascimento</div></div><div class="popup-diamonds">💎 87.244</div></div>
+<div class="popup-row"><span class="popup-rank">22</span><div class="popup-info"><div class="popup-handle">@tiktok_br_22</div><div class="popup-name">Fernanda Rocha</div></div><div class="popup-diamonds">💎 86.881</div></div>
+<div class="popup-row"><span class="popup-rank">23</span><div class="popup-info"><div class="popup-handle">@fire_18</div><div class="popup-name">Camila Gomes</div></div><div class="popup-diamonds">💎 86.071</div></div>
+<div class="popup-row"><span class="popup-rank">24</span><div class="popup-info"><div class="popup-handle">@ao_vivo_80</div><div class="popup-name">Eduardo Silva</div></div><div class="popup-diamonds">💎 85.175</div></div>
+<div class="popup-row"><span class="popup-rank">25</span><div class="popup-info"><div class="popup-handle">@night_oficial_25</div><div class="popup-name">Gabriel Cardoso</div></div><div class="popup-diamonds">💎 84.702</div></div>
+<div class="popup-row"><span class="popup-rank">26</span><div class="popup-info"><div class="popup-handle">@fire_47</div><div class="popup-name">Lucas Ferreira</div></div><div class="popup-diamonds">💎 84.038</div></div>
+<div class="popup-row"><span class="popup-rank">27</span><div class="popup-info"><div class="popup-handle">@live123_27</div><div class="popup-name">Isabela Ferreira</div></div><div class="popup-diamonds">💎 83.319</div></div>
+<div class="popup-row"><span class="popup-rank">28</span><div class="popup-info"><div class="popup-handle">@neon_oficial_28</div><div class="popup-name">Mateus Campos</div></div><div class="popup-diamonds">💎 82.465</div></div>
+<div class="popup-row"><span class="popup-rank">29</span><div class="popup-info"><div class="popup-handle">@play_57</div><div class="popup-name">Isabela Ferreira</div></div><div class="popup-diamonds">💎 81.713</div></div>
+<div class="popup-row"><span class="popup-rank">30</span><div class="popup-info"><div class="popup-handle">@fire_pro_30</div><div class="popup-name">Vinicius Martins</div></div><div class="popup-diamonds">💎 81.013</div></div>
+<div class="popup-row"><span class="popup-rank">31</span><div class="popup-info"><div class="popup-handle">@live_oficial_31</div><div class="popup-name">Renata Campos</div></div><div class="popup-diamonds">💎 80.499</div></div>
+<div class="popup-row"><span class="popup-rank">32</span><div class="popup-info"><div class="popup-handle">@queen_82</div><div class="popup-name">Juliana Oliveira</div></div><div class="popup-diamonds">💎 79.802</div></div>
+<div class="popup-row"><span class="popup-rank">33</span><div class="popup-info"><div class="popup-handle">@moon_oficial_33</div><div class="popup-name">Gabriel Cardoso</div></div><div class="popup-diamonds">💎 79.474</div></div>
+<div class="popup-row"><span class="popup-rank">34</span><div class="popup-info"><div class="popup-handle">@gamer_80</div><div class="popup-name">Henrique Pereira</div></div><div class="popup-diamonds">💎 78.734</div></div>
+<div class="popup-row"><span class="popup-rank">35</span><div class="popup-info"><div class="popup-handle">@moon_37</div><div class="popup-name">Leandro Araujo</div></div><div class="popup-diamonds">💎 78.329</div></div>
+<div class="popup-row"><span class="popup-rank">36</span><div class="popup-info"><div class="popup-handle">@night_95</div><div class="popup-name">Leticia Carvalho</div></div><div class="popup-diamonds">💎 77.681</div></div>
+<div class="popup-row"><span class="popup-rank">37</span><div class="popup-info"><div class="popup-handle">@neon_41</div><div class="popup-name">Bruno Oliveira</div></div><div class="popup-diamonds">💎 77.135</div></div>
+<div class="popup-row"><span class="popup-rank">38</span><div class="popup-info"><div class="popup-handle">@live2024_38</div><div class="popup-name">Patricia Alves</div></div><div class="popup-diamonds">💎 76.928</div></div>
+<div class="popup-row"><span class="popup-rank">39</span><div class="popup-info"><div class="popup-handle">@tiktok_18</div><div class="popup-name">Renata Santos</div></div><div class="popup-diamonds">💎 76.390</div></div>
+<div class="popup-row"><span class="popup-rank">40</span><div class="popup-info"><div class="popup-handle">@tiktok_95</div><div class="popup-name">Pedro Costa</div></div><div class="popup-diamonds">💎 75.638</div></div>
+<div class="popup-row"><span class="popup-rank">41</span><div class="popup-info"><div class="popup-handle">@gamer2024_41</div><div class="popup-name">Bruno Correia</div></div><div class="popup-diamonds">💎 74.954</div></div>
+<div class="popup-row"><span class="popup-rank">42</span><div class="popup-info"><div class="popup-handle">@fire_22</div><div class="popup-name">Felipe Ribeiro</div></div><div class="popup-diamonds">💎 74.392</div></div>
+<div class="popup-row"><span class="popup-rank">43</span><div class="popup-info"><div class="popup-handle">@vivo_16</div><div class="popup-name">Felipe Rocha</div></div><div class="popup-diamonds">💎 73.531</div></div>
+<div class="popup-row"><span class="popup-rank">44</span><div class="popup-info"><div class="popup-handle">@tiktok_53</div><div class="popup-name">Guilherme Barros</div></div><div class="popup-diamonds">💎 73.220</div></div>
+<div class="popup-row"><span class="popup-rank">45</span><div class="popup-info"><div class="popup-handle">@queen_67</div><div class="popup-name">Fernanda Ribeiro</div></div><div class="popup-diamonds">💎 72.833</div></div>
+<div class="popup-row"><span class="popup-rank">46</span><div class="popup-info"><div class="popup-handle">@king_19</div><div class="popup-name">Beatriz Correia</div></div><div class="popup-diamonds">💎 72.070</div></div>
+<div class="popup-row"><span class="popup-rank">47</span><div class="popup-info"><div class="popup-handle">@tiktok_br_47</div><div class="popup-name">Gabriel Campos</div></div><div class="popup-diamonds">💎 71.855</div></div>
+<div class="popup-row"><span class="popup-rank">48</span><div class="popup-info"><div class="popup-handle">@tiktok_72</div><div class="popup-name">Pedro Costa</div></div><div class="popup-diamonds">💎 71.245</div></div>
+<div class="popup-row"><span class="popup-rank">49</span><div class="popup-info"><div class="popup-handle">@neon_10</div><div class="popup-name">Camila Pereira</div></div><div class="popup-diamonds">💎 70.580</div></div>
+<div class="popup-row"><span class="popup-rank">50</span><div class="popup-info"><div class="popup-handle">@king_real_50</div><div class="popup-name">Thiago Correia</div></div><div class="popup-diamonds">💎 69.811</div></div>
+<div class="popup-row"><span class="popup-rank">51</span><div class="popup-info"><div class="popup-handle">@top_47</div><div class="popup-name">Larissa Santos</div></div><div class="popup-diamonds">💎 69.018</div></div>
+<div class="popup-row"><span class="popup-rank">52</span><div class="popup-info"><div class="popup-handle">@night_50</div><div class="popup-name">Carlos Santos</div></div><div class="popup-diamonds">💎 68.220</div></div>
+<div class="popup-row"><span class="popup-rank">53</span><div class="popup-info"><div class="popup-handle">@ao_vivo_pro_53</div><div class="popup-name">Amanda Ferreira</div></div><div class="popup-diamonds">💎 67.962</div></div>
+<div class="popup-row"><span class="popup-rank">54</span><div class="popup-info"><div class="popup-handle">@play_oficial_54</div><div class="popup-name">Juliana Moura</div></div><div class="popup-diamonds">💎 67.693</div></div>
+<div class="popup-row"><span class="popup-rank">55</span><div class="popup-info"><div class="popup-handle">@top_82</div><div class="popup-name">Bruno Dias</div></div><div class="popup-diamonds">💎 66.885</div></div>
+<div class="popup-row"><span class="popup-rank">56</span><div class="popup-info"><div class="popup-handle">@live_94</div><div class="popup-name">Patricia Dias</div></div><div class="popup-diamonds">💎 66.150</div></div>
+<div class="popup-row"><span class="popup-rank">57</span><div class="popup-info"><div class="popup-handle">@star_50</div><div class="popup-name">Bruno Pereira</div></div><div class="popup-diamonds">💎 65.545</div></div>
+<div class="popup-row"><span class="popup-rank">58</span><div class="popup-info"><div class="popup-handle">@gamer_games_58</div><div class="popup-name">Beatriz Martins</div></div><div class="popup-diamonds">💎 65.271</div></div>
+<div class="popup-row"><span class="popup-rank">59</span><div class="popup-info"><div class="popup-handle">@live_vip_59</div><div class="popup-name">Patricia Souza</div></div><div class="popup-diamonds">💎 64.996</div></div>
+<div class="popup-row"><span class="popup-rank">60</span><div class="popup-info"><div class="popup-handle">@play_live_60</div><div class="popup-name">Fernanda Freitas</div></div><div class="popup-diamonds">💎 64.439</div></div>
+<div class="popup-row"><span class="popup-rank">61</span><div class="popup-info"><div class="popup-handle">@neon_oficial_61</div><div class="popup-name">Diego Rodrigues</div></div><div class="popup-diamonds">💎 64.078</div></div>
+<div class="popup-row"><span class="popup-rank">62</span><div class="popup-info"><div class="popup-handle">@ao_vivo_pro_62</div><div class="popup-name">Vinicius Correia</div></div><div class="popup-diamonds">💎 63.209</div></div>
+<div class="popup-row"><span class="popup-rank">63</span><div class="popup-info"><div class="popup-handle">@play_br_63</div><div class="popup-name">Gabriel Rodrigues</div></div><div class="popup-diamonds">💎 62.330</div></div>
+<div class="popup-row"><span class="popup-rank">64</span><div class="popup-info"><div class="popup-handle">@tiktok_23</div><div class="popup-name">Thiago Araujo</div></div><div class="popup-diamonds">💎 61.971</div></div>
+<div class="popup-row"><span class="popup-rank">65</span><div class="popup-info"><div class="popup-handle">@king123_65</div><div class="popup-name">Natalia Martins</div></div><div class="popup-diamonds">💎 61.563</div></div>
+<div class="popup-row"><span class="popup-rank">66</span><div class="popup-info"><div class="popup-handle">@top_games_66</div><div class="popup-name">Amanda Torres</div></div><div class="popup-diamonds">💎 61.106</div></div>
+<div class="popup-row"><span class="popup-rank">67</span><div class="popup-info"><div class="popup-handle">@neon_64</div><div class="popup-name">Mariana Pereira</div></div><div class="popup-diamonds">💎 60.861</div></div>
+<div class="popup-row"><span class="popup-rank">68</span><div class="popup-info"><div class="popup-handle">@live_tiktok_68</div><div class="popup-name">Leticia Pereira</div></div><div class="popup-diamonds">💎 60.496</div></div>
+<div class="popup-row"><span class="popup-rank">69</span><div class="popup-info"><div class="popup-handle">@night_vip_69</div><div class="popup-name">Lucas Araujo</div></div><div class="popup-diamonds">💎 60.287</div></div>
+<div class="popup-row"><span class="popup-rank">70</span><div class="popup-info"><div class="popup-handle">@tiktok_oficial_70</div><div class="popup-name">Natalia Lopes</div></div><div class="popup-diamonds">💎 59.935</div></div>
+<div class="popup-row"><span class="popup-rank">71</span><div class="popup-info"><div class="popup-handle">@play_br_71</div><div class="popup-name">Patricia Araujo</div></div><div class="popup-diamonds">💎 59.584</div></div>
+<div class="popup-row"><span class="popup-rank">72</span><div class="popup-info"><div class="popup-handle">@vivo_56</div><div class="popup-name">Renata Freitas</div></div><div class="popup-diamonds">💎 59.344</div></div>
+<div class="popup-row"><span class="popup-rank">73</span><div class="popup-info"><div class="popup-handle">@neon_41</div><div class="popup-name">Felipe Souza</div></div><div class="popup-diamonds">💎 58.782</div></div>
+<div class="popup-row"><span class="popup-rank">74</span><div class="popup-info"><div class="popup-handle">@fire_pro_74</div><div class="popup-name">Lucas Moura</div></div><div class="popup-diamonds">💎 58.424</div></div>
+<div class="popup-row"><span class="popup-rank">75</span><div class="popup-info"><div class="popup-handle">@neon_live_75</div><div class="popup-name">Guilherme Correia</div></div><div class="popup-diamonds">💎 58.043</div></div>
+<div class="popup-row"><span class="popup-rank">76</span><div class="popup-info"><div class="popup-handle">@neon_52</div><div class="popup-name">Guilherme Freitas</div></div><div class="popup-diamonds">💎 57.422</div></div>
+<div class="popup-row"><span class="popup-rank">77</span><div class="popup-info"><div class="popup-handle">@fire_games_77</div><div class="popup-name">Guilherme Alves</div></div><div class="popup-diamonds">💎 56.949</div></div>
+<div class="popup-row"><span class="popup-rank">78</span><div class="popup-info"><div class="popup-handle">@gamer_14</div><div class="popup-name">Eduardo Torres</div></div><div class="popup-diamonds">💎 56.522</div></div>
+<div class="popup-row"><span class="popup-rank">79</span><div class="popup-info"><div class="popup-handle">@queen_39</div><div class="popup-name">Bruno Silva</div></div><div class="popup-diamonds">💎 55.647</div></div>
+<div class="popup-row"><span class="popup-rank">80</span><div class="popup-info"><div class="popup-handle">@queen_18</div><div class="popup-name">Isabela Pereira</div></div><div class="popup-diamonds">💎 55.088</div></div>
+<div class="popup-row"><span class="popup-rank">81</span><div class="popup-info"><div class="popup-handle">@top_78</div><div class="popup-name">Giovanna Silva</div></div><div class="popup-diamonds">💎 54.770</div></div>
+<div class="popup-row"><span class="popup-rank">82</span><div class="popup-info"><div class="popup-handle">@neon_43</div><div class="popup-name">Carlos Souza</div></div><div class="popup-diamonds">💎 53.960</div></div>
+<div class="popup-row"><span class="popup-rank">83</span><div class="popup-info"><div class="popup-handle">@vivo_tiktok_83</div><div class="popup-name">Giovanna Ribeiro</div></div><div class="popup-diamonds">💎 53.140</div></div>
+<div class="popup-row"><span class="popup-rank">84</span><div class="popup-info"><div class="popup-handle">@play_83</div><div class="popup-name">Larissa Pereira</div></div><div class="popup-diamonds">💎 52.895</div></div>
+<div class="popup-row"><span class="popup-rank">85</span><div class="popup-info"><div class="popup-handle">@night_78</div><div class="popup-name">Felipe Pinto</div></div><div class="popup-diamonds">💎 52.009</div></div>
+<div class="popup-row"><span class="popup-rank">86</span><div class="popup-info"><div class="popup-handle">@queen_95</div><div class="popup-name">Leandro Martins</div></div><div class="popup-diamonds">💎 51.171</div></div>
+<div class="popup-row"><span class="popup-rank">87</span><div class="popup-info"><div class="popup-handle">@star_games_87</div><div class="popup-name">Thiago Lopes</div></div><div class="popup-diamonds">💎 50.664</div></div>
+<div class="popup-row"><span class="popup-rank">88</span><div class="popup-info"><div class="popup-handle">@play123_88</div><div class="popup-name">Giovanna Gomes</div></div><div class="popup-diamonds">💎 50.162</div></div>
+<div class="popup-row"><span class="popup-rank">89</span><div class="popup-info"><div class="popup-handle">@play_95</div><div class="popup-name">Camila Castro</div></div><div class="popup-diamonds">💎 49.784</div></div>
+<div class="popup-row"><span class="popup-rank">90</span><div class="popup-info"><div class="popup-handle">@show_80</div><div class="popup-name">Mariana Silva</div></div><div class="popup-diamonds">💎 49.273</div></div>
+<div class="popup-row"><span class="popup-rank">91</span><div class="popup-info"><div class="popup-handle">@king_84</div><div class="popup-name">Vinicius Rocha</div></div><div class="popup-diamonds">💎 48.744</div></div>
+<div class="popup-row"><span class="popup-rank">92</span><div class="popup-info"><div class="popup-handle">@ao_vivo_37</div><div class="popup-name">Amanda Torres</div></div><div class="popup-diamonds">💎 48.371</div></div>
+<div class="popup-row"><span class="popup-rank">93</span><div class="popup-info"><div class="popup-handle">@top_94</div><div class="popup-name">Leticia Moura</div></div><div class="popup-diamonds">💎 47.828</div></div>
+<div class="popup-row"><span class="popup-rank">94</span><div class="popup-info"><div class="popup-handle">@tiktok_live_94</div><div class="popup-name">Bruno Correia</div></div><div class="popup-diamonds">💎 47.425</div></div>
+<div class="popup-row"><span class="popup-rank">95</span><div class="popup-info"><div class="popup-handle">@gamer_70</div><div class="popup-name">Vinicius Barros</div></div><div class="popup-diamonds">💎 47.151</div></div>
+<div class="popup-row"><span class="popup-rank">96</span><div class="popup-info"><div class="popup-handle">@ao_vivo_real_96</div><div class="popup-name">Patricia Costa</div></div><div class="popup-diamonds">💎 46.558</div></div>
+<div class="popup-row"><span class="popup-rank">97</span><div class="popup-info"><div class="popup-handle">@ao_vivo_93</div><div class="popup-name">Natalia Silva</div></div><div class="popup-diamonds">💎 46.249</div></div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* RANK TABLE */
+  .rank-table {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .rank-header {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    background: var(--bg3);
+    padding: 12px 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .rank-row {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    padding: 14px 20px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    transition: background 0.2s;
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-row:hover { background: rgba(255,255,255,0.02); }
+  .rank-medal {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  .rank-num {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--muted);
+    text-align: center;
+  }
+  .rank-handle {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .rank-name {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .rank-diamonds {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: var(--pink);
+    white-space: nowrap;
+  }
+
+  /* BTN VER LISTA */
+  .btn-ver-lista {
+    background: rgba(255,45,107,0.08);
+    border: 1px solid rgba(255,45,107,0.25);
+    color: var(--pink);
+    padding: 12px 28px;
+    border-radius: 50px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-ver-lista:hover {
+    background: rgba(255,45,107,0.15);
+    border-color: rgba(255,45,107,0.5);
+  }
+
+  /* POPUP */
+  .popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .popup-overlay.open { display: flex; }
+  .popup-box {
+    background: #111;
+    border: 1px solid rgba(255,45,107,0.2);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .popup-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink), var(--pink-light));
+    border-radius: 24px 24px 0 0;
+  }
+  .popup-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .popup-close {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .popup-close:hover { background: rgba(255,45,107,0.1); color: var(--pink); }
+  .popup-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0;
+  }
+  .popup-list::-webkit-scrollbar { width: 4px; }
+  .popup-list::-webkit-scrollbar-thumb { background: rgba(255,45,107,0.3); border-radius: 4px; }
+  .popup-row {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    padding: 10px 24px;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background 0.15s;
+  }
+  .popup-row:hover { background: rgba(255,255,255,0.02); }
+  .popup-rank {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-align: center;
+  }
+  .popup-handle {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 1px;
+  }
+  .popup-name { font-size: 0.75rem; color: var(--muted); }
+  .popup-diamonds {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--pink);
+    white-space: nowrap;
+  }
+</style>
+
+
+
+  <!-- PREMIUM PLAN - MAIS VENDIDO -->
+  <div class="price-card premium-card" style="max-width:500px;margin:40px auto 0;background:var(--card);border:2px solid rgba(255,184,0,0.4);border-radius:28px;padding:48px 40px;position:relative;overflow:visible;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FFB800,#FF2D6B);border-radius:28px 28px 0 0;"></div>
+    <div style="position:absolute;top:-16px;left:0;right:0;display:flex;justify-content:center;">
+      <div style="background:#FFB800;color:#000;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:0.75rem;padding:6px 22px;border-radius:50px;letter-spacing:0.06em;text-transform:uppercase;box-shadow:0 2px 12px rgba(255,184,0,0.4);">⭐ Mais Vendido</div>
+    </div>
+    <div style="position:absolute;top:-80px;right:-80px;width:250px;height:250px;background:radial-gradient(circle,rgba(255,184,0,0.08) 0%,transparent 70%);border-radius:50%;"></div>
+
+    <div style="display:inline-block;background:rgba(255,184,0,0.12);color:#FFB800;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;border-radius:50px;margin-bottom:20px;">Acesso Multicontas — Contas Ilimitadas</div>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <span style="font-size:0.9rem;color:var(--muted);text-decoration:line-through;">R$137,90</span>
+      <span style="background:rgba(255,184,0,0.15);color:#FFB800;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:50px;">Economize R$70</span>
+    </div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:3.8rem;font-weight:800;line-height:1;letter-spacing:-2px;">
+      <span style="font-size:1.6rem;vertical-align:super;margin-right:4px;color:#FFB800;">R$</span>67,90
+    </div>
+    <div style="font-size:0.85rem;color:var(--muted);margin-top:6px;margin-bottom:20px;">pagamento único · acesso imediato</div>
+
+    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);text-align:center;">
+      📧 Tutorial e acesso enviados por e-mail imediatamente após a compra
+    </div>
+
+    <div style="background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:0.85rem;font-weight:700;color:#FFB800;text-align:center;">
+      ♾️ Conecte quantas contas quiser — sem limite
+    </div>
+
+    <div style="margin:0 0 28px;display:flex;flex-direction:column;gap:12px;text-align:left;">
+      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Contas ilimitadas — ideal para quem gerencia múltiplos TikToks</span></div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Média de 5.000 💎 por dia (~R$140) por conta</span></div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Todos os jogos interativos desbloqueados</span></div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Sem aparecer na câmera, sem criar conteúdo</span></div>
+      
+      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Sem mensalidade — pague uma vez, use para sempre</span></div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Bônus: concorra à conta com 1 milhão de seguidores</span></div>
+    </div>
+
+    <div class="million-box" style="margin-bottom:24px;">
+      <div class="million-badge">🏆 BÔNUS EXCLUSIVO — AO COMPRAR AGORA</div>
+      <div class="million-title">Concorra a uma conta TikTok<br>com <span>1.000.000</span> de seguidores</div>
+      <p class="million-desc">Todo comprador do Acesso Multicontas entra automaticamente no sorteio. Imagine abrir suas lives já com 1M de pessoas te acompanhando em cada conta.</p>
+    </div>
+
+    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQCJF5" target="_blank" id="btn-premium" class="btn-buy" style="background:linear-gradient(135deg,#FFB800,#FF8C00);box-shadow:0 0 40px rgba(255,184,0,0.3);margin-bottom:0;">
+      🚀 Comprar Acesso Multicontas agora
+    </a>
+    <div class="price-guarantee" style="margin-top:14px;">🔒 Pagamento seguro · Acesso imediato após confirmação</div>
+  </div>
+
+  <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:32px;margin-bottom:12px;">ou prefere o acesso para 1 conta:</p>
   <div class="price-card">
-    <div class="price-label">🔥 Oferta Especial — Apenas 4 vagas</div>
+    <div class="price-label">🎮 Acesso Individual — 1 conta</div>
 
     <div class="price-original">
       <span class="po-de">De</span>
@@ -2212,11 +2558,7 @@
       <div class="price-feat"><span class="tick">✓</span><span>Qualquer pessoa, qualquer conta, começa hoje</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Média de 5.000 💎 por dia (~R$140 diários)</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Todos os jogos interativos desbloqueados</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Sem precisar Aparecer</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Sem criar conteúdo</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Suporte para configurar tudo</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Tutorial completo de implementação</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade, sem renovação, sem pegadinha</span></div>
     </div>
 
     <!-- MILLION FOLLOWERS BONUS -->
@@ -2226,7 +2568,7 @@
       <p class="million-desc">Todo comprador desta oferta entra automaticamente no sorteio de uma conta verificada com 1 milhão de seguidores no TikTok. Imagine abrir sua live já com 1M de pessoas te acompanhando.</p>
     </div>
 
-    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQC8US" target="_blank" class="btn-buy">🚀 Adquirir acesso aos Jogos</a>
+    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="btn-buy">🚀 Comprar Acesso Individual agora</a>
 
     <div class="price-guarantee">
       🔒 Pagamento seguro · Acesso imediato após confirmação
@@ -2281,8 +2623,8 @@
   <p style="color:var(--muted); margin: 16px auto 32px; max-width:420px; font-size:1rem; line-height:1.6;">
     Sem seguidores mínimos. Sem câmera. Sem conteúdo. Sem desculpa. R$37,90 uma vez e o jogo trabalha por você.
   </p>
-  <a href="https://checkout.perfectpay.com.br/pay/PPU38CQC8US" target="_blank" class="btn-primary" style="font-size:1.05rem; padding:18px 44px;">
-    🚀 Garantir meu acesso agora
+  <a href="https://checkout.perfectpay.com.br/pay/PPU38CQBTEA" target="_blank" class="btn-primary" style="font-size:1.05rem; padding:18px 44px;">
+    🚀 Comprar Acesso Individual agora
   </a>
 </div>
 
@@ -2320,7 +2662,7 @@
 <script>
   // Repassa todos os parametros de URL para os links do checkout
   (function() {
-    var checkoutBase = "https://checkout.perfectpay.com.br/pay/PPU38CQC8US";
+    var checkoutBase = "https://checkout.perfectpay.com.br/pay/PPU38CQBTEA";
 
     function appendParams(url) {
       var search = window.location.search;
@@ -2405,136 +2747,7 @@
   })();
 </script>
 
-<!-- TOAST NOTIFICATION -->
-<div id="toastNotif" class="toast-notif">
-  <div class="toast-avatar">MS</div>
-  <div class="toast-content">
-    <div class="toast-name">Matheus Solano</div>
-    <div class="toast-msg">acabou de adquirir acesso aos jogos</div>
-    <div class="toast-warn">⚠️ Restam apenas <strong>4 vagas</strong></div>
-  </div>
-  <button class="toast-close" onclick="document.getElementById('toastNotif').classList.remove('show')">✕</button>
-</div>
 
-<style>
-  .toast-notif {
-    position: fixed;
-    bottom: 28px;
-    left: 28px;
-    background: #1a1a1a;
-    border: 1px solid rgba(255,45,107,0.35);
-    border-radius: 16px;
-    padding: 16px 18px;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    max-width: 320px;
-    z-index: 9999;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,45,107,0.1);
-    transform: translateY(120px);
-    opacity: 0;
-    transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
-    pointer-events: none;
-  }
-
-  .toast-notif.show {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .toast-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #FF2D6B, #FF5C8A);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    font-size: 0.8rem;
-    color: #fff;
-    flex-shrink: 0;
-  }
-
-  .toast-content {
-    flex: 1;
-  }
-
-  .toast-name {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 2px;
-  }
-
-  .toast-msg {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 6px;
-  }
-
-  .toast-warn {
-    font-size: 0.78rem;
-    color: #FF2D6B;
-    font-weight: 600;
-  }
-
-  .toast-warn strong {
-    color: #FF2D6B;
-  }
-
-  .toast-close {
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.25);
-    cursor: pointer;
-    font-size: 0.75rem;
-    padding: 0;
-    flex-shrink: 0;
-    line-height: 1;
-    margin-top: 2px;
-    transition: color 0.2s;
-  }
-
-  .toast-close:hover { color: rgba(255,255,255,0.5); }
-
-  @media (max-width: 480px) {
-    .toast-notif { left: 16px; right: 16px; max-width: none; bottom: 16px; }
-  }
-</style>
-
-<script>
-  // Show toast when user reaches the price section
-  (function() {
-    var shown = false;
-    var priceSection = document.getElementById('preco');
-    if (!priceSection) return;
-
-    var toastObserver = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting && !shown) {
-          shown = true;
-          setTimeout(function() {
-            var toast = document.getElementById('toastNotif');
-            if (toast) {
-              toast.classList.add('show');
-              // Auto-hide after 6 seconds
-              setTimeout(function() {
-                toast.classList.remove('show');
-              }, 6000);
-            }
-          }, 800);
-          toastObserver.disconnect();
-        }
-      });
-    }, { threshold: 0.3 });
-
-    toastObserver.observe(priceSection);
-  })();
-</script>
 
 </body>
 </html>
