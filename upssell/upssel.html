@@ -1,1401 +1,281 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- Contify Tracker -->
-<script>
-(function(){
-  var TID="753ee9ba0ca49837";
-  var EP="https://kerxbkggbyjjbmtntbmk.supabase.co/functions/v1/track-event";
-  var SK="lpa_sid";
-  var sid=sessionStorage.getItem(SK);
-  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(SK,sid);}
-  var q=new URLSearchParams(location.search);
-  var start=Date.now();
-  function send(type,extra){
-    try{
-      fetch(EP,{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,
-        body:JSON.stringify(Object.assign({
-          tracking_id:TID,session_id:sid,event_type:type,
-          utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),
-          device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?"mobile":"desktop"),
-          page_url:location.href,referrer:document.referrer
-        },extra||{}))});
-    }catch(e){}
-  }
-  send("pageview");
-  document.addEventListener("click",function(ev){
-    var el=ev.target&&ev.target.closest&&ev.target.closest("[data-contify]");
-    if(el){send("click",{utm_campaign:el.getAttribute("data-contify")});}
-  },true);
-  var hb=setInterval(function(){send("heartbeat",{duration_ms:Date.now()-start});},30000);
-  window.addEventListener("beforeunload",function(){clearInterval(hb);send("leave",{duration_ms:Date.now()-start});});
-})();
-</script>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oferta Especial — KeepLive</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pack 50K Vídeos Virais — KeepLive</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --pink: #FF2D6B;
-    --pink-light: #FF5C8A;
-    --pink-glow: rgba(255,45,107,0.3);
-    --bg: #0A0A0A;
-    --card: #141414;
-    --border: rgba(255,255,255,0.06);
-    --text: #FFFFFF;
-    --muted: rgba(255,255,255,0.45);
-    --green: #00C48C;
-    --gold: #FFB800;
-    --blue: #4D9FFF;
-    --purple: #9B59F5;
+    --black:#080808; --neon:#ff2d55; --neon2:#ff6b00;
+    --gold:#ffd700; --white:#f5f5f5; --gray:#888; --card:#111;
+    --border:rgba(255,45,85,0.25);
   }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--black);color:var(--white);font-family:'Montserrat',sans-serif;overflow-x:hidden;}
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  /* HERO */
+  .hero{
+    position:relative;text-align:center;
+    padding:56px 20px 40px;overflow:hidden;
+  }
+  .hero::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(255,45,85,.18) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(0,200,80,.12);border:1px solid rgba(0,200,80,.35);
+    color:#00c850;font-size:.72rem;font-weight:800;letter-spacing:.1em;
+    padding:6px 16px;border-radius:999px;margin-bottom:20px;text-transform:uppercase;
+  }
+  .badge span{width:8px;height:8px;border-radius:50%;background:#00c850;display:inline-block;animation:pg 1.4s infinite;}
+  @keyframes pg{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+  .tag{
+    display:inline-block;
+    background:linear-gradient(90deg,var(--neon),var(--neon2));
+    color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.18em;
+    padding:5px 14px;border-radius:4px;margin-bottom:16px;text-transform:uppercase;
+  }
+  .hero h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(3rem,10vw,6rem);line-height:1;letter-spacing:.02em;margin-bottom:12px;
+  }
+  .hero h1 .hl{
+    background:linear-gradient(90deg,var(--neon),var(--neon2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .hero p{font-size:.95rem;color:#ccc;max-width:520px;margin:0 auto 32px;line-height:1.7;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    overflow-x: hidden;
+  /* URGENCY */
+  .urgency{
+    background:linear-gradient(90deg,rgba(255,45,85,.1),rgba(255,107,0,.07),rgba(255,45,85,.1));
+    border-top:1px solid rgba(255,45,85,.2);border-bottom:1px solid rgba(255,45,85,.2);
+    text-align:center;padding:12px 20px;font-size:.8rem;color:#ddd;margin-bottom:44px;
   }
+  .urgency strong{color:var(--neon);}
 
-  /* TOP BAR */
-  .top-bar {
-    background: var(--green);
-    text-align: center;
-    padding: 12px 20px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700;
-    font-size: 0.88rem;
-    letter-spacing: 0.02em;
-  }
+  /* SECTION WRAPPER */
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px;}
 
-  .wrap {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
+  /* IMAGES */
+  .imgs-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    max-width:420px;margin:0 auto 44px;padding:0 16px;
   }
+  .imgs-grid img{width:100%;border-radius:12px;border:2px solid rgba(255,45,85,.2);object-fit:cover;display:block;}
 
-  /* ALREADY NOTICE */
-  .already-notice {
-    background: rgba(255,184,0,0.06);
-    border: 1px solid rgba(255,184,0,0.2);
-    border-radius: 10px;
-    padding: 12px 18px;
-    margin-bottom: 40px;
-    font-size: 0.82rem;
-    color: rgba(255,255,255,0.4);
-    text-align: center;
-    line-height: 1.6;
+  /* ALGORITHM */
+  .algo-box{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:28px 22px;margin-bottom:44px;
   }
-  .already-notice strong { color: #FFB800; }
+  .algo-box h2{
+    font-family:'Bebas Neue',sans-serif;font-size:1.7rem;
+    letter-spacing:.04em;margin-bottom:20px;
+  }
+  .step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
+  .step:last-child{margin-bottom:0;}
+  .ico{
+    flex-shrink:0;width:38px;height:38px;border-radius:9px;
+    background:linear-gradient(135deg,rgba(255,45,85,.22),rgba(255,107,0,.12));
+    border:1px solid rgba(255,45,85,.3);
+    display:flex;align-items:center;justify-content:center;font-size:1rem;
+  }
+  .step-txt strong{display:block;font-size:.88rem;font-weight:800;margin-bottom:3px;}
+  .step-txt p{font-size:.8rem;color:#aaa;line-height:1.6;}
+  .step-txt p em{color:var(--neon);font-style:normal;font-weight:800;}
+  .divider{width:1px;height:14px;background:rgba(255,45,85,.3);margin:0 0 2px 19px;}
 
-  /* BADGE */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,184,0,0.1);
-    border: 1px solid rgba(255,184,0,0.3);
-    border-radius: 50px;
-    padding: 7px 18px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 22px;
+  /* STATS */
+  .stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:44px;}
+  .stat{
+    flex:1;min-width:130px;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:18px 14px;text-align:center;
   }
-  .badge::before {
-    content: '';
-    width: 7px; height: 7px;
-    background: var(--gold);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
+  .stat .big{
+    font-family:'Bebas Neue',sans-serif;font-size:2.3rem;
+    background:linear-gradient(90deg,var(--neon),var(--neon2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   }
-  @keyframes pulse {
-    0%,100% { opacity:1; transform:scale(1); }
-    50% { opacity:0.4; transform:scale(1.6); }
-  }
+  .stat .lbl{font-size:.73rem;color:#aaa;margin-top:3px;line-height:1.4;}
 
-  h1 {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -1.5px;
-    margin-bottom: 16px;
+  /* INSIDE */
+  .inside{display:flex;flex-direction:column;gap:10px;margin-bottom:44px;}
+  .item{
+    display:flex;gap:12px;align-items:center;
+    background:var(--card);border:1px solid var(--border);
+    border-radius:12px;padding:14px 16px;
   }
-  h1 .pink { color: var(--pink); }
-  h1 .gold { color: var(--gold); }
-  h1 .green { color: var(--green); }
+  .item .i{font-size:1.2rem;flex-shrink:0;}
+  .item p{font-size:.83rem;color:#ccc;line-height:1.5;}
+  .item p strong{color:var(--white);}
 
-  .hero-sub {
-    font-size: 1rem;
-    color: var(--muted);
-    line-height: 1.75;
-    margin-bottom: 40px;
-    text-align: center;
-    max-width: 560px;
-    margin-left: auto;
-    margin-right: auto;
+  /* CTA */
+  .cta-box{
+    background:var(--card);border:2px solid var(--neon);
+    border-radius:20px;padding:32px 24px;text-align:center;
+    position:relative;overflow:hidden;margin-bottom:44px;
   }
-  .hero-sub strong { color: #fff; }
+  .cta-img{
+    width:100%;max-width:360px;
+    border-radius:12px;
+    margin:0 auto 20px;
+    display:block;
+    border:1px solid rgba(255,45,85,.2);
+  }
+  .cta-box::before{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,45,85,.1) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .flag{
+    display:inline-block;
+    background:linear-gradient(90deg,var(--neon),var(--neon2));
+    color:#fff;font-size:.67rem;font-weight:800;letter-spacing:.12em;
+    padding:5px 16px;border-radius:4px;margin-bottom:18px;text-transform:uppercase;
+  }
+  .cta-box h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,5vw,2.2rem);letter-spacing:.03em;margin-bottom:10px;}
+  .de{font-size:.83rem;color:var(--gray);text-decoration:line-through;margin-bottom:2px;}
+  .por{
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,11vw,5rem);
+    background:linear-gradient(90deg,var(--neon),var(--neon2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;
+  }
+  .pix{font-size:.78rem;color:#aaa;margin-top:4px;margin-bottom:22px;}
+  .btn{
+    display:block;width:100%;
+    background:linear-gradient(90deg,var(--neon),var(--neon2));
+    color:#fff;font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:800;
+    letter-spacing:.08em;padding:17px 24px;border-radius:11px;border:none;
+    cursor:pointer;text-decoration:none;text-transform:uppercase;
+    box-shadow:0 0 30px rgba(255,45,85,.4);transition:transform .15s,box-shadow .15s;
+    margin-bottom:14px;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(255,45,85,.6);}
+  .trust{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .trust span{font-size:.7rem;color:#666;}
+  .skip{display:block;margin-top:18px;font-size:.73rem;color:#555;text-decoration:underline;cursor:pointer;}
+  .skip:hover{color:#888;}
 
-  /* ECOSYSTEM VISUAL */
-  .ecosystem {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 28px 24px;
-    margin-bottom: 36px;
-    position: relative;
-    overflow: hidden;
+  /* ACCESS */
+  .access{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:16px;padding:28px 22px;text-align:center;margin-bottom:60px;
   }
-  .ecosystem::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--pink), var(--gold), var(--green), var(--blue));
+  .access h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.05em;margin-bottom:8px;}
+  .access p{font-size:.83rem;color:#aaa;margin-bottom:18px;}
+  .access a{
+    display:inline-block;background:transparent;
+    border:1.5px solid var(--border);color:var(--white);
+    font-size:.88rem;font-weight:700;padding:13px 28px;
+    border-radius:10px;text-decoration:none;
   }
+  .footer{text-align:center;padding-bottom:36px;}
+  .footer p{font-size:.68rem;color:#333;}
 
-  .eco-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold);
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .eco-nodes {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr auto 1fr;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 20px;
-  }
-
-  .eco-node {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 16px;
-    padding: 16px 12px;
-    text-align: center;
-  }
-
-  .eco-node-icon { font-size: 1.6rem; margin-bottom: 6px; }
-  .eco-node-name {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: #fff;
-    margin-bottom: 3px;
-  }
-  .eco-node-val {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 800;
-    line-height: 1;
-  }
-  .eco-node-val.pink { color: var(--pink); }
-  .eco-node-val.gold { color: var(--gold); }
-  .eco-node-val.blue { color: var(--blue); }
-  .eco-node-sub { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
-
-  .eco-arrow {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.2);
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .eco-total {
-    background: linear-gradient(135deg, rgba(255,184,0,0.08), rgba(255,45,107,0.05));
-    border: 1px solid rgba(255,184,0,0.2);
-    border-radius: 14px;
-    padding: 16px 20px;
-    text-align: center;
-  }
-  .eco-total-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 4px;
-  }
-  .eco-total-val {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--gold);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .eco-total-sub {
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-
-  /* ===================== */
-  /* CYCLE SECTION (NOVO)  */
-  /* ===================== */
-  .cycle-section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 36px 24px 32px;
-    margin-bottom: 16px;
-    position: relative;
-    overflow: hidden;
-  }
-  .cycle-section::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--blue), var(--pink), var(--gold), var(--green));
-  }
-
-  .how-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 800;
-    margin-bottom: 6px;
-    text-align: center;
-  }
-  .how-sub {
-    text-align: center;
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 32px;
-  }
-
-  /* Ring diagram — canvas based */
-  .cycle-wrap {
-    position: relative;
-    width: 340px;
-    height: 340px;
-    margin: 0 auto 32px;
-  }
-  #cycleCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .cycle-node {
-    position: absolute;
-    width: 100px;
-    background: #1a1a1a;
-    border-radius: 14px;
-    padding: 11px 8px;
-    text-align: center;
-    border: 1px solid var(--border);
-    z-index: 2;
-    pointer-events: none;
-  }
-  /* top center */
-  .cycle-node.n-top    { top: 6px;  left: 50%; transform: translateX(-50%); border-color: rgba(77,159,255,0.4);  box-shadow: 0 0 16px rgba(77,159,255,0.15); }
-  /* right center */
-  .cycle-node.n-right  { top: 50%;  right: 4px; transform: translateY(-50%); border-color: rgba(255,45,107,0.4);  box-shadow: 0 0 16px rgba(255,45,107,0.15); }
-  /* bottom center */
-  .cycle-node.n-bottom { bottom: 6px; left: 50%; transform: translateX(-50%); border-color: rgba(255,184,0,0.4);  box-shadow: 0 0 16px rgba(255,184,0,0.15); }
-  /* left center */
-  .cycle-node.n-left   { top: 50%;  left: 4px; transform: translateY(-50%); border-color: rgba(0,196,140,0.4);  box-shadow: 0 0 16px rgba(0,196,140,0.15); }
-
-  .cycle-node-icon { font-size: 1.2rem; margin-bottom: 3px; }
-  .cycle-node-name {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.64rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.2;
-    margin-bottom: 2px;
-  }
-  .cycle-node-val {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.64rem;
-    font-weight: 700;
-  }
-  .cv-blue { color: var(--blue); }
-  .cv-pink { color: var(--pink); }
-  .cv-gold { color: var(--gold); }
-  .cv-green { color: var(--green); }
-
-  .cycle-center {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    z-index: 3;
-    pointer-events: none;
-  }
-  .cc-label {
-    font-size: 0.52rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.3);
-    margin-bottom: 2px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-  .cc-val {
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: var(--gold);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    line-height: 1;
-  }
-  .cc-sub {
-    font-size: 0.52rem;
-    color: rgba(255,255,255,0.22);
-    margin-top: 2px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-  }
-
-  /* Steps below ring */
-  .cycle-items {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .cycle-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .cycle-item:last-child { border-bottom: none; }
-  .cycle-num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    font-size: 0.78rem;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .cn-pink  { background: rgba(255,45,107,0.15);  color: var(--pink); }
-  .cn-gold  { background: rgba(255,184,0,0.15);   color: var(--gold); }
-  .cn-blue  { background: rgba(77,159,255,0.15);  color: var(--blue); }
-  .cn-green { background: rgba(0,196,140,0.15);   color: var(--green); }
-  .cycle-text strong {
-    display: block;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700;
-    font-size: 0.92rem;
-    margin-bottom: 3px;
-  }
-  .cycle-text span {
-    font-size: 0.84rem;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  /* ======================== */
-  /* FUNIL ANIMADO (NOVO)     */
-  /* ======================== */
-  .funnel-section {
-    background: var(--card);
-    border: 1px solid rgba(255,184,0,0.15);
-    border-radius: 24px;
-    margin-bottom: 36px;
-    padding: 28px 16px 20px;
-    text-align: center;
-    overflow: hidden;
-    position: relative;
-  }
-  .funnel-canvas-wrap {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  #funnelCanvas {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-  .funnel-label {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-top: 4px;
-    margin-bottom: 14px;
-  }
-  .funnel-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 14px;
-    justify-content: center;
-    margin-top: 2px;
-    padding: 0 8px;
-  }
-  .funnel-legend-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.74rem;
-    color: rgba(255,255,255,0.45);
-    font-family: 'DM Sans', sans-serif;
-  }
-  .funnel-legend-item span { font-size: 1rem; line-height: 1; }
-
-  /* GIFT BANNER */
-  .gift-banner {
-    background: linear-gradient(135deg, rgba(255,184,0,0.07), rgba(255,45,107,0.05));
-    border: 1px solid rgba(255,184,0,0.25);
-    border-radius: 20px;
-    padding: 22px 20px;
-    margin-bottom: 16px;
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    position: relative;
-    overflow: hidden;
-  }
-  .gift-banner::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--gold), var(--pink));
-  }
-  .gift-icon { font-size: 2.2rem; flex-shrink: 0; line-height: 1; }
-  .gift-text {}
-  .gift-tag {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 5px;
-  }
-  .gift-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 5px;
-    line-height: 1.2;
-  }
-  .gift-desc {
-    font-size: 0.82rem;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .gift-desc strong { color: #fff; }
-
-  /* WHAT YOU GET (removed) */
-
-  /* PRICE CARD */
-  .price-card {
-    background: var(--card);
-    border: 1px solid rgba(255,45,107,0.3);
-    border-radius: 28px;
-    padding: 36px 32px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .price-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--pink), var(--gold), var(--green));
-  }
-  .price-card::after {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(255,45,107,0.06) 0%, transparent 70%);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .pc-badge {
-    display: inline-block;
-    background: rgba(255,45,107,0.1);
-    color: var(--pink);
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 5px 14px;
-    border-radius: 50px;
-    margin-bottom: 18px;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
-  .pc-items {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .pc-item {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 0.82rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .pc-plus {
-    font-size: 1.2rem;
-    color: rgba(255,255,255,0.2);
-    font-weight: 800;
-  }
-
-  .pc-original {
-    font-size: 0.9rem;
-    color: var(--muted);
-    text-decoration: line-through;
-    margin-bottom: 4px;
-  }
-
-  .pc-amount {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 3.8rem;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -2px;
-    margin-bottom: 6px;
-  }
-  .pc-amount .cur {
-    font-size: 1.6rem;
-    vertical-align: super;
-    color: var(--pink);
-    margin-right: 3px;
-  }
-
-  .pc-once {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 28px;
-  }
-
-  .pc-learns {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px 18px;
-    margin-bottom: 24px;
-    text-align: left;
-  }
-  .pc-learn-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 12px;
-  }
-  .pc-learn-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 9px;
-    font-size: 0.86rem;
-    color: rgba(255,255,255,0.75);
-    margin-bottom: 8px;
-    line-height: 1.4;
-  }
-  .pc-learn-item:last-child { margin-bottom: 0; }
-  .tick { color: var(--green); font-weight: 700; flex-shrink: 0; }
-
-  .btn-cta {
-    display: block;
-    width: 100%;
-    background: var(--pink);
-    color: #fff;
-    border: none;
-    padding: 20px;
-    border-radius: 50px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
-    font-size: 1.05rem;
-    cursor: pointer;
-    text-decoration: none;
-    text-align: center;
-    transition: all 0.2s;
-    box-shadow: 0 0 40px var(--pink-glow);
-    margin-bottom: 12px;
-    letter-spacing: 0.01em;
-  }
-  .btn-cta:hover {
-    background: var(--pink-light);
-    transform: translateY(-2px);
-    box-shadow: 0 0 60px rgba(255,45,107,0.5);
-  }
-
-  .guarantee {
-    font-size: 0.76rem;
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  /* SKIP */
-  .skip-link {
-    display: block;
-    text-align: center;
-    font-size: 0.74rem;
-    color: rgba(255,255,255,0.18);
-    text-decoration: none;
-    padding: 8px;
-    cursor: pointer;
-    transition: color 0.2s;
-    margin-top: 6px;
-  }
-  .skip-link:hover { color: rgba(255,255,255,0.32); }
-
-  /* LOGIN */
-  .login-section {
-    margin-top: 64px;
-    padding-top: 48px;
-    border-top: 1px solid var(--border);
-    text-align: center;
-  }
-  .login-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-bottom: 10px;
-  }
-  .login-title {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 10px;
-    line-height: 1.3;
-  }
-  .login-sub {
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin-bottom: 28px;
-    line-height: 1.6;
-  }
-  .btn-login {
-    display: inline-block;
-    background: var(--green);
-    color: #fff;
-    border: none;
-    padding: 18px 44px;
-    border-radius: 50px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s;
-    box-shadow: 0 0 30px rgba(0,196,140,0.25);
-  }
-  .btn-login:hover { background: #00e6a8; transform: translateY(-2px); }
-  .login-note { font-size: 0.74rem; color: rgba(255,255,255,0.2); margin-top: 12px; }
-
-  @media (max-width: 600px) {
-    .wrap { padding: 36px 20px 60px; }
-    h1 { font-size: 1.75rem; letter-spacing: -0.5px; }
-    .eco-nodes { grid-template-columns: 1fr; gap: 6px; }
-    .eco-arrow { display: none; }
-    .gets-grid { grid-template-columns: 1fr; }
-    .pc-amount { font-size: 3rem; }
-    .price-card { padding: 28px 22px; }
-    .pc-items { flex-direction: column; }
-    .cycle-wrap { width: 260px; height: 260px; }
-    .ring-anim { transform-origin: 130px 130px; }
-    .cycle-node { width: 90px; }
+  @media(max-width:480px){
+    .stats{flex-direction:column;align-items:center;}
+    .stat{min-width:80%;max-width:260px;}
+    .imgs-grid{grid-template-columns:1fr;max-width:220px;}
   }
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  ✅ Compra confirmada! Seu acesso aos jogos está garantido.
+<!-- HERO -->
+<section class="hero">
+  <div class="badge"><span></span> Compra confirmada — acesso garantido</div>
+  <div class="tag">⚡ Oferta exclusiva — aparece só uma vez</div>
+  <h1>Quer <span class="hl">+300%</span><br>de gente<br>na sua live?</h1>
+  <p>Existe uma estratégia simples que faz o algoritmo mandar mais pessoas para sua live automaticamente — e ela começa com vídeos virais.</p>
+</section>
+
+<!-- URGENCY -->
+<div class="urgency">⏱️ Esta oferta <strong>desaparece</strong> quando você fechar a página.</div>
+
+<!-- IMAGES -->
+<div class="imgs-grid">
+  <img src="imagemupsell1.jpeg" alt="Exemplo live TikTok"/>
+  <img src="imagemupsell2.jpeg" alt="Perfil TikTok em live"/>
 </div>
 
+<!-- ALGORITHM -->
 <div class="wrap">
+  <div class="algo-box">
+    <h2>📲 Como o algoritmo trabalha por você</h2>
 
-  <div class="already-notice">
-    Já adquiriu esta oferta? <strong>Role até o final</strong> para acessar seu login.
-  </div>
-
-  <!-- Badge + Hero -->
-  <div style="text-align:center;">
-    <div class="badge">🌱 Construa seu ecossistema digital</div>
-  </div>
-
-  <h1 style="text-align:center;">
-    Não dependa de apenas<br>
-    <span class="pink">uma fonte de renda.</span><br>
-    Crie um <span class="gold">ecossistema</span><br>
-    que cresce <span class="green">sozinho.</span>
-  </h1>
-
-  <p class="hero-sub">
-    Lives geram seguidores. Seguidores viram audiência no Shop.
-    O Shop gera comissões. Vídeos virais alimentam tudo isso enquanto você dorme.
-    <strong>Um ciclo auto sustentável que cresce exponencialmente — e você só precisou montar uma vez.</strong>
-  </p>
-
-  <!-- Ecosystem visual -->
-  <div class="ecosystem">
-    <div class="eco-title">🌊 O Ecossistema KeepLive — Como tudo se conecta</div>
-    <div class="eco-nodes">
-      <div class="eco-node">
-        <div class="eco-node-icon">🎬</div>
-        <div class="eco-node-name">Vídeos Virais</div>
-        <div class="eco-node-val blue">+Seguidores</div>
-        <div class="eco-node-sub">50k vídeos prontos</div>
-      </div>
-      <div class="eco-arrow">→</div>
-      <div class="eco-node">
-        <div class="eco-node-icon">🎮</div>
-        <div class="eco-node-name">Lives Interativas</div>
-        <div class="eco-node-val pink">~R$3k</div>
-        <div class="eco-node-sub">por mês em diamantes</div>
-      </div>
-      <div class="eco-arrow">→</div>
-      <div class="eco-node">
-        <div class="eco-node-icon">🛍️</div>
-        <div class="eco-node-name">TikTok Shop</div>
-        <div class="eco-node-val gold">~R$3k</div>
-        <div class="eco-node-sub">por mês em comissões</div>
+    <div class="step">
+      <div class="ico">🎬</div>
+      <div class="step-txt">
+        <strong>Seu vídeo cai no For You de alguém</strong>
+        <p>Se você está em live, o <em>ícone do seu perfil fica piscando</em> indicando live — para todo mundo que vê o vídeo.</p>
       </div>
     </div>
-    <div class="eco-total">
-      <div class="eco-total-label">Potencial combinado do ecossistema</div>
-      <div class="eco-total-val">R$6.000+ por mês</div>
-      <div class="eco-total-sub">crescendo de forma exponencial conforme a conta aquece</div>
-    </div>
-  </div>
+    <div class="divider"></div>
 
-  <!-- ============================= -->
-  <!-- CICLO ANIMADO (SEÇÃO NOVA)    -->
-  <!-- ============================= -->
-  <div class="cycle-section">
-    <div class="how-title">Como o ciclo se sustenta sozinho</div>
-    <div class="how-sub">Cada etapa alimenta a próxima — indefinidamente</div>
-
-    <!-- Ring diagram -->
-    <div class="cycle-wrap">
-    <!-- Ring drawn on canvas, nodes fixed in HTML -->
-    <canvas id="cycleCanvas" width="340" height="340"></canvas>
-
-      <!-- Nodes fixed at cardinal points — ring animates behind them -->
-      <div class="cycle-node n-top">
-        <div class="cycle-node-icon">🎬</div>
-        <div class="cycle-node-name">Vídeos Virais</div>
-        <div class="cycle-node-val cv-blue">+Seguidores</div>
-      </div>
-      <div class="cycle-node n-right">
-        <div class="cycle-node-icon">🎮</div>
-        <div class="cycle-node-name">Lives Interativas</div>
-        <div class="cycle-node-val cv-pink">~R$3k/mês</div>
-      </div>
-      <div class="cycle-node n-bottom">
-        <div class="cycle-node-icon">🛍️</div>
-        <div class="cycle-node-name">TikTok Shop</div>
-        <div class="cycle-node-val cv-gold">~R$3k/mês</div>
-      </div>
-      <div class="cycle-node n-left">
-        <div class="cycle-node-icon">📈</div>
-        <div class="cycle-node-name">Crescimento Exp.</div>
-        <div class="cycle-node-val cv-green">∞ ciclos</div>
-      </div>
-
-      <!-- Center label -->
-      <div class="cycle-center">
-        <div class="cc-label">Potencial</div>
-        <div class="cc-val">R$6k+</div>
-        <div class="cc-sub">por mês</div>
+    <div class="step">
+      <div class="ico">👆</div>
+      <div class="step-txt">
+        <strong>Elas clicam e entram na sua live</strong>
+        <p><em>~10% das pessoas</em> que assistem um vídeo clicam no perfil. Com live ativa, entram direto. São centenas de entradas extras por dia.</p>
       </div>
     </div>
+    <div class="divider"></div>
 
-    <!-- Step descriptions -->
-    <div class="cycle-items">
-      <div class="cycle-item">
-        <div class="cycle-num cn-blue">1</div>
-        <div class="cycle-text">
-          <strong>Vídeos virais aquecem sua conta</strong>
-          <span>50 mil vídeos prontos e virais postados regularmente ensinam o algoritmo quem você é — e ele começa a distribuir seu conteúdo de graça para cada vez mais pessoas.</span>
-        </div>
-      </div>
-      <div class="cycle-item">
-        <div class="cycle-num cn-pink">2</div>
-        <div class="cycle-text">
-          <strong>Mais seguidores = mais audiência nas lives</strong>
-          <span>Cada seguidor novo é um espectador em potencial para sua live interativa. Mais gente na live = mais presentes = mais diamantes. O jogo trabalha por você.</span>
-        </div>
-      </div>
-      <div class="cycle-item">
-        <div class="cycle-num cn-gold">3</div>
-        <div class="cycle-text">
-          <strong>Audiência da live converte no TikTok Shop</strong>
-          <span>Quem já te viu na live já confia em você. Esse público converte muito mais do que tráfego frio. Seus links de afiliado viram comissões enquanto a IA cria os vídeos.</span>
-        </div>
-      </div>
-      <div class="cycle-item">
-        <div class="cycle-num cn-green">4</div>
-        <div class="cycle-text">
-          <strong>O ciclo se repete e cresce exponencialmente</strong>
-          <span>Mais comissões → mais prova social → mais seguidores → mais audiência → mais diamantes → mais comissões. Cada volta do ciclo é maior que a anterior.</span>
-        </div>
+    <div class="step">
+      <div class="ico">📈</div>
+      <div class="step-txt">
+        <strong>Mais views = mais espectadores</strong>
+        <p>Com <em>10K views/dia</em> no perfil, isso representa até <em>1.000 entradas extras</em> na live. Com vídeos virais todo dia, esse número só cresce.</p>
       </div>
     </div>
   </div>
 
-  <!-- ============================= -->
-  <!-- FUNIL ANIMADO (SEÇÃO NOVA)   -->
-  <!-- ============================= -->
-  <div class="funnel-section">
-    <div style="text-align:center; margin-bottom:20px;">
-      <div style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.05rem; font-weight:800; color:#fff; line-height:1.3; letter-spacing:-0.3px;">Isso que acontece no seu ecossistema<br><span style="color:#FFB800;">24 hrs por dia</span> depois de implementar<br>todas as fontes de renda</div>
-    </div>
-    <div class="funnel-canvas-wrap">
-      <canvas id="funnelCanvas" style="display:block;width:100%;"></canvas>
-    </div>
-    <div class="funnel-label">sua conta</div>
-    <div class="funnel-legend">
-      <div class="funnel-legend-item"><span>💎</span> Diamantes = Lives</div>
-      <div class="funnel-legend-item"><span>💵</span> Dinheiro = Comissão TikTok Shop</div>
-      <div class="funnel-legend-item"><span>👁️</span> Olho = Views</div>
-      <div class="funnel-legend-item"><span>💸</span> Nota voando = Monetização da conta</div>
-    </div>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="big">50K</div><div class="lbl">vídeos virais<br>prontos pra postar</div></div>
+    <div class="stat"><div class="big">+300%</div><div class="lbl">de espectadores<br>na live</div></div>
+    <div class="stat"><div class="big">0</div><div class="lbl">segundos de<br>edição</div></div>
   </div>
 
-  <!-- Gift banner -->
-  <div class="gift-banner">
-    <div class="gift-icon">🎁</div>
-    <div class="gift-text">
-      <div class="gift-tag">🎉 Bônus exclusivo para você</div>
-      <div class="gift-title">Pack 50.000 Vídeos Virais — de presente</div>
-      <div class="gift-desc">Por já ser cliente dos jogos e agora entrar no <strong>Ecossistema Gerador de Caixa TikTok</strong>, você ganha o pack com 50 mil vídeos prontos para postar e aquecer sua conta — sem precisar editar nada.</div>
-    </div>
+  <!-- INSIDE -->
+  <div class="inside">
+    <div class="item"><div class="i">🎬</div><p><strong>50.000 vídeos virais prontos</strong> — já validados pelo algoritmo. É só baixar e postar.</p></div>
+    <div class="item"><div class="i">📅</div><p><strong>Conteúdo para meses</strong> — postando 10 por dia você tem material por mais de 13 anos.</p></div>
+    <div class="item"><div class="i">⚡</div><p><strong>Acesso imediato</strong> — o link chega no seu e-mail assim que confirmar.</p></div>
   </div>
 
-  <!-- Price card -->
-  <div class="price-card">
-    <div class="pc-badge">🌱 Pacote Ecossistema Completo</div>
-
-    <div class="pc-items">
-      <div class="pc-item">🛍️ TikTok Shop com IA</div>
-      <div class="pc-plus">+</div>
-      <div class="pc-item">🎬 50k Vídeos Virais</div>
+  <!-- CTA -->
+  <div class="cta-box">
+    <img class="cta-img" src="Gemini_Generated_Image_n3qxt1n3qxt1n3qx.png" alt="Pack 50K Vídeos Virais"/>
+    <div class="flag">🎁 Só para clientes KeepLive</div>
+    <h2>Pack 50.000 Vídeos Virais</h2>
+    <div class="de">De R$ 97,00</div>
+    <div class="por">R$ 27,90</div>
+    <div class="pix">pagamento único · acesso imediato</div>
+    <a class="btn" href="https://go.perfectpay.com.br/PPU38CQCB1N">🚀 Quero o pack por R$ 27,90</a>
+    <div class="trust">
+      <span>🔒 Pagamento seguro</span>
+      <span>⚡ Acesso imediato</span>
+      <span>📧 Enviado por e-mail</span>
     </div>
-
-    <div class="pc-original">De R$97,00</div>
-    <div class="pc-amount"><span class="cur">R$</span>27,90</div>
-    <div class="pc-once">pagamento único · acesso imediato a tudo</div>
-
-    <div class="pc-learns">
-      <div class="pc-learn-title">Tudo que você vai receber:</div>
-      <div class="pc-learn-item"><span class="tick">✓</span> Método completo TikTok Shop com IA — 10 módulos</div>
-      <div class="pc-learn-item"><span class="tick">✓</span> Como a IA cria vídeos de vendas por você (ChatGPT + CapCut + ElevenLabs)</div>
-      <div class="pc-learn-item"><span class="tick">✓</span> Pack com 50.000 vídeos virais prontos para postar</div>
-      <div class="pc-learn-item"><span class="tick">✓</span> Como combinar lives + Shop + vídeos para crescer exponencialmente</div>
-      <div class="pc-learn-item"><span class="tick">✓</span> Psicologia de vendas + checklist semanal do ecossistema</div>
-      <div class="pc-learn-item"><span class="tick">✓</span> Monetização com programa de criadores do TikTok</div>
-    </div>
-
-    <a href="https://go.perfectpay.com.br/PPU38CQCB1N" class="btn-cta" id="btn-eco" target="_blank">
-      🌱 Quero montar meu ecossistema por R$27,90
-    </a>
-    <div class="guarantee">🔒 Pagamento seguro · Acesso imediato</div>
+    <a class="skip" href="#acesso">Não, prefiro ficar só com os jogos</a>
   </div>
 
-  <a href="#acesso" class="skip-link">
-    Não, prefiro ficar só com os jogos
-  </a>
-
-  <!-- LOGIN SECTION -->
-  <div class="login-section" id="acesso">
-    <div class="login-label">Seu acesso</div>
-    <div class="login-title">Tudo pronto.<br>Acesse seus jogos agora.</div>
-    <p class="login-sub">Use o e-mail cadastrado na compra para fazer login.</p>
-    <a href="https://keepmy.live/login" target="_blank" class="btn-login">
-      🎮 Acessar meus jogos
-    </a>
-    <p class="login-note">Não achou o e-mail? Verifique o spam.</p>
+  <!-- ACCESS -->
+  <div class="access" id="acesso">
+    <p style="font-size:1.3rem;margin-bottom:6px;">🎮</p>
+    <h3>Seu acesso aos jogos</h3>
+    <p>Use o e-mail cadastrado na compra para fazer login.</p>
+    <a href="https://keepmy.live/login">Acessar meus jogos →</a>
+    <p style="font-size:.7rem;color:#444;margin-top:10px;">Não achou o e-mail? Verifique o spam.</p>
   </div>
-
 </div>
 
-<script>
-  /* === URL params passthrough === */
-  (function() {
-    function appendParams(url) {
-      var s = window.location.search;
-      if (!s) return url;
-      return url + (url.indexOf('?') >= 0 ? '&' : '?') + s.slice(1);
-    }
-    function update() {
-      var el = document.getElementById('btn-eco');
-      if (el) el.href = appendParams('https://go.perfectpay.com.br/PPU38CQCB1N');
-    }
-    document.readyState === 'loading'
-      ? document.addEventListener('DOMContentLoaded', update)
-      : update();
-  })();
-
-  /* === Cycle ring canvas === */
-  (function() {
-    var canvas = document.getElementById('cycleCanvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var W = 340, H = 340, cx = 170, cy = 170, R = 118;
-    var angle = 0;
-    var colors = ['#4D9FFF','#FF2D6B','#FFB800','#00C48C'];
-
-    function drawArrow(x1,y1,x2,y2,color) {
-      var dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx+dy*dy);
-      var ux = dx/len, uy = dy/len;
-      // shorten end for arrowhead
-      var ex = x2 - ux*10, ey = y2 - uy*10;
-      ctx.beginPath();
-      ctx.moveTo(x1,y1);
-      ctx.lineTo(ex,ey);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 5;
-      ctx.lineCap = 'round';
-      ctx.globalAlpha = 0.85;
-      ctx.stroke();
-      // arrowhead
-      var angle = Math.atan2(uy,ux);
-      ctx.beginPath();
-      ctx.moveTo(x2,y2);
-      ctx.lineTo(x2 - 12*Math.cos(angle-0.4), y2 - 12*Math.sin(angle-0.4));
-      ctx.lineTo(x2 - 12*Math.cos(angle+0.4), y2 - 12*Math.sin(angle+0.4));
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.globalAlpha = 0.85;
-      ctx.fill();
-    }
-
-    function drawArc(startA, endA, color) {
-      ctx.beginPath();
-      ctx.arc(cx, cy, R, startA, endA, false);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 7;
-      ctx.lineCap = 'butt';
-      ctx.globalAlpha = 0.7;
-      ctx.stroke();
-    }
-
-    function render() {
-      ctx.clearRect(0,0,W,H);
-      ctx.globalAlpha = 1;
-
-      // faint track
-      ctx.beginPath();
-      ctx.arc(cx,cy,R,0,Math.PI*2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-      ctx.lineWidth = 22;
-      ctx.globalAlpha = 1;
-      ctx.stroke();
-
-      // inner glow
-      ctx.beginPath();
-      ctx.arc(cx,cy,52,0,Math.PI*2);
-      ctx.strokeStyle = 'rgba(255,184,0,0.12)';
-      ctx.lineWidth = 1.5;
-      ctx.globalAlpha = 1;
-      ctx.stroke();
-
-      // Draw 4 colored arcs — each spans 90° starting from angle
-      // offset so arcs align with the 4 card positions (top=–90°, right=0°, bottom=90°, left=180°)
-      var base = angle - Math.PI/2;
-      var gap = 0.18; // gap in radians between arcs
-
-      for (var i = 0; i < 4; i++) {
-        var sa = base + i * (Math.PI/2) + gap;
-        var ea = base + (i+1) * (Math.PI/2) - gap;
-        drawArc(sa, ea, colors[i]);
-
-        // arrowhead at end of arc
-        var arrowA = ea;
-        var ax = cx + R * Math.cos(arrowA);
-        var ay = cy + R * Math.sin(arrowA);
-        // tangent direction at end
-        var tx = -Math.sin(arrowA), ty = Math.cos(arrowA);
-        ctx.save();
-        ctx.globalAlpha = 0.85;
-        ctx.beginPath();
-        ctx.moveTo(ax, ay);
-        ctx.lineTo(ax - 11*tx + 5*ty, ay - 11*ty - 5*tx);
-        ctx.lineTo(ax - 11*tx - 5*ty, ay - 11*ty + 5*tx);
-        ctx.closePath();
-        ctx.fillStyle = colors[i];
-        ctx.fill();
-        ctx.restore();
-      }
-
-      ctx.globalAlpha = 1;
-      angle += 0.008;
-      requestAnimationFrame(render);
-    }
-    render();
-  })();
-
-  /* === Funnel animation === */
-  (function() {
-    var canvas = document.getElementById('funnelCanvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var W = 400, H = 520;
-
-    // Funnel geometry — wide top, narrow neck, then into wallet
-    var TL = 60,  TR = 340;   // top edge x
-    var MY = 200;              // mid y where walls converge
-    var NL = 178, NR = 222;   // neck x
-    var NB = 290;              // neck bottom y
-    var pipeBot = 370;         // bottom of pipe above wallet
-    var walletCY = 440;        // wallet center y
-
-    // Draw funnel body with gradient shading for 3D look
-    function drawFunnel() {
-      // left wall gradient (light on inner edge)
-      var grad = ctx.createLinearGradient(TL, 0, NL, 0);
-      grad.addColorStop(0, 'rgba(255,184,0,0.06)');
-      grad.addColorStop(1, 'rgba(255,184,0,0.22)');
-
-      // Fill funnel body
-      ctx.beginPath();
-      ctx.moveTo(TL, 0);
-      ctx.lineTo(TR, 0);
-      ctx.lineTo(NR, MY);
-      ctx.lineTo(NR, NB);
-      ctx.lineTo(NL, NB);
-      ctx.lineTo(NL, MY);
-      ctx.closePath();
-      var fillGrad = ctx.createLinearGradient(W/2, 0, W/2, NB);
-      fillGrad.addColorStop(0, 'rgba(255,184,0,0.03)');
-      fillGrad.addColorStop(1, 'rgba(255,184,0,0.09)');
-      ctx.fillStyle = fillGrad;
-      ctx.fill();
-
-      // Left outer wall
-      ctx.beginPath();
-      ctx.moveTo(TL, 2);
-      ctx.lineTo(NL, MY);
-      ctx.lineTo(NL, NB);
-      var lg = ctx.createLinearGradient(TL, 0, NL, MY);
-      lg.addColorStop(0, 'rgba(255,184,0,0.6)');
-      lg.addColorStop(1, 'rgba(255,184,0,0.3)');
-      ctx.strokeStyle = lg;
-      ctx.lineWidth = 2.5;
-      ctx.lineJoin = 'round';
-      ctx.stroke();
-
-      // Right outer wall
-      ctx.beginPath();
-      ctx.moveTo(TR, 2);
-      ctx.lineTo(NR, MY);
-      ctx.lineTo(NR, NB);
-      var rg = ctx.createLinearGradient(TR, 0, NR, MY);
-      rg.addColorStop(0, 'rgba(255,184,0,0.6)');
-      rg.addColorStop(1, 'rgba(255,184,0,0.3)');
-      ctx.strokeStyle = rg;
-      ctx.lineWidth = 2.5;
-      ctx.lineJoin = 'round';
-      ctx.stroke();
-
-      // Inner shading lines for 3D depth
-      for (var i = 1; i <= 3; i++) {
-        var t = i / 4;
-        var lx = TL + (NL - TL) * t;
-        var rx = TR + (NR - TR) * t;
-        var botLx = NL + (NL - NL) * t; // neck left
-        var botRx = NR;
-        ctx.beginPath();
-        ctx.moveTo(lx + (rx - lx) * 0.15, 0);
-        ctx.lineTo(NL + (NR - NL) * (0.15 + t * 0.3), MY * 0.7);
-        ctx.strokeStyle = 'rgba(255,255,255,0.02)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Rim highlight at top
-      ctx.beginPath();
-      ctx.moveTo(TL, 2);
-      ctx.lineTo(TR, 2);
-      ctx.strokeStyle = 'rgba(255,184,0,0.5)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Rim glow
-      ctx.beginPath();
-      ctx.moveTo(TL, 2);
-      ctx.lineTo(TR, 2);
-      ctx.strokeStyle = 'rgba(255,220,80,0.15)';
-      ctx.lineWidth = 6;
-      ctx.stroke();
-
-      // Pipe left
-      ctx.beginPath();
-      ctx.moveTo(NL, NB);
-      ctx.lineTo(NL, pipeBot);
-      ctx.strokeStyle = 'rgba(255,184,0,0.35)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Pipe right
-      ctx.beginPath();
-      ctx.moveTo(NR, NB);
-      ctx.lineTo(NR, pipeBot);
-      ctx.strokeStyle = 'rgba(255,184,0,0.35)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Pipe interior fill
-      ctx.beginPath();
-      ctx.rect(NL, NB, NR-NL, pipeBot-NB);
-      var pg = ctx.createLinearGradient(NL, 0, NR, 0);
-      pg.addColorStop(0, 'rgba(255,184,0,0.08)');
-      pg.addColorStop(0.5, 'rgba(255,220,80,0.05)');
-      pg.addColorStop(1, 'rgba(255,184,0,0.08)');
-      ctx.fillStyle = pg;
-      ctx.fill();
-    }
-
-    // Wallet — vector drawn matching reference image (dark navy body, blue cards, clasp)
-    var glowT = 0;
-    function drawWallet() {
-      glowT += 0.035;
-      var gAlpha = 0.08 + Math.sin(glowT) * 0.05;
-      var cx2 = W/2, cy2 = walletCY;
-      var ww = 100, wh = 78; // wallet body dimensions
-      var wx = cx2 - ww/2, wy = cy2 - wh/2;
-
-      // Outer glow
-      ctx.save();
-      var grd = ctx.createRadialGradient(cx2, cy2, 10, cx2, cy2, 68);
-      grd.addColorStop(0, 'rgba(77,159,255,' + (gAlpha * 2) + ')');
-      grd.addColorStop(1, 'rgba(77,159,255,0)');
-      ctx.fillStyle = grd;
-      ctx.beginPath();
-      ctx.arc(cx2, cy2, 68, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-
-      ctx.save();
-
-      // --- CARDS peeking out top ---
-      function drawCard(offsetX, rot, color) {
-        ctx.save();
-        ctx.translate(cx2 - 10 + offsetX, wy - 4);
-        ctx.rotate(rot);
-        ctx.beginPath();
-        ctx.roundRect(-26, -22, 52, 28, 5);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.restore();
-      }
-      // back card (darkest blue)
-      drawCard(-10, -0.38, '#2451a0');
-      // mid card
-      drawCard(-2, -0.18, '#3b6fd4');
-      // front card (lightest blue)
-      drawCard(6, 0.05, '#5ba8f5');
-
-      // --- WALLET BODY ---
-      ctx.beginPath();
-      ctx.roundRect(wx, wy, ww, wh, 12);
-      ctx.fillStyle = '#1a2e50';
-      ctx.fill();
-
-      // Subtle inner highlight top edge
-      ctx.beginPath();
-      ctx.roundRect(wx+1, wy+1, ww-2, 12, [11,11,0,0]);
-      ctx.fillStyle = 'rgba(255,255,255,0.05)';
-      ctx.fill();
-
-      // --- CLASP on right side ---
-      var claspX = wx + ww - 2;
-      var claspY = cy2;
-      var claspW = 20, claspH = 28;
-
-      // clasp body
-      ctx.beginPath();
-      ctx.roundRect(claspX, claspY - claspH/2, claspW, claspH, 7);
-      ctx.fillStyle = '#1a2e50';
-      ctx.fill();
-      // clasp border/highlight
-      ctx.beginPath();
-      ctx.roundRect(claspX, claspY - claspH/2, claspW, claspH, 7);
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // clasp dot (circle with white ring)
-      ctx.beginPath();
-      ctx.arc(claspX + claspW/2, claspY, 6, 0, Math.PI*2);
-      ctx.fillStyle = '#1a2e50';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
-    // Get funnel x bounds at y
-    function funnelX(y) {
-      if (y < 0) return { l: TL, r: TR };
-      if (y <= MY) {
-        var t = y / MY;
-        return { l: TL + (NL-TL)*t, r: TR + (NR-TR)*t };
-      }
-      return { l: NL, r: NR };
-    }
-
-    // Items falling — only the 4 types with legend
-    var types = ['💎','💵','👁️','💸'];
-    var particles = [];
-    var lastSpawn = 0;
-
-    function spawn() {
-      var x = TL + 20 + Math.random() * (TR - TL - 40);
-      particles.push({
-        e: types[Math.floor(Math.random() * types.length)],
-        x: x, y: -24 - Math.random()*40,
-        vx: (Math.random()-0.5)*0.6,
-        vy: 1.2 + Math.random()*1.4,
-        size: 20 + Math.random()*10,
-        rot: (Math.random()-0.5)*0.3,
-        spin: (Math.random()-0.5)*0.03,
-        op: 1,
-        phase: 'fall'
-      });
-    }
-    // Pre-fill pipeline
-    for (var i=0;i<10;i++) {
-      var x0 = TL+20+Math.random()*(TR-TL-40);
-      particles.push({
-        e: types[Math.floor(Math.random()*types.length)],
-        x: x0, y: -24-Math.random()*350,
-        vx:(Math.random()-0.5)*0.6, vy:1.2+Math.random()*1.4,
-        size:20+Math.random()*10, rot:0, spin:(Math.random()-0.5)*0.03,
-        op:1, phase:'fall'
-      });
-    }
-
-    function updateParticles(ts) {
-      if (ts - lastSpawn > 580) { spawn(); lastSpawn = ts; }
-
-      particles = particles.filter(function(p){ return p.phase !== 'done'; });
-
-      particles.forEach(function(p) {
-        if (p.phase === 'fall') {
-          p.rot += p.spin;
-          p.x += p.vx;
-          p.y += p.vy;
-
-          // Wall guidance
-          var edges = funnelX(p.y);
-          var m = p.size * 0.38;
-          if (p.x < edges.l + m) { p.x = edges.l + m; p.vx = Math.abs(p.vx) * 0.4 + 0.2; }
-          if (p.x > edges.r - m) { p.x = edges.r - m; p.vx = -(Math.abs(p.vx) * 0.4 + 0.2); }
-
-          // Gravity increase inside neck
-          if (p.y > MY) { p.vy = Math.min(p.vy + 0.09, 4.5); p.vx *= 0.88; }
-
-          // Funnel to center in neck zone
-          if (p.y > MY) {
-            var pull = (p.x - W/2) * 0.06;
-            p.vx -= pull;
-          }
-
-          // Enter wallet zone
-          if (p.y > pipeBot + 30 && Math.abs(p.x - W/2) < 28) {
-            p.phase = 'absorb';
-          }
-
-          if (p.y > H + 40) p.phase = 'done';
-
-        } else if (p.phase === 'absorb') {
-          p.x += (W/2 - p.x) * 0.2;
-          p.y += (walletCY - p.y) * 0.2;
-          p.size *= 0.88;
-          p.op -= 0.06;
-          if (p.op <= 0 || p.size < 3) p.phase = 'done';
-        }
-      });
-    }
-
-    function drawParticle(p) {
-      ctx.save();
-      ctx.globalAlpha = p.op;
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.font = p.size + 'px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(255,255,255,1)';
-      ctx.fillText(p.e, 0, 0);
-      ctx.restore();
-    }
-
-    function frame(ts) {
-      // Keep canvas resolution in sync with its CSS display size
-      var rect = canvas.parentElement.getBoundingClientRect();
-      var dpr = window.devicePixelRatio || 1;
-      var displayW = Math.floor(rect.width);
-      if (canvas.width !== displayW * dpr || canvas._lastDpr !== dpr) {
-        canvas.width  = displayW * dpr;
-        canvas.height = Math.round(H * (displayW / W) * dpr);
-        canvas.style.width  = displayW + 'px';
-        canvas.style.height = Math.round(H * (displayW / W)) + 'px';
-        canvas._lastDpr = dpr;
-        ctx.scale(dpr * (displayW / W), dpr * (displayW / W));
-      }
-      ctx.clearRect(0,0,W,H);
-      drawFunnel();
-
-      // particles behind wallet
-      particles.forEach(function(p){ if(p.phase==='fall') drawParticle(p); });
-
-      drawWallet();
-
-      // absorbing particles on top of wallet
-      particles.forEach(function(p){ if(p.phase==='absorb') drawParticle(p); });
-
-      updateParticles(ts);
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  })();
-</script>
+<div class="footer"><p>KeepLive · Não somos afiliados ao TikTok</p></div>
 
 </body>
 </html>
