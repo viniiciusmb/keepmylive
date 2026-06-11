@@ -1049,31 +1049,67 @@
     background: rgba(77,159,255,0.05);
     border: 1px solid rgba(77,159,255,0.2);
     border-radius: 18px;
-    padding: 22px 28px;
+    padding: 28px 28px 24px;
     max-width: min(580px, calc(100vw - 48px));
-    text-align: left;
+    text-align: center;
     animation: fadeUp 0.7s 0.35s ease both;
+    position: relative;
+    overflow: hidden;
   }
 
-  .bo-badge {
-    font-size: 0.78rem;
-    font-weight: 700;
+  .blue-ocean-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(77,159,255,0.6), rgba(77,159,255,0.1));
+  }
+
+  .bo-wave {
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .bo-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(2rem, 6vw, 2.8rem);
+    font-weight: 800;
     color: #4D9FFF;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .bo-divider {
+    width: 40px;
+    height: 2px;
+    background: rgba(77,159,255,0.35);
+    border-radius: 2px;
+    margin: 0 auto 16px;
   }
 
   .bo-text {
     font-size: 0.95rem;
     color: var(--muted);
-    line-height: 1.7;
+    line-height: 1.75;
   }
 
-  .bo-text strong { color: #4D9FFF; }
+  .bo-text strong { color: #fff; }
+
+  .bo-cta-line {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    font-style: italic;
+    line-height: 1.6;
+  }
 
   @media (max-width: 768px) {
-    .blue-ocean-box { padding: 18px 20px; }
+    .blue-ocean-box { padding: 22px 20px 20px; }
+    .bo-title { font-size: 2rem; }
   }
 
   /* MILLION FOLLOWERS BOX */
@@ -1169,20 +1205,20 @@
 
   <div class="badge">🔥 Enquanto você lê isso, alguém está ganhando</div>
 
-  <h1>O único jeito de ganhar<br><span class="accent">dinheiro 100% automático</span><br>hoje em dia</h1>
+  <h1>Como pessoas comuns estão<br><span class="accent">ganhando R$140 por dia</span><br>sem aparecer na câmera</h1>
 
   <p class="hero-sub">
-    Qualquer pessoa pode abrir uma live interativa no TikTok e receber diamantes enquanto o jogo roda sozinho. Média de <strong style="color:#fff">5.000 diamantes por dia</strong> — equivalente a <strong style="color:#fff">~R$140 diários</strong>. Sem fazer nada. Literalmente.
+    Abra uma live no TikTok, ligue o jogo e vai fazer outra coisa. O jogo roda sozinho, o público manda presentes, e os diamantes caem na sua conta. <strong style="color:#fff">Média de 5.000 diamantes por dia</strong> — <strong style="color:#fff">~R$140 diários</strong>. Sem criar conteúdo. Sem aparecer. Sem esforço.
   </p>
 
   <div class="blue-ocean-box">
-    <div class="bo-badge">🌊 Mar azul — quase ninguém está fazendo isso</div>
+    <div class="bo-wave">🌊</div>
+    <div class="bo-title">Mar Azul</div>
+    <div class="bo-divider"></div>
     <p class="bo-text">
-      Enquanto milhares de pessoas brigam por atenção criando conteúdo, 
-      <strong>uma minoria silenciosa abre a live, liga o jogo e vai dormir</strong> — 
-      e acorda com dinheiro na conta. O mercado de lives interativas no TikTok 
-      ainda está no início no Brasil. <strong style="color:#fff">Quem entrar agora vai colher 
-      muito mais do que quem entrar daqui a 6 meses.</strong>
+      Esses jogos <strong>não estão disponíveis para o público geral.</strong><br>
+      Só quem é da nossa comunidade tem acesso.<br><br>
+      <span class="bo-cta-line">Ou você vem fazer dinheiro com a gente —<br>ou deixa mais uma oportunidade passar por medo de dar errado.</span>
     </p>
   </div>
 
@@ -1813,63 +1849,59 @@
   </div>
 </section>
 
-<!-- TABELA DE EVOLUÇÃO -->
+<!-- GRÁFICO DE GANHOS MAIO -->
 <section id="ganhos" style="padding-top:0;">
-  <div class="section-label">Sua evolução</div>
-  <h2>Veja quanto você<br><span class="accent">evolui com o tempo</span></h2>
-  <p class="section-sub">Quanto mais você usa, mais o algoritmo do TikTok te empurra. Os números abaixo são médias reais de quem usa os jogos.</p>
+  <div class="section-label">Média de maio</div>
+  <h2>Diamantes por dia<br><span class="accent">conta dos players — maio 2026</span></h2>
+  <p class="section-sub">Média real dos usuários KeepLive ativos em maio. Tem dias melhores, tem dias piores — é assim que funciona.</p>
 
-  <div class="growth-table">
-    <div class="growth-header">
-      <span>Período</span>
-      <span>💎 Diamantes / live</span>
-      <span>👥 Seguidores ganhos</span>
-      <span>Status</span>
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div class="chart-meta">
+        <span class="chart-meta-item"><span class="chart-dot2"></span> Diamantes/dia · maio 2026</span>
+        <span class="chart-meta-item chart-meta-trend">💎 Média mensal: ~6.000/dia</span>
+      </div>
     </div>
-    <div class="growth-row">
-      <div class="growth-period">
-        <span class="period-label">Semanas 1 – 3</span>
-        <span class="period-sub">fase inicial</span>
+
+    <div class="bar-chart-area">
+      <div class="chart-y-axis2">
+        <span>8.000</span>
+        <span>6.000</span>
+        <span>4.000</span>
+        <span>2.000</span>
+        <span>0</span>
       </div>
-      <div class="growth-stat">
-        <span class="gstat-num">~500</span>
-        <span class="gstat-sub">diamantes por live</span>
+      <div class="bar-chart-inner">
+        <div class="bar-grid">
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <div class="bar-chart-bars" id="barChartBars"></div>
       </div>
-      <div class="growth-stat">
-        <span class="gstat-num">+200</span>
-        <span class="gstat-sub">seguidores em média</span>
-      </div>
-      <div class="growth-tag tag-start">🌱 Crescendo</div>
     </div>
-    <div class="growth-row growth-row-highlight">
-      <div class="growth-period">
-        <span class="period-label">Semanas 3 – 6</span>
-        <span class="period-sub">fase de aceleração</span>
+    <div class="bar-x-axis">
+      <span>1</span><span>5</span><span>10</span><span>15</span><span>20</span><span>25</span><span>31</span>
+    </div>
+
+    <div class="chart-summary">
+      <div class="cs-item">
+        <div class="cs-val">4.400 💎</div>
+        <div class="cs-label">mínimo do mês</div>
       </div>
-      <div class="growth-stat">
-        <span class="gstat-num accent-text">~5.000</span>
-        <span class="gstat-sub">diamantes/dia (~R$140)</span>
+      <div class="cs-arrow">·</div>
+      <div class="cs-item cs-item-highlight">
+        <div class="cs-val" style="color:var(--pink)">~6.000 💎</div>
+        <div class="cs-label">média diária · maio</div>
       </div>
-      <div class="growth-stat">
-        <span class="gstat-num accent-text">+500</span>
-        <span class="gstat-sub">seguidores em média</span>
+      <div class="cs-arrow">·</div>
+      <div class="cs-item">
+        <div class="cs-val">8.100 💎</div>
+        <div class="cs-label">máximo do mês</div>
       </div>
-      <div class="growth-tag tag-peak">🔥 Acelerado</div>
     </div>
   </div>
 
   <!-- EASE BULLETS -->
   <div class="ease-grid">
-    <div class="ease-card">
-      <div class="ease-icon">⚡</div>
-      <h4>2 minutos pra abrir uma live</h4>
-      <p>Do zero até ao vivo em 2 minutos. Sem configuração toda vez — é só abrir e ligar.</p>
-    </div>
-    <div class="ease-card">
-      <div class="ease-icon">🔄</div>
-      <h4>Fecha e abre quando quiser</h4>
-      <p>Tem 15 minutos livres? Abre a live. Precisa sair? Fecha. Sem compromisso de horário fixo.</p>
-    </div>
     <div class="ease-card">
       <div class="ease-icon">🤖</div>
       <h4>Deixe o jogo trabalhar por você</h4>
@@ -1877,6 +1909,188 @@
     </div>
   </div>
 </section>
+
+<style>
+  .chart-wrap {
+    margin-top: 48px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px 20px 8px;
+    position: relative;
+    overflow: hidden;
+  }
+  .chart-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink), var(--pink-light));
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chart-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .chart-meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--muted); }
+  .chart-dot2 { width: 10px; height: 10px; border-radius: 3px; background: var(--pink); flex-shrink: 0; }
+  .chart-meta-trend { color: var(--pink); font-weight: 700; }
+
+  .bar-chart-area { display: flex; gap: 6px; align-items: flex-end; }
+  .chart-y-axis2 {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 200px;
+    text-align: right;
+    font-size: 0.62rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    min-width: 38px;
+    padding-right: 4px;
+    padding-bottom: 0;
+  }
+  .bar-chart-inner {
+    flex: 1;
+    height: 200px;
+    position: relative;
+  }
+  .bar-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .bar-grid div { border-top: 1px solid rgba(255,255,255,0.04); }
+  .bar-chart-bars {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .bc-bar-wrap {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    cursor: default;
+  }
+  .bc-bar {
+    width: 100%;
+    border-radius: 3px 3px 0 0;
+    transition: opacity 0.15s;
+  }
+  .bc-bar-wrap:hover .bc-bar { opacity: 0.75; }
+  .bc-tooltip {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    border: 1px solid rgba(255,45,107,0.4);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.65rem;
+    color: #fff;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s;
+    z-index: 10;
+  }
+  .bc-bar-wrap:hover .bc-tooltip { opacity: 1; }
+
+  .bar-x-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    margin-bottom: 14px;
+    padding-left: 44px;
+    font-size: 0.62rem;
+    color: var(--muted);
+  }
+  .chart-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 14px 0 8px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .cs-item { text-align: center; }
+  .cs-item-highlight {
+    background: rgba(255,45,107,0.06);
+    border: 1px solid rgba(255,45,107,0.2);
+    border-radius: 12px;
+    padding: 8px 18px;
+  }
+  .cs-val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+  }
+  .cs-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+  .cs-arrow { font-size: 1rem; color: var(--muted); opacity: 0.4; }
+
+  @media (max-width: 600px) {
+    .chart-y-axis2 { min-width: 30px; font-size: 0.56rem; }
+    .bar-x-axis { padding-left: 36px; }
+    .bar-chart-bars { gap: 1px; }
+  }
+</style>
+
+<script>
+(function() {
+  // Maio 2026 — zigzag bem inconstante: sobe cai sobe cai, sem tendência
+  // padrão: sequência crescente interrompida por queda brusca, depois sobe de novo, etc.
+  var data = [
+    5100, 6800, 4400, 7200, 5600, 7900, 4700,   // dias 1-7:  sobe/desce intenso
+    6300, 5000, 7500, 4600, 8100, 5300, 7000,   // dias 8-14: pico e vale rápidos
+    4500, 6600, 5800, 7700, 4900, 6200, 7400,   // dias 15-21: oscila no meio
+    5500, 8000, 4800, 7100, 5200, 6900, 4600,   // dias 22-28: alta e queda brusca
+    7600, 5400, 6700                             // dias 29-31: fecha em alta
+  ];
+  var maxVal = 9000;
+  var container = document.getElementById('barChartBars');
+  if (!container) return;
+
+  data.forEach(function(val, i) {
+    var pct = (val / maxVal) * 100;
+    // cor baseada no valor: mais alto = mais brilhante
+    var color = val >= 7500
+      ? 'linear-gradient(180deg, #FF2D6B 0%, #ff5c8a 100%)'
+      : val >= 6000
+        ? 'linear-gradient(180deg, rgba(255,45,107,0.85) 0%, rgba(255,45,107,0.55) 100%)'
+        : 'linear-gradient(180deg, rgba(255,45,107,0.5) 0%, rgba(255,45,107,0.25) 100%)';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'bc-bar-wrap';
+
+    var bar = document.createElement('div');
+    bar.className = 'bc-bar';
+    bar.style.height = pct + '%';
+    bar.style.background = color;
+
+    var tip = document.createElement('div');
+    tip.className = 'bc-tooltip';
+    tip.textContent = 'Dia ' + (i + 1) + ': ' + val.toLocaleString('pt-BR') + ' 💎';
+
+    wrap.appendChild(bar);
+    wrap.appendChild(tip);
+    container.appendChild(wrap);
+  });
+})();
+</script>
 
 <style>
   /* GROWTH TABLE */
@@ -2033,198 +2247,10 @@
   </div>
 </section>
 
-<!-- FEATURES -->
-<section>
-  <div class="features-split">
-    <div>
-      <div class="section-label">Por que a KeepLive</div>
-      <h2>Funciona para<br><span class="accent">qualquer pessoa</span></h2>
-      <p class="section-sub">Conta nova, conta pequena, conta grande — não importa. Se você tem TikTok, tem tudo que precisa para começar a receber diamantes hoje.</p>
-
-      <div class="features-list">
-        <div class="feature-item">
-          <div class="feature-check">✓</div>
-          <div class="feature-text">
-            <h4>Qualquer pessoa pode começar</h4>
-            <p>Conta nova ou antiga, poucos ou muitos seguidores — o jogo funciona e os diamantes chegam. Ponto final.</p>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-check">✓</div>
-          <div class="feature-text">
-            <h4>Média de 5.000 diamantes por dia</h4>
-            <p>O jogo prende o público. Quanto mais ficam, mais mandam. ~R$140 por dia rodando sozinho — sem você fazer nada.</p>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-check">✓</div>
-          <div class="feature-text">
-            <h4>Sem mensalidade, nunca</h4>
-            <p>R$37,90 uma vez. Outros cobram R$30–R$60 por mês. Aqui você paga uma vez e usa para sempre.</p>
-          </div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-check">✓</div>
-          <div class="feature-text">
-            <h4>Suporte disponível</h4>
-            <p>Se travar em qualquer etapa, tem alguém pra te ajudar a configurar tudo.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mockup-box">
-      <div class="mockup-header">
-        <div class="dot dot-r"></div>
-        <div class="dot dot-y"></div>
-        <div class="dot dot-g"></div>
-        <span class="mockup-title">TikTok Live — Jogo rodando, dinheiro entrando</span>
-      </div>
-
-      <div class="mockup-live">
-        <div class="live-dot"></div>
-        <span class="live-text">AO VIVO</span>
-        <span class="live-count">👥 1.247 assistindo</span>
-      </div>
-
-      <div class="event-list">
-        <div class="event">
-          <span class="event-left">🌹 @lucasgamer enviou Rosa</span>
-          <span class="event-right">+🚀 Boost</span>
-        </div>
-        <div class="event">
-          <span class="event-left">💎 @ana_live enviou Diamante</span>
-          <span class="event-right">+🏆 Podium</span>
-        </div>
-        <div class="event">
-          <span class="event-left">❤️ 4.300 curtidas acumuladas</span>
-          <span class="event-right">🔓 Power-up!</span>
-        </div>
-        <div class="event">
-          <span class="event-left">💬 @pedro digita "subir"</span>
-          <span class="event-right">+⬆️ Movimento</span>
-        </div>
-      </div>
-
-      <div class="earnings-row">
-        <div>
-          <div class="earnings-label">Ganhos da sessão de hoje</div>
-        </div>
-        <div class="earnings-val">R$ 187,40</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PREÇO -->
-<section id="preco" style="text-align:center;">
-  <div class="section-label">Oferta</div>
-  <h2>Pare de deixar<br><span class="accent">dinheiro na mesa</span></h2>
-  <p class="section-sub" style="margin: 14px auto 0;">Acesso imediato. Sem mensalidade. Sem renovação. Enquanto você hesita, outros já estão recebendo diamantes.</p>
-  <div style="height:20px;"></div>
-
-  <!-- VAGAS -->
-  <div class="vacancy-box">
-    <div class="vacancy-top">
-      <span class="vacancy-fire">🔒</span>
-      <span class="vacancy-title">Acessos limitados por conta da concorrência</span>
-    </div>
-    <p class="vacancy-desc">Estamos limitando o acesso para proteger quem já está dentro. Quando muita gente usa o mesmo mercado, os ganhos caem. Aqui só entra quem vai usar de verdade.</p>
-    <div class="vacancy-bar-wrap">
-      <div class="vacancy-bar-track">
-        <div class="vacancy-bar-fill"></div>
-      </div>
-      <div class="vacancy-numbers">
-        <span class="vacancy-used">97 acessos ativados</span>
-        <span class="vacancy-left">⚠️ Apenas <strong>3 acessos restantes</strong></span>
-      </div>
-    </div>
-    <div class="vacancy-urgency">
-      <div class="vu-item">
-        <span class="vu-icon">⏱️</span>
-        <span class="vu-text">Estimativa para esgotar: <strong id="vacancyTimer">20:00</strong></span>
-      </div>
-      <div class="vu-divider"></div>
-      <div class="vu-item">
-        <span class="vu-icon">📅</span>
-        <span class="vu-text">Próximos acessos: <strong>Janeiro 2027</strong> por <strong style="color:var(--pink)">R$197,90</strong></span>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    .vacancy-box {
-      max-width: 500px;
-      margin: 40px auto 0;
-      margin-bottom: 0;
-      background: rgba(255,45,107,0.06);
-      border: 1px solid rgba(255,45,107,0.3);
-      border-radius: 20px;
-      padding: 28px 28px 24px;
-    }
-
-    .vacancy-top {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .vacancy-fire { font-size: 1.3rem; }
-
-    .vacancy-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: var(--pink);
-    }
-
-    .vacancy-desc {
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.6;
-      margin-bottom: 18px;
-    }
-
-    .vacancy-bar-track {
-      background: rgba(255,255,255,0.08);
-      border-radius: 50px;
-      height: 10px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .vacancy-bar-fill {
-      height: 100%;
-      width: 96%;
-      background: linear-gradient(90deg, var(--pink), #ff8fab);
-      border-radius: 50px;
-      animation: fillBar 1.5s ease both;
-    }
-
-    @keyframes fillBar {
-      from { width: 0%; }
-      to   { width: 96%; }
-    }
-
-    .vacancy-numbers {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-    }
-
-    .vacancy-used { color: var(--muted); }
-
-    .vacancy-left {
-      color: var(--pink);
-      font-weight: 600;
-    }
-  </style>
-
 
 <!-- RANKING SECTION -->
 <section id="ranking" style="padding-top:56px; padding-bottom:56px;">
-  <div class="section-label">🏆 Ranking — Maio 2025</div>
+  <div class="section-label">🏆 Ranking — Maio 2026</div>
   <h2 style="margin-bottom:8px;">Top 10 usuários que fizeram<br>mais <span class="accent">diamantes em maio</span></h2>
   <p class="section-sub" style="margin-bottom:28px;">Resultados reais de usuários KeepLive. Ranking final do mês de maio.</p>
 
@@ -2234,16 +2260,16 @@
       <span>Usuário</span>
       <span>Diamantes em Maio</span>
     </div>
-      <div class="rank-row" style="background:rgba(255,45,107,0.04);"><span class="rank-medal">🥇</span><div class="rank-info"><div class="rank-handle">Ana Lima</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 482.391</div></div>
-      <div class="rank-row" style=""><span class="rank-medal">🥈</span><div class="rank-info"><div class="rank-handle">Carlos Mendes</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 461.708</div></div>
-      <div class="rank-row" style=""><span class="rank-medal">🥉</span><div class="rank-info"><div class="rank-handle">Juliana Costa</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 438.254</div></div>
-      <div class="rank-row" style=""><span class="rank-num">4</span><div class="rank-info"><div class="rank-handle">Rafael Torres</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 419.087</div></div>
-      <div class="rank-row" style=""><span class="rank-num">5</span><div class="rank-info"><div class="rank-handle">Fernanda Souza</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 396.543</div></div>
-      <div class="rank-row" style=""><span class="rank-num">6</span><div class="rank-info"><div class="rank-handle">Henrique Neto</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 374.812</div></div>
-      <div class="rank-row" style=""><span class="rank-num">7</span><div class="rank-info"><div class="rank-handle">Larissa Moura</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 351.629</div></div>
-      <div class="rank-row" style=""><span class="rank-num">8</span><div class="rank-info"><div class="rank-handle">Bruno Alves</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 332.947</div></div>
-      <div class="rank-row" style=""><span class="rank-num">9</span><div class="rank-info"><div class="rank-handle">Thayna Reis</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 314.183</div></div>
-      <div class="rank-row" style=""><span class="rank-num">10</span><div class="rank-info"><div class="rank-handle">Mateus Silva</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 297.456</div></div>
+      <div class="rank-row" style="background:rgba(255,45,107,0.04);"><span class="rank-medal">🥇</span><div class="rank-info"><div class="rank-handle">Ana Lima</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 1.104.837</div></div>
+      <div class="rank-row"><span class="rank-medal">🥈</span><div class="rank-info"><div class="rank-handle">Carlos Mendes</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 1.031.492</div></div>
+      <div class="rank-row"><span class="rank-medal">🥉</span><div class="rank-info"><div class="rank-handle">Juliana Costa</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 963.751</div></div>
+      <div class="rank-row"><span class="rank-num">4</span><div class="rank-info"><div class="rank-handle">Rafael Torres</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 897.214</div></div>
+      <div class="rank-row"><span class="rank-num">5</span><div class="rank-info"><div class="rank-handle">Fernanda Souza</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 824.638</div></div>
+      <div class="rank-row"><span class="rank-num">6</span><div class="rank-info"><div class="rank-handle">Henrique Neto</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 763.409</div></div>
+      <div class="rank-row"><span class="rank-num">7</span><div class="rank-info"><div class="rank-handle">Larissa Moura</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 712.853</div></div>
+      <div class="rank-row"><span class="rank-num">8</span><div class="rank-info"><div class="rank-handle">Bruno Alves</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">4 contas conectadas</div></div><div class="rank-diamonds">💎 671.247</div></div>
+      <div class="rank-row"><span class="rank-num">9</span><div class="rank-info"><div class="rank-handle">Thayna Reis</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 634.918</div></div>
+      <div class="rank-row"><span class="rank-num">10</span><div class="rank-info"><div class="rank-handle">Mateus Silva</div><div class="rank-name" style="color:var(--muted);font-size:0.75rem;">3 contas conectadas</div></div><div class="rank-diamonds">💎 601.372</div></div>
     </div>
 
 </section>
@@ -2536,87 +2562,169 @@
 </style>
 
 
+<!-- PREÇO -->
+<section id="preco" style="text-align:center;">
+  <div class="section-label">Oferta única</div>
+  <h2>Essa é sua única<br><span class="accent">chance de entrar</span></h2>
+  <p class="section-sub" style="margin: 14px auto 0;">Acesso imediato. Sem mensalidade. Sem renovação. Sem segunda chance — quando fechar, fecha.</p>
+  <div style="height:20px;"></div>
 
-  <!-- PREMIUM PLAN - MAIS VENDIDO -->
-  <div class="price-card premium-card" style="max-width:500px;margin:40px auto 0;background:var(--card);border:2px solid rgba(255,184,0,0.4);border-radius:28px;padding:48px 40px;position:relative;overflow:visible;">
-    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FFB800,#FF2D6B);border-radius:28px 28px 0 0;"></div>
-    <div style="position:absolute;top:-16px;left:0;right:0;display:flex;justify-content:center;">
-      <div style="background:#FFB800;color:#000;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:0.75rem;padding:6px 22px;border-radius:50px;letter-spacing:0.06em;text-transform:uppercase;box-shadow:0 2px 12px rgba(255,184,0,0.4);">⭐ Mais Vendido</div>
+  <!-- VAGAS -->
+  <div class="vacancy-box">
+    <div class="vacancy-top">
+      <span class="vacancy-fire">🔒</span>
+      <span class="vacancy-title">Acessos limitados por conta da concorrência</span>
     </div>
-    <div style="position:absolute;top:-80px;right:-80px;width:250px;height:250px;background:radial-gradient(circle,rgba(255,184,0,0.08) 0%,transparent 70%);border-radius:50%;"></div>
-
-    <div style="display:inline-block;background:rgba(255,184,0,0.12);color:#FFB800;font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:6px 16px;border-radius:50px;margin-bottom:20px;">Acesso Multicontas — Contas Ilimitadas</div>
-
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
-      <span style="font-size:0.9rem;color:var(--muted);text-decoration:line-through;">R$137,90</span>
-      <span style="background:rgba(255,184,0,0.15);color:#FFB800;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:50px;">Economize R$70</span>
+    <p class="vacancy-desc">Estamos limitando o acesso para proteger quem já está dentro. Quando muita gente usa o mesmo mercado, os ganhos caem. Aqui só entra quem vai usar de verdade.</p>
+    <div class="vacancy-bar-wrap">
+      <div class="vacancy-bar-track">
+        <div class="vacancy-bar-fill"></div>
+      </div>
+      <div class="vacancy-numbers">
+        <span class="vacancy-used">97 acessos ativados</span>
+        <span class="vacancy-left">⚠️ Apenas <strong>3 acessos restantes</strong></span>
+      </div>
     </div>
-    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:3.8rem;font-weight:800;line-height:1;letter-spacing:-2px;">
-      <span style="font-size:1.6rem;vertical-align:super;margin-right:4px;color:#FFB800;">R$</span>67,90
+    <div class="vacancy-urgency">
+      <div class="vu-item">
+        <span class="vu-icon">⏱️</span>
+        <span class="vu-text">Estimativa para esgotar: <strong id="vacancyTimer">20:00</strong></span>
+      </div>
+      <div class="vu-divider"></div>
+      <div class="vu-item">
+        <span class="vu-icon">🚫</span>
+        <span class="vu-text"><strong>Quando esgotar, não abrimos mais vagas.</strong> Sem data de retorno.</span>
+      </div>
     </div>
-    <div style="font-size:0.85rem;color:var(--muted);margin-top:6px;margin-bottom:20px;">pagamento único · acesso imediato</div>
-
-    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:0.82rem;color:var(--muted);text-align:center;">
-      📧 Tutorial e acesso enviados por e-mail imediatamente após a compra
-    </div>
-
-    <div style="background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:10px;padding:10px 14px;margin-bottom:20px;font-size:0.85rem;font-weight:700;color:#FFB800;text-align:center;">
-      ♾️ Conecte quantas contas quiser — sem limite
-    </div>
-
-    <div style="margin:0 0 28px;display:flex;flex-direction:column;gap:12px;text-align:left;">
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Contas ilimitadas — ideal para quem gerencia múltiplos TikToks</span></div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Média de 5.000 💎 por dia (~R$140) por conta</span></div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Todos os jogos interativos desbloqueados</span></div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Sem aparecer na câmera, sem criar conteúdo</span></div>
-      
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Sem mensalidade — pague uma vez, use para sempre</span></div>
-      <div style="display:flex;align-items:center;gap:10px;font-size:0.9rem;"><span style="color:#FFB800;font-weight:700;">✓</span><span style="color:rgba(255,255,255,0.75);">Bônus: concorra à conta com 1 milhão de seguidores</span></div>
-    </div>
-
-    <div class="million-box" style="margin-bottom:24px;">
-      <div class="million-badge">🏆 BÔNUS EXCLUSIVO — AO COMPRAR AGORA</div>
-      <div class="million-title">Concorra a uma conta TikTok<br>com <span>1.000.000</span> de seguidores</div>
-      <p class="million-desc">Todo comprador do Acesso Multicontas entra automaticamente no sorteio. Imagine abrir suas lives já com 1M de pessoas te acompanhando em cada conta.</p>
-    </div>
-
-    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQCJF5" id="btn-premium" class="btn-buy btn-comprar" style="background:linear-gradient(135deg,#FFB800,#FF8C00);box-shadow:0 0 40px rgba(255,184,0,0.3);margin-bottom:0;">
-      🚀 Comprar Acesso Multicontas agora
-    </a>
-    <div class="price-guarantee" style="margin-top:14px;">🔒 Pagamento seguro · Acesso imediato após confirmação</div>
   </div>
 
-  <p style="text-align:center;color:var(--muted);font-size:0.8rem;margin-top:32px;margin-bottom:12px;">ou prefere o acesso para 1 conta:</p>
-  <div class="price-card">
-    <div class="price-label">🎮 Acesso Individual — 1 conta</div>
+  <style>
+    .vacancy-box {
+      max-width: 500px;
+      margin: 40px auto 0;
+      margin-bottom: 0;
+      background: rgba(255,45,107,0.06);
+      border: 1px solid rgba(255,45,107,0.3);
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+    }
 
-    <div class="price-original">
-      <span class="po-de">De</span>
-      <span class="po-old">R$67,90</span>
-      <span class="po-arrow">→</span>
-      <span class="po-por">por apenas</span>
+    .vacancy-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .vacancy-fire { font-size: 1.3rem; }
+
+    .vacancy-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--pink);
+    }
+
+    .vacancy-desc {
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    .vacancy-bar-track {
+      background: rgba(255,255,255,0.08);
+      border-radius: 50px;
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .vacancy-bar-fill {
+      height: 100%;
+      width: 96%;
+      background: linear-gradient(90deg, var(--pink), #ff8fab);
+      border-radius: 50px;
+      animation: fillBar 1.5s ease both;
+    }
+
+    @keyframes fillBar {
+      from { width: 0%; }
+      to   { width: 96%; }
+    }
+
+    .vacancy-numbers {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .vacancy-used { color: var(--muted); }
+
+    .vacancy-left {
+      color: var(--pink);
+      font-weight: 600;
+    }
+  </style>
+
+
+
+
+
+  <!-- BÔNUS — FORA DA CAIXA DE PREÇO -->
+  <div style="max-width:500px;margin:40px auto 0;display:flex;flex-direction:column;gap:16px;">
+
+    <!-- BONUS 1: TIKTOK SHOP -->
+    <div class="tks-bonus-box">
+      <div class="tks-badge">📘 BÔNUS INCLUSO — TODOS QUE ENTRAREM RECEBEM</div>
+      <div class="tks-title">Guia TikTok Shop com IA<br><span>Fature R$3.000/mês sem aparecer na câmera</span></div>
+      <div class="tks-desc">Todo comprador recebe junto com o acesso um guia completo de 8 módulos ensinando como ganhar como afiliado TikTok Shop usando IA para criar vídeos que vendem por você:</div>
+      <div class="tks-items">
+        <div class="tks-item"><span>→</span><span>TikTok Shop Afiliado — sem CNPJ, sem estoque, sem câmera</span></div>
+        <div class="tks-item"><span>→</span><span>IA cria os vídeos por você — ChatGPT, CapCut IA, ElevenLabs</span></div>
+        <div class="tks-item"><span>→</span><span>Como escolher produtos com comissão acima de 15%</span></div>
+        <div class="tks-item"><span>→</span><span>Combo: live interativa + TikTok Shop — diamantes E comissões ao mesmo tempo</span></div>
+        <div class="tks-item"><span>→</span><span>Caminho de R$500 a R$3.000/mês — metas reais mês a mês</span></div>
+        <div class="tks-item"><span>→</span><span>Os 5 erros fatais que fazem as pessoas desistirem antes de ganhar</span></div>
+      </div>
     </div>
+
+    <!-- BONUS 2: 1M SEGUIDORES -->
+    <div class="million-box" style="margin-bottom:0;">
+      <div class="million-badge">🏆 BÔNUS INCLUSO — TODOS QUE ENTRAREM CONCORREM</div>
+      <div class="million-title">Concorra a uma conta TikTok<br>com <span>1.000.000</span> de seguidores</div>
+      <p class="million-desc">Todo comprador entra automaticamente no sorteio de uma conta verificada com 1 milhão de seguidores no TikTok. Imagine abrir sua live já com 1M de pessoas te acompanhando.</p>
+    </div>
+
+  </div>
+
+  <!-- PLANO ÚNICO R$37,90 -->
+  <div class="price-card" style="max-width:500px;margin:24px auto 0;">
+
+    <div class="price-label">🎮 Acesso Completo — KeepLive</div>
 
     <div class="price-amount">
       <span class="currency">R$</span>37,90
     </div>
-    <div class="price-once">por apenas • acesso imediato</div>
+    <div class="price-once">pagamento único · acesso imediato · para sempre</div>
 
     <div class="price-features">
-      <div class="price-feat"><span class="tick">✓</span><span>Qualquer pessoa, qualquer conta, começa hoje</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Qualquer pessoa, qualquer conta — começa hoje mesmo</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Média de 5.000 💎 por dia (~R$140 diários)</span></div>
       <div class="price-feat"><span class="tick">✓</span><span>Todos os jogos interativos desbloqueados</span></div>
-      <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade, sem renovação, sem pegadinha</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Sem aparecer na câmera, sem criar conteúdo</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Sem mensalidade — pague uma vez, use para sempre</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Guia TikTok Shop com IA incluso</span></div>
+      <div class="price-feat"><span class="tick">✓</span><span>Concorre à conta com 1.000.000 de seguidores</span></div>
     </div>
 
-    <!-- MILLION FOLLOWERS BONUS -->
-    <div class="million-box">
-      <div class="million-badge">🏆 BÔNUS EXCLUSIVO — AO COMPRAR AGORA</div>
-      <div class="million-title">Concorra a uma conta TikTok<br>com <span>1.000.000</span> de seguidores</div>
-      <p class="million-desc">Todo comprador desta oferta entra automaticamente no sorteio de uma conta verificada com 1 milhão de seguidores no TikTok. Imagine abrir sua live já com 1M de pessoas te acompanhando.</p>
+    <!-- EMAIL INFO -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:24px;font-size:0.85rem;color:var(--muted);text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <span style="font-size:1.1rem;">📧</span>
+      <span>Tutorial completo + acesso enviados direto no seu e-mail para criar a conta e começar</span>
     </div>
 
-    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQCA28" class="btn-buy btn-comprar">🚀 Comprar Acesso Individual agora</a>
+    <a href="https://checkout.perfectpay.com.br/pay/PPU38CQCA28" class="btn-buy btn-comprar">🚀 Garantir meu acesso</a>
 
     <div class="price-guarantee">
       🔒 Pagamento seguro · Acesso imediato após confirmação
@@ -2624,12 +2732,69 @@
   </div>
 </section>
 
+<style>
+  /* TIKTOK SHOP BONUS BOX */
+  .tks-bonus-box {
+    background: linear-gradient(135deg, rgba(255,184,0,0.08), rgba(255,45,107,0.05));
+    border: 1px solid rgba(255,184,0,0.4);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .tks-bonus-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #FFB800, var(--pink));
+  }
+  .tks-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #FFB800;
+    margin-bottom: 8px;
+  }
+  .tks-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .tks-title span { color: #FFB800; }
+  .tks-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .tks-items { display: flex; flex-direction: column; gap: 6px; }
+  .tks-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.8);
+  }
+  .tks-item span:first-child { color: #FFB800; flex-shrink: 0; font-weight: 700; }
+</style>
+
 <!-- FAQ -->
 <section id="faq" style="text-align:center;">
   <div class="section-label">Dúvidas</div>
   <h2>Perguntas <span class="accent">frequentes</span></h2>
 
   <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">
+        Isso pode banir minha conta do TikTok? <span class="arrow">+</span>
+      </div>
+      <div class="faq-a">Não. Os jogos da KeepLive funcionam dentro do TikTok Live Studio, a ferramenta oficial do próprio TikTok para lives. Você está usando os recursos nativos da plataforma — nada de bot, nada de terceiro suspeito. Centenas de pessoas usam todo dia sem qualquer problema.</div>
+    </div>
     <div class="faq-item">
       <div class="faq-q" onclick="toggleFaq(this)">
         Preciso aparecer na câmera? <span class="arrow">+</span>
@@ -2666,13 +2831,13 @@
 <!-- FOOTER CTA -->
 <div style="text-align:center; padding: 0 24px 80px;">
   <h2 style="font-family:'Plus Jakarta Sans',sans-serif; font-size:clamp(1.8rem,3.5vw,2.8rem); font-weight:800; letter-spacing:-1px;">
-    Qualquer pessoa. 10 minutos.<br><span style="color:var(--pink)">Já tá gerando diamantes.</span>
+    Última chance para entrar.<br><span style="color:var(--pink)">Quando esgotar, não abre mais.</span>
   </h2>
-  <p style="color:var(--muted); margin: 16px auto 32px; max-width:420px; font-size:1rem; line-height:1.6;">
-    Sem seguidores mínimos. Sem câmera. Sem conteúdo. Sem desculpa. R$37,90 uma vez e o jogo trabalha por você.
+  <p style="color:var(--muted); margin: 16px auto 32px; max-width:460px; font-size:1rem; line-height:1.6;">
+    Sem data de retorno. Sem segunda chance. Quem entrar agora garante o acesso para sempre — quem hesitar fica de fora.
   </p>
   <a href="https://checkout.perfectpay.com.br/pay/PPU38CQCA28" class="btn-primary btn-comprar" style="font-size:1.05rem; padding:18px 44px;">
-    🚀 Comprar Acesso Individual agora
+    🚀 Garantir meu acesso
   </a>
 </div>
 
@@ -2708,25 +2873,43 @@
 
 
 <script>
-  // Repassa UTM params para os links do checkout — dois planos com links diferentes
+  // Repassa UTM params para os links do checkout — com persistencia via cookie (30 dias)
   (function() {
     var linkIndividual = "https://checkout.perfectpay.com.br/pay/PPU38CQCA28";
-    var linkMulticontas = "https://checkout.perfectpay.com.br/pay/PPU38CQCJF5";
+
+    var utmParams = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var hasUtms = utmParams.some(function(p){ return urlParams.get(p); });
+    if (hasUtms) {
+      var toSave = {};
+      utmParams.forEach(function(p){ if(urlParams.get(p)) toSave[p] = urlParams.get(p); });
+      var exp = new Date(Date.now() + 30*24*60*60*1000).toUTCString();
+      document.cookie = 'pp_utms=' + encodeURIComponent(JSON.stringify(toSave)) + ';expires=' + exp + ';path=/';
+    }
+
+    function getUtmString() {
+      if (hasUtms) return window.location.search.slice(1);
+      try {
+        var match = document.cookie.match(/pp_utms=([^;]+)/);
+        if (match) {
+          var saved = JSON.parse(decodeURIComponent(match[1]));
+          return Object.keys(saved).map(function(k){ return k+'='+encodeURIComponent(saved[k]); }).join('&');
+        }
+      } catch(e){}
+      return '';
+    }
 
     function appendParams(url) {
-      var search = window.location.search;
-      if (!search) return url;
-      return url + (url.indexOf('?') >= 0 ? '&' : '?') + search.slice(1);
+      var params = getUtmString();
+      if (!params) return url;
+      return url + (url.indexOf('?') >= 0 ? '&' : '?') + params;
     }
 
     function updateLinks() {
       var links = document.querySelectorAll('a[href*="perfectpay.com.br"]');
       links.forEach(function(link) {
-        if (link.id === 'btn-premium') {
-          link.href = appendParams(linkMulticontas);
-        } else {
-          link.href = appendParams(linkIndividual);
-        }
+        link.href = appendParams(linkIndividual);
       });
     }
 
