@@ -556,6 +556,217 @@ td:last-child { padding-right: 20px; }
   color: var(--muted);
 }
 .table-footer strong { color: var(--text); }
+
+/* ── POPUP ── */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+}
+.popup-overlay.open { display: flex; }
+
+.popup-box {
+  background: #111;
+  border: 1px solid rgba(255,45,107,0.25);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,45,107,0.3) transparent;
+}
+.popup-box::-webkit-scrollbar { width: 4px; }
+.popup-box::-webkit-scrollbar-thumb { background: rgba(255,45,107,0.3); border-radius: 4px; }
+
+.popup-box::before {
+  content: '';
+  position: sticky;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--pink), var(--pink-light));
+  display: block;
+  border-radius: 20px 20px 0 0;
+}
+
+.popup-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 3px;
+  background: #111;
+  z-index: 10;
+}
+.popup-client-info { flex: 1; }
+.popup-client-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+.popup-client-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.popup-client-meta span { display: flex; align-items: center; gap: 4px; }
+.popup-close {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.popup-close:hover { background: rgba(255,45,107,0.12); color: var(--pink); border-color: rgba(255,45,107,0.3); }
+
+.popup-body { padding: 20px 24px 24px; }
+
+/* popup kpi row */
+.p-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.p-kpi {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.p-kpi-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+.p-kpi-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.p-kpi-sub { font-size: 0.65rem; color: var(--muted); }
+
+/* popup chart */
+.p-chart-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.p-chart-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.p-chart-sub { font-size: 0.68rem; color: var(--muted); margin-bottom: 14px; }
+.p-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  height: 100px;
+  position: relative;
+}
+.p-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+.p-bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: opacity 0.15s;
+  position: relative;
+}
+.p-bar:hover { opacity: 0.75; }
+.p-bar-lbl {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.58rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.p-bar-top {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.58rem;
+  color: var(--muted);
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* accounts breakdown */
+.p-accounts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.p-account-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.p-acc-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.p-acc-diamonds { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.95rem; font-weight: 800; color: var(--pink); margin-bottom: 2px; }
+.p-acc-revenue { font-size: 0.75rem; color: var(--green); font-weight: 600; }
+.p-acc-bar { height: 3px; border-radius: 2px; background: var(--pink); margin-top: 8px; }
+
+/* game + info row */
+.p-info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.p-info-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+}
+.p-info-title { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.p-game-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border2);
+  font-size: 0.78rem;
+}
+.p-game-item:last-child { border-bottom: none; }
+.p-game-pct { font-weight: 700; color: var(--pink); font-family: 'JetBrains Mono', monospace; }
+.p-game-bar-wrap { width: 60px; height: 4px; background: var(--border); border-radius: 2px; margin-left: 8px; }
+.p-game-bar-fill { height: 100%; border-radius: 2px; background: var(--pink); }
+.p-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border2);
+  font-size: 0.78rem;
+}
+.p-stat-row:last-child { border-bottom: none; }
+.p-stat-key { color: var(--muted); }
+.p-stat-val { font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 </style>
 </head>
 <body>
@@ -783,8 +994,13 @@ td:last-child { padding-right: 20px; }
       </div>
     </div>
 
-  </div>
+</div>
 </main>
+
+<!-- POPUP -->
+<div class="popup-overlay" id="clientPopup" onclick="if(event.target===this)closePopup()">
+  <div class="popup-box" id="popupBox"></div>
+</div>
 
 <script>
 // ── BAR CHART ──
@@ -802,52 +1018,19 @@ td:last-child { padding-right: 20px; }
     col.style.position = 'relative';
     col.style.height = '100%';
 
-    // meta bar (behind)
     var metaBar = document.createElement('div');
-    metaBar.className = 'bar-fill';
-    metaBar.style.height = ((meta[i]/max)*100) + '%';
-    metaBar.style.background = 'rgba(77,159,255,0.2)';
-    metaBar.style.position = 'absolute';
-    metaBar.style.bottom = '0';
-    metaBar.style.width = '100%';
-    metaBar.style.borderRadius = '4px 4px 0 0';
+    metaBar.style.cssText = 'position:absolute;bottom:0;width:100%;border-radius:4px 4px 0 0;background:rgba(77,159,255,0.2);height:'+((meta[i]/max)*100)+'%';
 
-    // value bar
     var bar = document.createElement('div');
-    bar.className = 'bar-fill';
-    bar.style.height = ((vals[i]/max)*100) + '%';
-    bar.style.background = i === months.length-1
-      ? 'linear-gradient(180deg,#FF2D6B,#ff5c8a)'
-      : 'rgba(255,45,107,0.55)';
-    bar.style.position = 'absolute';
-    bar.style.bottom = '0';
-    bar.style.width = '78%';
-    bar.style.left = '11%';
-    bar.style.borderRadius = '4px 4px 0 0';
+    bar.style.cssText = 'position:absolute;bottom:0;width:78%;left:11%;border-radius:4px 4px 0 0;height:'+((vals[i]/max)*100)+'%;background:'+(i===months.length-1?'linear-gradient(180deg,#FF2D6B,#ff5c8a)':'rgba(255,45,107,0.55)');
 
-    // label
     var lbl = document.createElement('div');
-    lbl.style.position = 'absolute';
-    lbl.style.bottom = '-22px';
-    lbl.style.left = '50%';
-    lbl.style.transform = 'translateX(-50%)';
-    lbl.style.fontSize = '0.6rem';
-    lbl.style.color = 'rgba(255,255,255,0.35)';
-    lbl.style.whiteSpace = 'nowrap';
+    lbl.style.cssText = 'position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:rgba(255,255,255,0.35);white-space:nowrap';
     lbl.textContent = m;
 
-    // top label
     var top = document.createElement('div');
-    top.style.position = 'absolute';
-    top.style.bottom = ((vals[i]/max)*100+1) + '%';
-    top.style.left = '50%';
-    top.style.transform = 'translateX(-50%)';
-    top.style.fontSize = '0.6rem';
-    top.style.color = i === months.length-1 ? '#FF2D6B' : 'rgba(255,255,255,0.35)';
-    top.style.fontWeight = '700';
-    top.style.fontFamily = 'JetBrains Mono, monospace';
-    top.style.whiteSpace = 'nowrap';
-    top.textContent = 'R$' + vals[i] + 'M';
+    top.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:0.6rem;font-weight:700;font-family:JetBrains Mono,monospace;white-space:nowrap;color:'+(i===months.length-1?'#FF2D6B':'rgba(255,255,255,0.35)')+';bottom:'+((vals[i]/max)*100+1)+'%';
+    top.textContent = 'R$'+vals[i]+'M';
 
     col.appendChild(metaBar);
     col.appendChild(bar);
@@ -857,59 +1040,66 @@ td:last-child { padding-right: 20px; }
   });
 })();
 
-// ── TABLE DATA ──
+// ── CLIENT DATA — diamantes elevados, <4 meses como cliente ──
+var games = ['Territory War','Travel Station','Woman vs Man','League War'];
+
 var clients = [
-  {name:'Ana Lima',       state:'SP', accounts:4, lives:94,  hours:487, diamonds:1104837, followers:31420, revenue:6165},
-  {name:'Carlos Mendes',  state:'RJ', accounts:4, lives:88,  hours:461, diamonds:1031492, followers:28740, revenue:5756},
-  {name:'Juliana Costa',  state:'MG', accounts:3, lives:81,  hours:432, diamonds:963751,  followers:26190, revenue:5379},
-  {name:'Rafael Torres',  state:'SP', accounts:4, lives:76,  hours:408, diamonds:897214,  followers:24580, revenue:5007},
-  {name:'Fernanda Souza', state:'BA', accounts:3, lives:72,  hours:389, diamonds:824638,  followers:22310, revenue:4604},
-  {name:'Henrique Neto',  state:'PR', accounts:4, lives:68,  hours:374, diamonds:763409,  followers:20870, revenue:4261},
-  {name:'Larissa Moura',  state:'RS', accounts:3, lives:65,  hours:358, diamonds:712853,  followers:19240, revenue:3979},
-  {name:'Bruno Alves',    state:'CE', accounts:4, lives:63,  hours:341, diamonds:671247,  followers:18030, revenue:3747},
-  {name:'Thayna Reis',    state:'GO', accounts:3, lives:59,  hours:326, diamonds:634918,  followers:17120, revenue:3543},
-  {name:'Mateus Silva',   state:'SC', accounts:3, lives:57,  hours:312, diamonds:601372,  followers:16280, revenue:3355},
-  {name:'Camila Gomes',   state:'SP', accounts:2, lives:54,  hours:298, diamonds:571840,  followers:15410, revenue:3192},
-  {name:'Diego Rocha',    state:'RJ', accounts:3, lives:52,  hours:284, diamonds:543291,  followers:14680, revenue:3031},
-  {name:'Patricia Lima',  state:'PE', accounts:2, lives:49,  hours:271, diamonds:514703,  followers:13920, revenue:2873},
-  {name:'Lucas Ferreira', state:'AM', accounts:3, lives:47,  hours:259, diamonds:487165,  followers:13140, revenue:2719},
-  {name:'Amanda Torres',  state:'MA', accounts:2, lives:45,  hours:247, diamonds:461834,  followers:12470, revenue:2578},
-  {name:'Vinicius Barros',state:'SP', accounts:3, lives:44,  hours:236, diamonds:437209,  followers:11820, revenue:2440},
-  {name:'Isabela Campos', state:'MG', accounts:2, lives:42,  hours:226, diamonds:413782,  followers:11190, revenue:2309},
-  {name:'Felipe Correia', state:'RJ', accounts:2, lives:40,  hours:216, diamonds:391354,  followers:10580, revenue:2184},
-  {name:'Natalia Araujo', state:'DF', accounts:2, lives:38,  hours:207, diamonds:370291,  followers:10010, revenue:2067},
-  {name:'Eduardo Santos', state:'SP', accounts:3, lives:37,  hours:198, diamonds:350618,  followers:9480,  revenue:1957},
-  {name:'Renata Freitas', state:'PR', accounts:2, lives:35,  hours:190, diamonds:331847,  followers:8980,  revenue:1852},
-  {name:'Guilherme Lopes',state:'RS', accounts:2, lives:34,  hours:182, diamonds:314203,  followers:8510,  revenue:1754},
-  {name:'Mariana Pinto',  state:'BA', accounts:1, lives:32,  hours:174, diamonds:297741,  followers:8070,  revenue:1662},
-  {name:'Thiago Carvalho',state:'GO', accounts:2, lives:31,  hours:167, diamonds:282163,  followers:7650,  revenue:1575},
-  {name:'Beatriz Moura',  state:'CE', accounts:1, lives:30,  hours:160, diamonds:267384,  followers:7260,  revenue:1493},
-  {name:'Leonardo Costa', state:'SC', accounts:2, lives:29,  hours:153, diamonds:253471,  followers:6890,  revenue:1415},
-  {name:'Gabriela Silva', state:'SP', accounts:1, lives:27,  hours:147, diamonds:240318,  followers:6540,  revenue:1342},
-  {name:'Rodrigo Dias',   state:'RJ', accounts:2, lives:26,  hours:141, diamonds:227904,  followers:6210,  revenue:1272},
-  {name:'Leticia Ramos',  state:'MG', accounts:1, lives:25,  hours:135, diamonds:216037,  followers:5900,  revenue:1207},
-  {name:'Anderson Nunes', state:'PE', accounts:2, lives:24,  hours:130, diamonds:204891,  followers:5610,  revenue:1144},
-  {name:'Sabrina Vieira', state:'AM', accounts:1, lives:23,  hours:124, diamonds:194317,  followers:5340,  revenue:1085},
-  {name:'Marcos Teixeira',state:'SP', accounts:2, lives:22,  hours:119, diamonds:184213,  followers:5080,  revenue:1028},
-  {name:'Caroline Melo',  state:'DF', accounts:1, lives:21,  hours:114, diamonds:174682,  followers:4840,  revenue:975},
-  {name:'Paulo Rezende',  state:'BA', accounts:1, lives:20,  hours:109, diamonds:165618,  followers:4610,  revenue:924},
-  {name:'Aline Santana',  state:'PR', accounts:1, lives:19,  hours:105, diamonds:156924,  followers:4390,  revenue:876},
-  {name:'Caio Monteiro',  state:'RS', accounts:2, lives:19,  hours:100, diamonds:148801,  followers:4190,  revenue:831},
-  {name:'Tatiana Borges', state:'GO', accounts:1, lives:18,  hours:96,  diamonds:141124,  followers:3990,  revenue:788},
-  {name:'Fábio Cunha',    state:'CE', accounts:1, lives:17,  hours:92,  diamonds:133841,  followers:3810,  revenue:747},
-  {name:'Priscila Farias',state:'SC', accounts:1, lives:16,  hours:88,  diamonds:126947,  followers:3630,  revenue:709},
-  {name:'Leandro Braga',  state:'SP', accounts:2, lives:16,  hours:84,  diamonds:120438,  followers:3460,  revenue:672},
-  {name:'Viviane Leal',   state:'RJ', accounts:1, lives:15,  hours:80,  diamonds:114217,  followers:3300,  revenue:638},
-  {name:'Sérgio Paiva',   state:'MG', accounts:1, lives:14,  hours:77,  diamonds:108381,  followers:3150,  revenue:605},
-  {name:'Juliana Matos',  state:'PE', accounts:1, lives:14,  hours:73,  diamonds:102739,  followers:3010,  revenue:574},
-  {name:'Davi Nogueira',  state:'BA', accounts:1, lives:13,  hours:70,  diamonds:97408,   followers:2870,  revenue:544},
-  {name:'Marcia Coelho',  state:'PR', accounts:1, lives:13,  hours:67,  diamonds:92383,   followers:2740,  revenue:516},
-  {name:'Robson Lima',    state:'AM', accounts:1, lives:12,  hours:64,  diamonds:87514,   followers:2620,  revenue:489},
-  {name:'Daniele Castro', state:'DF', accounts:1, lives:12,  hours:61,  diamonds:83018,   followers:2510,  revenue:464},
-  {name:'Ivan Macedo',    state:'RS', accounts:1, lives:11,  hours:58,  diamonds:78741,   followers:2400,  revenue:440},
-  {name:'Simone Aguiar',  state:'GO', accounts:1, lives:11,  hours:55,  diamonds:74683,   followers:2290,  revenue:417},
-  {name:'Flávio Rios',    state:'CE', accounts:1, lives:10,  hours:53,  diamonds:70847,   followers:2190,  revenue:395},
+  {name:'Ana Lima',        state:'SP', accounts:4, lives:94,  hours:487, diamonds:2841937, followers:31420, revenue:15861, days:112},
+  {name:'Carlos Mendes',   state:'RJ', accounts:4, lives:88,  hours:461, diamonds:2658492, followers:28740, revenue:14838, days:98 },
+  {name:'Juliana Costa',   state:'MG', accounts:3, lives:81,  hours:432, diamonds:2481751, followers:26190, revenue:13849, days:87 },
+  {name:'Rafael Torres',   state:'SP', accounts:4, lives:76,  hours:408, diamonds:2310214, followers:24580, revenue:12900, days:115},
+  {name:'Fernanda Souza',  state:'BA', accounts:3, lives:72,  hours:389, diamonds:2124638, followers:22310, revenue:11857, days:74 },
+  {name:'Henrique Neto',   state:'PR', accounts:4, lives:68,  hours:374, diamonds:1965409, followers:20870, revenue:10972, days:103},
+  {name:'Larissa Moura',   state:'RS', accounts:3, lives:65,  hours:358, diamonds:1834853, followers:19240, revenue:10237, days:62 },
+  {name:'Bruno Alves',     state:'CE', accounts:4, lives:63,  hours:341, diamonds:1728247, followers:18030, revenue:9648,  days:91 },
+  {name:'Thayna Reis',     state:'GO', accounts:3, lives:59,  hours:326, diamonds:1634918, followers:17120, revenue:9123,  days:78 },
+  {name:'Mateus Silva',    state:'SC', accounts:3, lives:57,  hours:312, diamonds:1549372, followers:16280, revenue:8647,  days:110},
+  {name:'Camila Gomes',    state:'SP', accounts:2, lives:54,  hours:298, diamonds:1471840, followers:15410, revenue:8213,  days:55 },
+  {name:'Diego Rocha',     state:'RJ', accounts:3, lives:52,  hours:284, diamonds:1398291, followers:14680, revenue:7805,  days:83 },
+  {name:'Patricia Lima',   state:'PE', accounts:2, lives:49,  hours:271, diamonds:1324703, followers:13920, revenue:7396,  days:67 },
+  {name:'Lucas Ferreira',  state:'AM', accounts:3, lives:47,  hours:259, diamonds:1254165, followers:13140, revenue:7001,  days:99 },
+  {name:'Amanda Torres',   state:'MA', accounts:2, lives:45,  hours:247, diamonds:1188834, followers:12470, revenue:6634,  days:44 },
+  {name:'Vinicius Barros', state:'SP', accounts:3, lives:44,  hours:236, diamonds:1126209, followers:11820, revenue:6286,  days:72 },
+  {name:'Isabela Campos',  state:'MG', accounts:2, lives:42,  hours:226, diamonds:1065782, followers:11190, revenue:5949,  days:88 },
+  {name:'Felipe Correia',  state:'RJ', accounts:2, lives:40,  hours:216, diamonds:1008354, followers:10580, revenue:5629,  days:61 },
+  {name:'Natalia Araujo',  state:'DF', accounts:2, lives:38,  hours:207, diamonds:953291,  followers:10010, revenue:5322,  days:107},
+  {name:'Eduardo Santos',  state:'SP', accounts:3, lives:37,  hours:198, diamonds:902618,  followers:9480,  revenue:5039,  days:79 },
+  {name:'Renata Freitas',  state:'PR', accounts:2, lives:35,  hours:190, diamonds:854847,  followers:8980,  revenue:4771,  days:51 },
+  {name:'Guilherme Lopes', state:'RS', accounts:2, lives:34,  hours:182, diamonds:809203,  followers:8510,  revenue:4516,  days:94 },
+  {name:'Mariana Pinto',   state:'BA', accounts:1, lives:32,  hours:174, diamonds:766741,  followers:8070,  revenue:4280,  days:68 },
+  {name:'Thiago Carvalho', state:'GO', accounts:2, lives:31,  hours:167, diamonds:726163,  followers:7650,  revenue:4054,  days:85 },
+  {name:'Beatriz Moura',   state:'CE', accounts:1, lives:30,  hours:160, diamonds:688384,  followers:7260,  revenue:3843,  days:43 },
+  {name:'Leonardo Costa',  state:'SC', accounts:2, lives:29,  hours:153, diamonds:652471,  followers:6890,  revenue:3643,  days:102},
+  {name:'Gabriela Silva',  state:'SP', accounts:1, lives:27,  hours:147, diamonds:618318,  followers:6540,  revenue:3452,  days:57 },
+  {name:'Rodrigo Dias',    state:'RJ', accounts:2, lives:26,  hours:141, diamonds:586904,  followers:6210,  revenue:3276,  days:76 },
+  {name:'Leticia Ramos',   state:'MG', accounts:1, lives:25,  hours:135, diamonds:557037,  followers:5900,  revenue:3109,  days:90 },
+  {name:'Anderson Nunes',  state:'PE', accounts:2, lives:24,  hours:130, diamonds:528891,  followers:5610,  revenue:2952,  days:48 },
+  {name:'Sabrina Vieira',  state:'AM', accounts:1, lives:23,  hours:124, diamonds:501317,  followers:5340,  revenue:2798,  days:65 },
+  {name:'Marcos Teixeira', state:'SP', accounts:2, lives:22,  hours:119, diamonds:475213,  followers:5080,  revenue:2652,  days:82 },
+  {name:'Caroline Melo',   state:'DF', accounts:1, lives:21,  hours:114, diamonds:450682,  followers:4840,  revenue:2517,  days:39 },
+  {name:'Paulo Rezende',   state:'BA', accounts:1, lives:20,  hours:109, diamonds:427618,  followers:4610,  revenue:2387,  days:71 },
+  {name:'Aline Santana',   state:'PR', accounts:1, lives:19,  hours:105, diamonds:404924,  followers:4390,  revenue:2261,  days:54 },
+  {name:'Caio Monteiro',   state:'RS', accounts:2, lives:19,  hours:100, diamonds:383801,  followers:4190,  revenue:2143,  days:93 },
+  {name:'Tatiana Borges',  state:'GO', accounts:1, lives:18,  hours:96,  diamonds:364124,  followers:3990,  revenue:2033,  days:46 },
+  {name:'Fábio Cunha',     state:'CE', accounts:1, lives:17,  hours:92,  diamonds:345841,  followers:3810,  revenue:1931,  days:77 },
+  {name:'Priscila Farias', state:'SC', accounts:1, lives:16,  hours:88,  diamonds:328947,  followers:3630,  revenue:1836,  days:60 },
+  {name:'Leandro Braga',   state:'SP', accounts:2, lives:16,  hours:84,  diamonds:312438,  followers:3460,  revenue:1744,  days:88 },
+  {name:'Viviane Leal',    state:'RJ', accounts:1, lives:15,  hours:80,  diamonds:296217,  followers:3300,  revenue:1654,  days:35 },
+  {name:'Sérgio Paiva',    state:'MG', accounts:1, lives:14,  hours:77,  diamonds:280381,  followers:3150,  revenue:1565,  days:69 },
+  {name:'Juliana Matos',   state:'PE', accounts:1, lives:14,  hours:73,  diamonds:265739,  followers:3010,  revenue:1483,  days:52 },
+  {name:'Davi Nogueira',   state:'BA', accounts:1, lives:13,  hours:70,  diamonds:251408,  followers:2870,  revenue:1403,  days:81 },
+  {name:'Marcia Coelho',   state:'PR', accounts:1, lives:13,  hours:67,  diamonds:238383,  followers:2740,  revenue:1331,  days:42 },
+  {name:'Robson Lima',     state:'AM', accounts:1, lives:12,  hours:64,  diamonds:225514,  followers:2620,  revenue:1259,  days:67 },
+  {name:'Daniele Castro',  state:'DF', accounts:1, lives:12,  hours:61,  diamonds:213018,  followers:2510,  revenue:1190,  days:58 },
+  {name:'Ivan Macedo',     state:'RS', accounts:1, lives:11,  hours:58,  diamonds:201741,  followers:2400,  revenue:1126,  days:76 },
+  {name:'Simone Aguiar',   state:'GO', accounts:1, lives:11,  hours:55,  diamonds:191283,  followers:2290,  revenue:1068,  days:49 },
+  {name:'Flávio Rios',     state:'CE', accounts:1, lives:10,  hours:53,  diamonds:181247,  followers:2190,  revenue:1012,  days:38 },
 ];
+
+// assign random primary game per client
+var gameAssign = [0,0,0,1,0,2,1,0,3,1,0,2,1,0,0,1,2,0,3,1,0,2,1,0,3,0,1,2,0,1,3,0,2,1,0,0,2,1,3,0,1,2,0,1,2,3,0,1,0,2];
+
+function fmt(n) { return n.toLocaleString('pt-BR'); }
 
 function statusBadge(i) {
   if (i < 5)  return '<span class="status-badge status-online">● Destaque</span>';
@@ -924,28 +1114,27 @@ function accountDots(n) {
   return html;
 }
 
-function fmt(n) {
-  return n.toLocaleString('pt-BR');
-}
-
 function renderTable(data) {
   var tbody = document.getElementById('tableBody');
   tbody.innerHTML = '';
   data.forEach(function(c, i) {
+    var origIdx = clients.indexOf(c);
     var rank = i+1;
     var isTop3 = rank <= 3;
     var medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
     var tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
     tr.innerHTML =
       '<td class="td-rank '+(isTop3?'top3':'')+'">'+medal+(isTop3?'':'#'+rank)+'</td>'+
-      '<td><div class="client-name">'+c.name+'</div><div class="client-state">'+c.state+'</div></td>'+
+      '<td><div class="client-name">'+c.name+'</div><div class="client-state">'+c.state+' · '+c.days+' dias</div></td>'+
       '<td>'+accountDots(c.accounts)+'</td>'+
       '<td class="td-mono">'+c.lives+'</td>'+
       '<td class="td-mono td-hours">'+c.hours+'h</td>'+
       '<td class="td-mono td-diamonds">'+fmt(c.diamonds)+' 💎</td>'+
       '<td class="td-mono td-followers">+'+fmt(c.followers)+'</td>'+
       '<td class="td-mono td-revenue">R$ '+fmt(c.revenue)+'</td>'+
-      '<td>'+statusBadge(i)+'</td>';
+      '<td>'+statusBadge(origIdx >= 0 ? origIdx : i)+'</td>';
+    tr.addEventListener('click', function(){ openPopup(c, origIdx >= 0 ? origIdx : i); });
     tbody.appendChild(tr);
   });
 }
@@ -958,6 +1147,153 @@ function filterTable(q) {
   });
   renderTable(filtered);
 }
+
+// ── POPUP ──
+function openPopup(c, idx) {
+  var overlay = document.getElementById('clientPopup');
+  var box     = document.getElementById('popupBox');
+
+  // monthly revenue data — random zigzag for this client
+  var monthKeys   = ['Mar','Abr','Mai','Jun'];
+  var base = c.revenue;
+  var monthVals = [
+    Math.round(base * (0.38 + Math.random()*0.15)),
+    Math.round(base * (0.55 + Math.random()*0.18)),
+    Math.round(base * (0.72 + Math.random()*0.14)),
+    base
+  ];
+  var maxMV = Math.max.apply(null, monthVals) * 1.15;
+
+  // per-account breakdown
+  var accs = [];
+  var remaining = c.diamonds;
+  for (var a = 0; a < c.accounts; a++) {
+    var share = a === c.accounts-1
+      ? remaining
+      : Math.round(remaining * (0.25 + Math.random()*0.2));
+    remaining -= share;
+    var accRev = Math.round(share * 0.00558);
+    accs.push({ diamonds: share, revenue: accRev });
+  }
+  var maxAccD = Math.max.apply(null, accs.map(function(a){return a.diamonds;}));
+
+  // game usage percentages
+  var primaryGame = gameAssign[idx] || 0;
+  var gamePcts = [0,0,0,0];
+  gamePcts[primaryGame] = Math.floor(38 + Math.random()*22);
+  var rem2 = 100 - gamePcts[primaryGame];
+  var others = [0,1,2,3].filter(function(x){return x!==primaryGame;});
+  gamePcts[others[0]] = Math.floor(rem2 * 0.42);
+  gamePcts[others[1]] = Math.floor(rem2 * 0.33);
+  gamePcts[others[2]] = rem2 - gamePcts[others[0]] - gamePcts[others[1]];
+  var gameSorted = [0,1,2,3].sort(function(a,b){return gamePcts[b]-gamePcts[a];});
+
+  var avgDay = Math.round(c.revenue / c.days);
+  var totalD  = fmt(c.diamonds);
+  var totalR  = fmt(c.revenue);
+
+  // build popup HTML
+  var html = '';
+
+  // header
+  html += '<div class="popup-header">';
+  html += '<div class="popup-client-info">';
+  html += '<div class="popup-client-name">'+c.name+'</div>';
+  html += '<div class="popup-client-meta">';
+  html += '<span>📍 '+c.state+'</span>';
+  html += '<span>📅 Cliente há '+c.days+' dias</span>';
+  html += '<span>📺 '+c.lives+' lives · '+c.hours+'h transmitidas</span>';
+  html += '<span>👥 +'+fmt(c.followers)+' seguidores</span>';
+  html += '</div></div>';
+  html += '<button class="popup-close" onclick="closePopup()">✕</button>';
+  html += '</div>';
+
+  // body
+  html += '<div class="popup-body">';
+
+  // kpi row
+  html += '<div class="p-kpi-row">';
+  html += '<div class="p-kpi"><div class="p-kpi-label">💎 Diamantes totais</div><div class="p-kpi-val" style="color:var(--pink)">'+totalD+'</div><div class="p-kpi-sub">acumulado</div></div>';
+  html += '<div class="p-kpi"><div class="p-kpi-label">💰 Faturamento total</div><div class="p-kpi-val" style="color:var(--green)">R$ '+totalR+'</div><div class="p-kpi-sub">desde entrada</div></div>';
+  html += '<div class="p-kpi"><div class="p-kpi-label">📈 Média por dia</div><div class="p-kpi-val" style="color:var(--gold)">R$ '+fmt(avgDay)+'</div><div class="p-kpi-sub">'+c.days+' dias ativos</div></div>';
+  html += '<div class="p-kpi"><div class="p-kpi-label">🎮 Contas ativas</div><div class="p-kpi-val" style="color:var(--blue)">'+c.accounts+'</div><div class="p-kpi-sub">contas conectadas</div></div>';
+  html += '</div>';
+
+  // monthly chart
+  html += '<div class="p-chart-card">';
+  html += '<div class="p-chart-title">Faturamento mensal</div>';
+  html += '<div class="p-chart-sub">Últimos 4 meses · R$</div>';
+  html += '<div class="p-bars">';
+  monthKeys.forEach(function(m, mi) {
+    var pct = (monthVals[mi] / maxMV) * 100;
+    var isLast = mi === monthKeys.length-1;
+    html += '<div class="p-bar-col">';
+    html += '<div class="p-bar-top" style="bottom:'+(pct+2)+'%;color:'+(isLast?'#FF2D6B':'rgba(255,255,255,0.35)')+'">R$'+fmt(monthVals[mi])+'</div>';
+    html += '<div class="p-bar" style="height:'+pct+'%;background:'+(isLast?'linear-gradient(180deg,#FF2D6B,#ff5c8a)':'rgba(255,45,107,0.45)')+'"></div>';
+    html += '<div class="p-bar-lbl">'+m+'</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  // accounts breakdown
+  html += '<div class="p-chart-title" style="margin-bottom:10px;">Desempenho por conta</div>';
+  html += '<div class="p-accounts-grid">';
+  accs.forEach(function(ac, ai) {
+    var barW = Math.round((ac.diamonds / maxAccD) * 100);
+    html += '<div class="p-account-card">';
+    html += '<div class="p-acc-label">Conta '+(ai+1)+'</div>';
+    html += '<div class="p-acc-diamonds">'+fmt(ac.diamonds)+' 💎</div>';
+    html += '<div class="p-acc-revenue">R$ '+fmt(ac.revenue)+'/mês</div>';
+    html += '<div class="p-acc-bar" style="width:'+barW+'%"></div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // games + extra stats
+  html += '<div class="p-info-row">';
+
+  // games
+  html += '<div class="p-info-card">';
+  html += '<div class="p-info-title">Jogos utilizados</div>';
+  gameSorted.forEach(function(gi) {
+    var pct = gamePcts[gi];
+    var isPrimary = gi === primaryGame;
+    html += '<div class="p-game-item">';
+    html += '<span style="'+(isPrimary?'color:#fff;font-weight:700;':'color:var(--muted)')+'">'+games[gi]+'</span>';
+    html += '<div style="display:flex;align-items:center;gap:6px">';
+    html += '<div class="p-game-bar-wrap"><div class="p-game-bar-fill" style="width:'+pct+'%;background:'+(isPrimary?'var(--pink)':'rgba(255,45,107,0.4)')+'"></div></div>';
+    html += '<span class="p-game-pct">'+pct+'%</span>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  // extra stats
+  html += '<div class="p-info-card">';
+  html += '<div class="p-info-title">Estatísticas detalhadas</div>';
+  html += '<div class="p-stat-row"><span class="p-stat-key">💎 Diamantes/dia</span><span class="p-stat-val" style="color:var(--pink)">'+fmt(Math.round(c.diamonds/c.days))+'</span></div>';
+  html += '<div class="p-stat-row"><span class="p-stat-key">📺 Lives/semana</span><span class="p-stat-val">'+Math.round(c.lives/(c.days/7)*10)/10+'</span></div>';
+  html += '<div class="p-stat-row"><span class="p-stat-key">⏱️ Horas/live</span><span class="p-stat-val">'+Math.round(c.hours/c.lives*10)/10+'h</span></div>';
+  html += '<div class="p-stat-row"><span class="p-stat-key">👥 Seguidores/semana</span><span class="p-stat-val" style="color:var(--blue)">+'+fmt(Math.round(c.followers/(c.days/7)))+'</span></div>';
+  html += '<div class="p-stat-row"><span class="p-stat-key">💰 R$ por diamante</span><span class="p-stat-val" style="color:var(--green)">R$ '+((c.revenue/c.diamonds).toFixed(4)).replace('.',',')+'</span></div>';
+  html += '<div class="p-stat-row"><span class="p-stat-key">🎮 Jogo principal</span><span class="p-stat-val">'+games[primaryGame]+'</span></div>';
+  html += '</div>';
+
+  html += '</div>'; // p-info-row
+  html += '</div>'; // popup-body
+
+  box.innerHTML = html;
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePopup() {
+  document.getElementById('clientPopup').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closePopup();
+});
 </script>
 
 </body>
