@@ -1,351 +1,435 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- Contify Tracker -->
-<script>
-(function(){
-  var TID="753ee9ba0ca49837";
-  var EP="https://kerxbkggbyjjbmtntbmk.supabase.co/functions/v1/track-event";
-  var SK="lpa_sid";
-  var sid=sessionStorage.getItem(SK);
-  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(SK,sid);}
-  var q=new URLSearchParams(location.search);
-  var start=Date.now();
-  function send(type,extra){
-    try{
-      fetch(EP,{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,
-        body:JSON.stringify(Object.assign({
-          tracking_id:TID,session_id:sid,event_type:type,
-          utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),
-          device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?"mobile":"desktop"),
-          page_url:location.href,referrer:document.referrer
-        },extra||{}))});
-    }catch(e){}
-  }
-  send("pageview");
-  document.addEventListener("click",function(ev){
-    var el=ev.target&&ev.target.closest&&ev.target.closest("[data-contify]");
-    if(el){send("click",{utm_campaign:el.getAttribute("data-contify")});}
-  },true);
-  var hb=setInterval(function(){send("heartbeat",{duration_ms:Date.now()-start});},30000);
-  window.addEventListener("beforeunload",function(){clearInterval(hb);send("leave",{duration_ms:Date.now()-start});});
-})();
-</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Pack 50K Vídeos Virais — KeepLive</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet"/>
+<title>Oferta Especial — KeepLive</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --black:#080808; --neon:#ff2d55; --neon2:#ff6b00;
-    --white:#f5f5f5; --gray:#888; --card:#111;
-    --border:rgba(255,45,85,0.25);
+    --pink: #FF2D6B;
+    --pink-light: #FF5C8A;
+    --pink-glow: rgba(255,45,107,0.3);
+    --gold: #FFB800;
+    --bg: #0A0A0A;
+    --card: #141414;
+    --border: rgba(255,255,255,0.06);
+    --text: #FFFFFF;
+    --muted: rgba(255,255,255,0.45);
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--black);color:var(--white);font-family:'Montserrat',sans-serif;overflow-x:hidden;}
 
-  /* HERO */
-  .hero{position:relative;text-align:center;padding:56px 20px 40px;overflow:hidden;}
-  .hero::before{content:'';position:absolute;inset:0;
-    background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(255,45,85,.18) 0%,transparent 70%);
-    pointer-events:none;}
-  .badge{display:inline-flex;align-items:center;gap:8px;
-    background:rgba(0,200,80,.12);border:1px solid rgba(0,200,80,.35);
-    color:#00c850;font-size:.72rem;font-weight:800;letter-spacing:.1em;
-    padding:6px 16px;border-radius:999px;margin-bottom:20px;text-transform:uppercase;}
-  .badge span{width:8px;height:8px;border-radius:50%;background:#00c850;display:inline-block;animation:pg 1.4s infinite;}
-  @keyframes pg{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-  .tag{display:inline-block;background:linear-gradient(90deg,var(--neon),var(--neon2));
-    color:#fff;font-size:.65rem;font-weight:800;letter-spacing:.18em;
-    padding:5px 14px;border-radius:4px;margin-bottom:16px;text-transform:uppercase;}
-  .hero h1{font-family:'Bebas Neue',sans-serif;
-    font-size:clamp(3rem,10vw,6rem);line-height:1;letter-spacing:.02em;margin-bottom:12px;}
-  .hero h1 .hl{background:linear-gradient(90deg,var(--neon),var(--neon2));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-  .hero p{font-size:.95rem;color:#ccc;max-width:520px;margin:0 auto 32px;line-height:1.7;}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 60px;
+  }
 
-  /* URGENCY */
-  .urgency{background:linear-gradient(90deg,rgba(255,45,85,.1),rgba(255,107,0,.07),rgba(255,45,85,.1));
-    border-top:1px solid rgba(255,45,85,.2);border-bottom:1px solid rgba(255,45,85,.2);
-    text-align:center;padding:12px 20px;font-size:.8rem;color:#ddd;margin-bottom:44px;}
-  .urgency strong{color:var(--neon);}
+  /* BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,80,0.1);
+    border: 1px solid rgba(0,200,80,0.3);
+    color: #00c850;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .badge-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #00c850;
+    animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse {
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.5;transform:scale(1.4)}
+  }
 
-  .wrap{max-width:640px;margin:0 auto;padding:0 16px;}
+  /* HEADLINE */
+  .headline {
+    text-align: center;
+    margin-bottom: 32px;
+    max-width: 540px;
+  }
+  .headline h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .headline h1 span { color: var(--pink); }
+  .headline p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
 
-  /* ALGORITHM */
-  .algo-box{background:var(--card);border:1px solid var(--border);
-    border-radius:16px;padding:28px 22px;margin-bottom:44px;}
-  .algo-box h2{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:.04em;margin-bottom:20px;}
-  .step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;}
-  .step:last-child{margin-bottom:0;}
-  .ico{flex-shrink:0;width:38px;height:38px;border-radius:9px;
-    background:linear-gradient(135deg,rgba(255,45,85,.22),rgba(255,107,0,.12));
-    border:1px solid rgba(255,45,85,.3);
-    display:flex;align-items:center;justify-content:center;font-size:1rem;}
-  .step-txt strong{display:block;font-size:.88rem;font-weight:800;margin-bottom:3px;}
-  .step-txt p{font-size:.8rem;color:#aaa;line-height:1.6;}
-  .step-txt p em{color:var(--neon);font-style:normal;font-weight:800;}
-  .divider{width:1px;height:14px;background:rgba(255,45,85,.3);margin:0 0 2px 19px;}
+  /* OFFER BOX */
+  .offer-box {
+    width: 100%;
+    max-width: 540px;
+    background: var(--card);
+    border: 2px solid rgba(255,45,107,0.4);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+  }
 
-  /* IMAGES — depois do algo-box, tamanho grande */
-  .imgs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;
-    max-width:640px;margin:0 auto 44px;padding:0 16px;}
-  .imgs-grid img{width:100%;border-radius:14px;border:2px solid rgba(255,45,85,.25);
-    object-fit:cover;display:block;aspect-ratio:9/16;}
+  .offer-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink), var(--gold));
+  }
 
-  /* RECEITA */
-  .receita-box{background:linear-gradient(135deg,rgba(255,45,85,.08),rgba(255,107,0,.06));
-    border:1px solid rgba(255,107,0,.3);border-radius:16px;
-    padding:28px 22px;margin-bottom:44px;text-align:center;}
-  .receita-box h2{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;
-    letter-spacing:.04em;margin-bottom:6px;}
-  .receita-box .sub{font-size:.82rem;color:#aaa;margin-bottom:24px;line-height:1.6;}
-  .receita-rows{display:flex;flex-direction:column;gap:10px;text-align:left;}
-  .receita-row{background:rgba(0,0,0,.35);border:1px solid rgba(255,45,85,.15);
-    border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
-  .receita-row .rr-label{flex:1;font-size:.82rem;color:#ccc;line-height:1.5;}
-  .receita-row .rr-label strong{color:var(--white);display:block;font-size:.88rem;margin-bottom:2px;}
-  .receita-row .rr-val{text-align:right;flex-shrink:0;}
-  .receita-row .rr-val .antes{font-size:.7rem;color:var(--gray);text-decoration:line-through;}
-  .receita-row .rr-val .depois{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;
-    background:linear-gradient(90deg,var(--neon),var(--neon2));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-    line-height:1.1;}
-  .receita-total{margin-top:18px;background:rgba(255,45,85,.1);border:1px solid rgba(255,45,85,.3);
-    border-radius:10px;padding:16px;display:flex;align-items:center;justify-content:space-between;}
-  .receita-total .tl{font-size:.85rem;font-weight:800;color:var(--white);}
-  .receita-total .tv{font-family:'Bebas Neue',sans-serif;font-size:2rem;
-    background:linear-gradient(90deg,#ffd700,#ff6b00);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  /* DISCOUNT TAG */
+  .discount-tag {
+    background: linear-gradient(90deg, var(--pink), #ff6b35);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: center;
+  }
 
-  /* STATS */
-  .stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:44px;}
-  .stat{flex:1;min-width:130px;background:var(--card);border:1px solid var(--border);
-    border-radius:12px;padding:18px 14px;text-align:center;}
-  .stat .big{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;
-    background:linear-gradient(90deg,var(--neon),var(--neon2));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
-  .stat .lbl{font-size:.73rem;color:#aaa;margin-top:4px;line-height:1.4;}
-  .stat .ctx{font-size:.68rem;color:rgba(255,45,85,.7);font-weight:700;margin-top:3px;}
+  .offer-inner {
+    padding: 24px 20px;
+  }
 
-  /* INSIDE */
-  .inside{display:flex;flex-direction:column;gap:10px;margin-bottom:44px;}
-  .item{display:flex;gap:12px;align-items:center;background:var(--card);
-    border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
-  .item .i{font-size:1.2rem;flex-shrink:0;}
-  .item p{font-size:.83rem;color:#ccc;line-height:1.5;}
-  .item p strong{color:var(--white);}
+  /* PRICE HEADER */
+  .price-header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .price-old {
+    font-size: 1rem;
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--pink);
+    margin-bottom: 4px;
+  }
+  .price-new {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .price-new .cur { font-size: 1.4rem; vertical-align: super; color: var(--pink); }
+  .price-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
 
-  /* CTA */
-  .cta-box{background:var(--card);border:2px solid var(--neon);
-    border-radius:20px;padding:32px 24px;text-align:center;
-    position:relative;overflow:hidden;margin-bottom:44px;}
-  .cta-img{width:100%;max-width:360px;border-radius:12px;
-    margin:0 auto 20px;display:block;border:1px solid rgba(255,45,85,.2);}
-  .cta-box::before{content:'';position:absolute;inset:0;
-    background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(255,45,85,.1) 0%,transparent 70%);
-    pointer-events:none;}
-  .flag{display:inline-block;background:linear-gradient(90deg,var(--neon),var(--neon2));
-    color:#fff;font-size:.67rem;font-weight:800;letter-spacing:.12em;
-    padding:5px 16px;border-radius:4px;margin-bottom:18px;text-transform:uppercase;}
-  .cta-box h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,5vw,2.2rem);
-    letter-spacing:.03em;margin-bottom:10px;}
-  .de{font-size:.83rem;color:var(--gray);text-decoration:line-through;margin-bottom:2px;}
-  .por{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,11vw,5rem);
-    background:linear-gradient(90deg,var(--neon),var(--neon2));
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
-  .pix{font-size:.78rem;color:#aaa;margin-top:4px;margin-bottom:22px;}
-  .btn{display:block;width:100%;background:linear-gradient(90deg,var(--neon),var(--neon2));
-    color:#fff;font-family:'Montserrat',sans-serif;font-size:.95rem;font-weight:800;
-    letter-spacing:.08em;padding:17px 24px;border-radius:11px;border:none;
-    cursor:pointer;text-decoration:none;text-transform:uppercase;
-    box-shadow:0 0 30px rgba(255,45,85,.4);transition:transform .15s,box-shadow .15s;margin-bottom:14px;}
-  .btn:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(255,45,85,.6);}
-  .trust{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
-  .trust span{font-size:.7rem;color:#666;}
-  .skip{display:block;margin-top:18px;font-size:.73rem;color:#555;text-decoration:underline;cursor:pointer;}
-  .skip:hover{color:#888;}
+  /* PRODUCTS */
+  .products {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
 
-  /* ACCESS */
-  .access{background:var(--card);border:1px solid var(--border);
-    border-radius:16px;padding:28px 22px;text-align:center;margin-bottom:60px;}
-  .access h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.05em;margin-bottom:8px;}
-  .access p{font-size:.83rem;color:#aaa;margin-bottom:18px;}
-  .access a{display:inline-block;background:transparent;border:1.5px solid var(--border);
-    color:var(--white);font-size:.88rem;font-weight:700;padding:13px 28px;border-radius:10px;text-decoration:none;}
-  .footer{text-align:center;padding-bottom:36px;}
-  .footer p{font-size:.68rem;color:#333;}
+  .product-item {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
 
-  @media(max-width:480px){
-    .stats{flex-direction:column;align-items:center;}
-    .stat{min-width:80%;max-width:260px;}
-    .imgs-grid{grid-template-columns:1fr;max-width:280px;}
-    .receita-total{flex-direction:column;gap:6px;text-align:center;}
+  .product-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .product-info {
+    padding: 14px 16px;
+  }
+
+  .product-tag {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  .tag-pink { background: rgba(255,45,107,0.15); color: var(--pink); }
+  .tag-gold { background: rgba(255,184,0,0.15); color: var(--gold); }
+  .tag-green { background: rgba(0,200,80,0.12); color: #00c850; }
+
+  .product-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .product-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .product-value {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 5px;
+    text-decoration: line-through;
+    text-decoration-color: rgba(255,255,255,0.2);
+  }
+
+  /* TOTAL */
+  .total-row {
+    background: rgba(255,184,0,0.06);
+    border: 1px solid rgba(255,184,0,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .total-label { font-size: 0.82rem; color: var(--muted); }
+  .total-label strong { color: var(--text); display: block; font-size: 0.88rem; }
+  .total-val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--gold);
+    font-weight: 800;
+    text-align: right;
+  }
+  .total-val .big {
+    font-size: 1.5rem;
+    display: block;
+    line-height: 1;
+  }
+  .total-save {
+    font-size: 0.68rem;
+    color: #00c850;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  /* CTA BUTTON */
+  .btn-cta {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, var(--pink), #ff6b35);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 18px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 0 36px rgba(255,45,107,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-bottom: 12px;
+  }
+  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 0 52px rgba(255,45,107,0.5); }
+
+  .trust {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .trust span { font-size: 0.7rem; color: #555; }
+
+  /* SKIP */
+  .skip {
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #444;
+    text-decoration: underline;
+    cursor: pointer;
+    padding-top: 4px;
+    padding-bottom: 8px;
+    transition: color 0.2s;
+  }
+  .skip:hover { color: #777; }
+
+  /* ACCESS BOX */
+  .access {
+    width: 100%;
+    max-width: 540px;
+    margin-top: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .access h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 8px 0 6px;
+  }
+  .access p { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; }
+  .access a {
+    display: inline-block;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .access a:hover { background: rgba(255,255,255,0.1); }
+
+  footer {
+    margin-top: 40px;
+    font-size: 0.75rem;
+    color: #333;
+    text-align: center;
   }
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="badge"><span></span> Compra confirmada — acesso garantido</div>
-  <div class="tag">⚡ Leia isso antes de começar</div>
-  <h1>Veja essa<br>dica antes<br>de <span class="hl">começar</span></h1>
-  <p>Existe uma coisa simples que multiplica o número de pessoas na sua live — e a maioria ignora porque acha que dá trabalho. A gente já resolveu isso pra você.</p>
-</section>
+<div class="badge"><span class="badge-dot"></span> Compra confirmada — acesso garantido</div>
 
-<!-- URGENCY -->
-<div class="urgency">⏱️ Esta oferta <strong>desaparece</strong> quando você fechar a página.</div>
+<div class="headline">
+  <h1>Oferta especial<br>para <span>novos membros</span></h1>
+  <p>Tudo que você precisa pra maximizar seus resultados desde o primeiro dia — em um único pacote.</p>
+</div>
 
-<div class="wrap">
+<div class="offer-box">
 
-  <!-- ALGORITHM -->
-  <div class="algo-box">
-    <h2>📲 Por que postar vídeos muda tudo</h2>
+  <div class="discount-tag">🔥 62% OFF — Só para novos membros · Aparece só uma vez</div>
 
-    <div class="step">
-      <div class="ico">🎬</div>
-      <div class="step-txt">
-        <strong>Vídeos virais trazem pessoas de fora para sua live</strong>
-        <p>Quando você está ao vivo, o <em>ícone do seu perfil fica piscando</em> para todo mundo que vê seus vídeos. Eles clicam e entram direto na sua live — sem você fazer nada.</p>
-      </div>
+  <div class="offer-inner">
+
+    <!-- PRICE HEADER -->
+    <div class="price-header">
+      <div class="price-label">Oferta completa</div>
+      <div class="price-old">De R$ 127,00</div>
+      <div class="price-new"><span class="cur">R$</span>47,90</div>
+      <div class="price-sub">pagamento único · acesso imediato</div>
     </div>
-    <div class="divider"></div>
 
-    <div class="step">
-      <div class="ico">📈</div>
-      <div class="step-txt">
-        <strong>Mais gente na live = mais diamantes</strong>
-        <p>Não é só o algoritmo da live que te impulsiona. <em>Seu perfil, seus vídeos, sua bio</em> — tudo vira porta de entrada. Quanto mais vídeos, mais fluxo constante de pessoas novas.</p>
-      </div>
-    </div>
-    <div class="divider"></div>
+    <!-- PRODUCTS -->
+    <div class="products">
 
-    <div class="step">
-      <div class="ico">😩</div>
-      <div class="step-txt">
-        <strong>O problema: ninguém tem tempo pra ficar fazendo cortes</strong>
-        <p>A gente sabe que você <em>não comprou os jogos pra ficar editando vídeo</em>. Você quer o dinheiro rodando automaticamente. Então a gente já resolveu esse problema pra você.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- IMAGES -->
-  <div class="imgs-grid">
-    <img src="../imagens/imagemupsell1.jpeg" alt="Exemplo live TikTok"/>
-    <img src="../imagens/imagemupsell2.jpeg" alt="Perfil TikTok em live"/>
-  </div>
-
-  <!-- RECEITA -->
-  <div class="receita-box">
-    <h2>💰 O impacto direto na sua receita</h2>
-    <p class="sub">Com mais pessoas entrando pela sua vitrine de vídeos, os mesmos jogos rendem muito mais.</p>
-
-    <div class="receita-rows">
-      <div class="receita-row">
-        <div class="rr-label">
-          <strong>Espectadores na live</strong>
-          postando vídeos virais diariamente
-        </div>
-        <div class="rr-val">
-          <div class="antes">~30 pessoas</div>
-          <div class="depois">+340%</div>
+      <!-- PRODUTO 1: 50K VÍDEOS -->
+      <div class="product-item">
+        <img class="product-img" src="https://keeplive.vercel.app/imagens/Gemini_Generated_Image_n3qxt1n3qxt1n3qx.png" alt="50K Vídeos Virais"/>
+        <div class="product-info">
+          <div class="product-tag tag-pink">Incluso</div>
+          <div class="product-name">Pack 50.000 Vídeos Virais</div>
+          <div class="product-desc">Trends mundiais, cortes engraçados, dicas rápidas, estilo de vida e desafios prontos pra postar no TikTok, Reels e Shorts. Zero edição — só baixar e postar.</div>
+          <div class="product-value">Valor separado: R$ 47,00</div>
         </div>
       </div>
 
-      <div class="receita-row">
-        <div class="rr-label">
-          <strong>Diamantes por sessão</strong>
-          mais gente = mais presentes enviados
-        </div>
-        <div class="rr-val">
-          <div class="antes">~500 💎</div>
-          <div class="depois">+2.200 💎</div>
-        </div>
-      </div>
-
-      <div class="receita-row">
-        <div class="rr-label">
-          <strong>Receita diária estimada</strong>
-          só com o aumento de audiência
-        </div>
-        <div class="rr-val">
-          <div class="antes">~R$28/dia</div>
-          <div class="depois">R$140+</div>
+      <!-- PRODUTO 2: GUIA TIKTOK SHOP -->
+      <div class="product-item">
+        <img class="product-img" src="https://keeplive.vercel.app/imagens/capattkcomia.png" alt="Guia TikTok Shop com IA"/>
+        <div class="product-info">
+          <div class="product-tag tag-gold">Incluso</div>
+          <div class="product-name">Guia TikTok Shop com IA</div>
+          <div class="product-desc">Passo a passo para vender todos os dias como afiliado usando IA — sem aparecer na câmera. Do zero ao R$3.000/mês com ChatGPT, CapCut IA e ElevenLabs.</div>
+          <div class="product-value">Valor separado: R$ 57,00</div>
         </div>
       </div>
 
-      <div class="receita-row">
-        <div class="rr-label">
-          <strong>Receita mensal adicional</strong>
-          apenas com mais gente na live
+      <!-- PRODUTO 3: GUIA LUCRATIVIDADE (BÔNUS) -->
+      <div class="product-item">
+        <img class="product-img" src="https://keeplive.vercel.app/imagens/capaguiaaumentodalucratividade.png" alt="Guia de Lucratividade"/>
+        <div class="product-info">
+          <div class="product-tag tag-green">Bônus</div>
+          <div class="product-name">Guia de Lucratividade com Lives</div>
+          <div class="product-desc">Estratégias exclusivas para aumentar os diamantes e maximizar seus ganhos em cada sessão de live no TikTok. Vai direto ao ponto — sem enrolação.</div>
+          <div class="product-value">Valor separado: R$ 23,00</div>
         </div>
-        <div class="rr-val">
-          <div class="antes">~R$840/mês</div>
-          <div class="depois">R$4.200+</div>
-        </div>
+      </div>
+
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-row">
+      <div class="total-label">
+        <strong>Total do pacote completo</strong>
+        3 produtos · acesso imediato
+      </div>
+      <div class="total-val">
+        <span class="big">R$ 47,90</span>
+        <span class="total-save">✓ Você economiza R$ 79,10</span>
       </div>
     </div>
 
-    <div class="receita-total">
-      <div class="tl">🚀 Potencial mensal com vídeos virais</div>
-      <div class="tv">R$ 4.200+ / mês</div>
-    </div>
-  </div>
+    <!-- CTA -->
+    <a class="btn-cta" href="https://checkout.perfectpay.com.br/pay/PPU38CQE06L">🚀 Quero o pacote completo</a>
 
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat">
-      <div class="big">50K</div>
-      <div class="lbl">vídeos prontos<br>pra postar hoje</div>
-    </div>
-    <div class="stat">
-      <div class="big">+340%</div>
-      <div class="lbl">de espectadores<br>na live</div>
-      <div class="ctx">com postagem diária</div>
-    </div>
-    <div class="stat">
-      <div class="big">13+</div>
-      <div class="lbl">anos de conteúdo<br>postando 10/dia</div>
-    </div>
-  </div>
-
-  <!-- INSIDE -->
-  <div class="inside">
-    <div class="item"><div class="i">🎬</div><p><strong>50.000 vídeos virais já mastigados</strong> — validados pelo algoritmo, prontos pra baixar e postar. Zero edição, zero trabalho.</p></div>
-    <div class="item"><div class="i">📅</div><p><strong>Comece a postar desde o primeiro dia</strong> — não precisa esperar, não precisa criar nada. Pega, posta e deixa o algoritmo trabalhar.</p></div>
-    <div class="item"><div class="i">⚡</div><p><strong>Acesso imediato no seu e-mail</strong> — assim que confirmar, o link chega e você já pode começar.</p></div>
-  </div>
-
-  <!-- CTA -->
-  <div class="cta-box">
-    <img class="cta-img" src="../imagens/Gemini_Generated_Image_n3qxt1n3qxt1n3qx.png" alt="Pack 50K Vídeos Virais"/>
-    <div class="flag">🎁 Exclusivo para clientes KeepLive</div>
-    <h2>50.000 Vídeos Virais<br>Prontos pra Postar</h2>
-    <p style="font-size:.85rem;color:#aaa;margin-bottom:20px;line-height:1.6;">Já deixamos tudo mastigado pra você. Só pegar e postar — desde o primeiro dia.</p>
-    <div class="de">De R$ 97,00</div>
-    <div class="por">R$ 27,90</div>
-    <div class="pix">pagamento único · acesso imediato</div>
-    <a class="btn" href="https://go.perfectpay.com.br/PPU38CQCOQ0">🚀 Quero os vídeos por R$ 27,90</a>
     <div class="trust">
       <span>🔒 Pagamento seguro</span>
       <span>⚡ Acesso imediato</span>
       <span>📧 Enviado por e-mail</span>
     </div>
-    <a class="skip" href="#acesso">Não, prefiro ficar só com os jogos</a>
-  </div>
 
-  <!-- ACCESS -->
-  <div class="access" id="acesso">
-    <p style="font-size:1.3rem;margin-bottom:6px;">🎮</p>
-    <h3>Seu acesso aos jogos</h3>
-    <p>Use o e-mail cadastrado na compra para fazer login.</p>
-    <a href="https://keepmy.live/login">Acessar meus jogos →</a>
-    <p style="font-size:.7rem;color:#444;margin-top:10px;">Não achou o e-mail? Verifique o spam.</p>
+    <a class="skip" href="#acesso">Não, prefiro ficar só com os jogos</a>
+
   </div>
 </div>
 
-<div class="footer"><p>KeepLive · Não somos afiliados ao TikTok</p></div>
+<!-- ACCESS -->
+<div class="access" id="acesso">
+  <p style="font-size:1.3rem;margin-bottom:2px;">🎮</p>
+  <h3>Seu acesso aos jogos</h3>
+  <p>Use o e-mail cadastrado na compra para fazer login.</p>
+  <a href="https://keeplive.vercel.app/upssell/upsell2.html">Acessar meus jogos →</a>
+  <p style="font-size:.7rem;color:#333;margin-top:10px;">Não achou o e-mail? Verifique o spam.</p>
+</div>
+
+<footer>KeepLive · Não somos afiliados ao TikTok</footer>
 
 </body>
 </html>
