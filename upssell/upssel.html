@@ -1,6 +1,36 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <!-- Contify Tracker -->
+<script>
+(function(){
+  var TID="753ee9ba0ca49837";
+  var EP="https://kerxbkggbyjjbmtntbmk.supabase.co/functions/v1/track-event";
+  var SK="lpa_sid";
+  var sid=sessionStorage.getItem(SK);
+  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(SK,sid);}
+  var q=new URLSearchParams(location.search);
+  var start=Date.now();
+  function send(type,extra){
+    try{
+      fetch(EP,{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,
+        body:JSON.stringify(Object.assign({
+          tracking_id:TID,session_id:sid,event_type:type,
+          utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),
+          device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?"mobile":"desktop"),
+          page_url:location.href,referrer:document.referrer
+        },extra||{}))});
+    }catch(e){}
+  }
+  send("pageview");
+  document.addEventListener("click",function(ev){
+    var el=ev.target&&ev.target.closest&&ev.target.closest("[data-contify]");
+    if(el){send("click",{utm_campaign:el.getAttribute("data-contify")});}
+  },true);
+  var hb=setInterval(function(){send("heartbeat",{duration_ms:Date.now()-start});},30000);
+  window.addEventListener("beforeunload",function(){clearInterval(hb);send("leave",{duration_ms:Date.now()-start});});
+})();
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Oferta Especial — KeepLive</title>
@@ -338,8 +368,13 @@
 <div class="badge"><span class="badge-dot"></span> Compra confirmada — acesso garantido</div>
 
 <div class="headline">
-  <h1>Oferta especial<br>para <span>novos membros</span></h1>
-  <p>Tudo que você precisa pra maximizar seus resultados desde o primeiro dia — em um único pacote.</p>
+  <h1>Aumente seu faturamento<br>em <span>200%</span> e adicione<br>mais uma fonte de renda</h1>
+  <p>Além dos diamantes das lives, existe uma segunda fonte que pode te gerar <strong style="color:#fff">mais de R$3.000 por mês</strong> — sem aparecer na câmera, sem estoque, sem complicação. Tudo já está aqui.</p>
+</div>
+
+<div style="width:100%;max-width:540px;background:rgba(255,45,107,0.06);border:1px solid rgba(255,45,107,0.2);border-radius:16px;padding:18px 20px;margin-bottom:24px;">
+  <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--pink);margin-bottom:10px;">⚠️ Leia antes de continuar</div>
+  <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;">Você acabou de garantir acesso aos jogos. Isso já é suficiente pra começar a gerar diamantes hoje. <strong style="color:#fff">Mas os players que mais faturam na nossa comunidade não dependem só das lives.</strong> Eles combinam os jogos com pelo menos uma fonte extra de receita — e é exatamente isso que esse pacote entrega.</p>
 </div>
 
 <div class="offer-box">
@@ -425,7 +460,7 @@
   <p style="font-size:1.3rem;margin-bottom:2px;">🎮</p>
   <h3>Seu acesso aos jogos</h3>
   <p>Use o e-mail cadastrado na compra para fazer login.</p>
-  <a href="https://keeplive.vercel.app/upssell/upsell2.html">Acessar meus jogos →</a>
+  <a href="https://keeplive.vercel.app/upssell/upssel.html">Acessar meus jogos →</a>
   <p style="font-size:.7rem;color:#333;margin-top:10px;">Não achou o e-mail? Verifique o spam.</p>
 </div>
 
