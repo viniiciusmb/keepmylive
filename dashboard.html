@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KeepLive — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --pink: #FF2D6B;
+  --pink-light: #FF5C8A;
+  --pink-glow: rgba(255,45,107,0.2);
+  --gold: #FFB800;
+  --green: #00D084;
+  --blue: #4D9FFF;
+  --bg: #080808;
+  --bg2: #0e0e0e;
+  --bg3: #141414;
+  --card: #111111;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.04);
+  --text: #F0F0F0;
+  --muted: rgba(255,255,255,0.4);
+  --muted2: rgba(255,255,255,0.22);
+  --sidebar-w: 220px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 34px; height: 34px;
+  background: var(--pink);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.logo-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.3px;
+}
+.logo-sub {
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: -2px;
+}
+
+.sidebar-nav {
+  padding: 16px 12px;
+  flex: 1;
+}
+.nav-group-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  padding: 0 8px;
+  margin: 14px 0 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.nav-item.active {
+  background: rgba(255,45,107,0.12);
+  color: var(--pink);
+  font-weight: 700;
+}
+.nav-item .ni { font-size: 1rem; flex-shrink: 0; }
+
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border2);
+  font-size: 0.72rem;
+  color: var(--muted2);
+}
+.online-dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* ── MAIN ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  height: 60px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.topbar-left {
+  display: flex;
+  flex-direction: column;
+}
+.topbar-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+.topbar-date { font-size: 0.72rem; color: var(--muted); }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.tb-badge {
+  background: rgba(0,208,132,0.12);
+  border: 1px solid rgba(0,208,132,0.25);
+  color: var(--green);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 50px;
+  letter-spacing: 0.05em;
+}
+.tb-period {
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 8px;
+}
+
+/* PAGE CONTENT */
+.page {
+  padding: 28px;
+  flex: 1;
+}
+
+/* ── KPI CARDS ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 20px 16px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.kpi-card:hover { border-color: rgba(255,255,255,0.12); }
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.kpi-pink::before { background: var(--pink); }
+.kpi-gold::before { background: var(--gold); }
+.kpi-green::before { background: var(--green); }
+.kpi-blue::before { background: var(--blue); }
+
+.kpi-icon {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+}
+.kpi-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.kpi-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.kpi-pink .kpi-val { color: var(--pink); }
+.kpi-gold .kpi-val { color: var(--gold); }
+.kpi-green .kpi-val { color: var(--green); }
+.kpi-blue .kpi-val { color: var(--blue); }
+
+.kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--green);
+  background: rgba(0,208,132,0.1);
+  padding: 2px 8px;
+  border-radius: 50px;
+}
+.kpi-delta.down { color: var(--pink); background: rgba(255,45,107,0.1); }
+.kpi-sub {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── CHARTS ROW ── */
+.charts-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.chart-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.chart-sub { font-size: 0.72rem; color: var(--muted); }
+.chart-legend {
+  display: flex;
+  gap: 14px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+.legend-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+
+/* BAR CHART */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 140px;
+  padding-bottom: 28px;
+  position: relative;
+}
+.bar-chart::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 28px;
+  border-top: 1px solid var(--border2);
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar-fill {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: opacity 0.2s;
+  cursor: default;
+  position: relative;
+}
+.bar-fill:hover { opacity: 0.8; }
+.bar-label {
+  font-size: 0.6rem;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-top: 4px;
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* DONUT */
+.donut-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.donut-svg { display: block; }
+.donut-center {
+  text-align: center;
+}
+.donut-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--green);
+  line-height: 1;
+}
+.donut-lbl { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+.donut-items {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.donut-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+.donut-item-left { display: flex; align-items: center; gap: 7px; color: var(--muted); }
+.donut-item-val { font-weight: 700; color: var(--text); font-size: 0.78rem; }
+
+/* ── MINI STATS ROW ── */
+.mini-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+.mini-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.mini-ico {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.mini-ico.pink { background: rgba(255,45,107,0.12); }
+.mini-ico.gold { background: rgba(255,184,0,0.12); }
+.mini-ico.green { background: rgba(0,208,132,0.1); }
+.mini-info { flex: 1; }
+.mini-label { font-size: 0.72rem; color: var(--muted); margin-bottom: 3px; }
+.mini-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* ── TABLE ── */
+.table-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.table-top {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.table-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+.table-meta { font-size: 0.72rem; color: var(--muted); }
+.table-search {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  padding: 7px 12px;
+  border-radius: 8px;
+  outline: none;
+  width: 180px;
+}
+.table-search::placeholder { color: var(--muted2); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  background: var(--bg2);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+thead th:first-child { padding-left: 20px; }
+thead th:last-child { padding-right: 20px; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border2);
+  transition: background 0.12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.025); }
+
+td {
+  padding: 11px 14px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+td:first-child { padding-left: 20px; }
+td:last-child { padding-right: 20px; }
+
+.td-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  width: 36px;
+}
+.td-rank.top3 { color: var(--gold); font-weight: 700; }
+
+.client-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+.client-state { font-size: 0.68rem; color: var(--muted); margin-top: 1px; }
+
+.td-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+}
+
+.td-diamonds { color: var(--pink); font-weight: 700; }
+.td-revenue { color: var(--green); font-weight: 700; }
+.td-followers { color: var(--blue); }
+.td-hours { color: var(--muted); }
+.td-accounts {
+  display: inline-flex;
+  gap: 3px;
+}
+.acc-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--pink);
+  opacity: 0.7;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 50px;
+  letter-spacing: 0.04em;
+}
+.status-online {
+  background: rgba(0,208,132,0.12);
+  color: var(--green);
+  border: 1px solid rgba(0,208,132,0.2);
+}
+.status-active {
+  background: rgba(77,159,255,0.1);
+  color: var(--blue);
+  border: 1px solid rgba(77,159,255,0.18);
+}
+.status-new {
+  background: rgba(255,184,0,0.1);
+  color: var(--gold);
+  border: 1px solid rgba(255,184,0,0.2);
+}
+
+/* TABLE FOOTER */
+.table-footer {
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.table-footer strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🎮</div>
+    <div>
+      <div class="logo-text">KeepLive</div>
+      <span class="logo-sub">Admin Panel</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">Visão geral</div>
+    <a class="nav-item active" href="#">
+      <span class="ni">📊</span> Dashboard
+    </a>
+    <a class="nav-item" href="#">
+      <span class="ni">👥</span> Clientes
+    </a>
+    <a class="nav-item" href="#">
+      <span class="ni">💎</span> Diamantes
+    </a>
+    <a class="nav-item" href="#">
+      <span class="ni">💰</span> Faturamento
+    </a>
+
+    <div class="nav-group-label">Jogos</div>
+    <a class="nav-item" href="#">
+      <span class="ni">🎮</span> Catálogo
+    </a>
+    <a class="nav-item" href="#">
+      <span class="ni">📺</span> Lives ativas
+    </a>
+    <a class="nav-item" href="#">
+      <span class="ni">🏆</span> Ranking
+    </a>
+
+    <div class="nav-group-label">Plataforma</div>
+    <a class="nav-item" href="#">
+      <span class="ni">⚙️</span> Configurações
+    </a>
+    <a class="nav-item" href="#">
+      <span class="ni">📁</span> Relatórios
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="online-dot"></span> Sistema operacional · v2.4.1
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">Dashboard Geral</div>
+      <div class="topbar-date">Junho 2026 — Dados em tempo real</div>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-badge">● 347 lives ao vivo agora</div>
+      <div class="tb-period">Período: Junho 2026</div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- KPI CARDS -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-pink">
+        <div class="kpi-icon">💎</div>
+        <div class="kpi-label">Diamantes totais · Junho</div>
+        <div class="kpi-val">847,3M</div>
+        <div class="kpi-delta">↑ +34,7%</div>
+        <div class="kpi-sub">vs. maio 2026</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Faturamento total membros</div>
+        <div class="kpi-val">R$4,7M</div>
+        <div class="kpi-delta">↑ +28,3%</div>
+        <div class="kpi-sub">estimado · mês atual</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-icon">👥</div>
+        <div class="kpi-label">Membros ativos</div>
+        <div class="kpi-val">2.847</div>
+        <div class="kpi-delta">↑ +412</div>
+        <div class="kpi-sub">novos este mês</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-icon">📺</div>
+        <div class="kpi-label">Horas de live · Junho</div>
+        <div class="kpi-val">193.4k</div>
+        <div class="kpi-delta">↑ +21,5%</div>
+        <div class="kpi-sub">horas transmitidas</div>
+      </div>
+    </div>
+
+    <!-- CHARTS ROW -->
+    <div class="charts-row">
+
+      <!-- BAR CHART - faturamento mensal -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Faturamento mensal dos membros</div>
+            <div class="chart-sub">Total em R$ · últimos 8 meses</div>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div> Faturamento</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Meta</div>
+          </div>
+        </div>
+        <div class="bar-chart" id="barChart"></div>
+      </div>
+
+      <!-- DONUT - distribuição jogos -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Jogos mais usados</div>
+            <div class="chart-sub">% de sessões · Junho</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130">
+            <circle cx="65" cy="65" r="50" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="18"/>
+            <!-- Territory War 38% -->
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#FF2D6B" stroke-width="18"
+              stroke-dasharray="238.76 376.99" stroke-dashoffset="0" transform="rotate(-90 65 65)"/>
+            <!-- Travel Station 27% -->
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#4D9FFF" stroke-width="18"
+              stroke-dasharray="169.65 376.99" stroke-dashoffset="-238.76" transform="rotate(-90 65 65)"/>
+            <!-- Woman vs Man 21% -->
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#FFB800" stroke-width="18"
+              stroke-dasharray="131.95 376.99" stroke-dashoffset="-408.41" transform="rotate(-90 65 65)"/>
+            <!-- League War 14% -->
+            <circle cx="65" cy="65" r="50" fill="none" stroke="#00D084" stroke-width="18"
+              stroke-dasharray="52.78 376.99" stroke-dashoffset="-540.36" transform="rotate(-90 65 65)"/>
+            <text x="65" y="60" text-anchor="middle" fill="#F0F0F0" font-family="Plus Jakarta Sans" font-weight="800" font-size="18">2.847</text>
+            <text x="65" y="76" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-family="DM Sans" font-size="9">membros</text>
+          </svg>
+          <div class="donut-items">
+            <div class="donut-item">
+              <div class="donut-item-left"><div class="legend-dot" style="background:var(--pink);width:8px;height:8px;border-radius:50%;"></div> Territory War</div>
+              <div class="donut-item-val">38%</div>
+            </div>
+            <div class="donut-item">
+              <div class="donut-item-left"><div class="legend-dot" style="background:var(--blue);width:8px;height:8px;border-radius:50%;"></div> Travel Station</div>
+              <div class="donut-item-val">27%</div>
+            </div>
+            <div class="donut-item">
+              <div class="donut-item-left"><div class="legend-dot" style="background:var(--gold);width:8px;height:8px;border-radius:50%;"></div> Woman vs Man</div>
+              <div class="donut-item-val">21%</div>
+            </div>
+            <div class="donut-item">
+              <div class="donut-item-left"><div class="legend-dot" style="background:var(--green);width:8px;height:8px;border-radius:50%;"></div> League War</div>
+              <div class="donut-item-val">14%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINI STATS -->
+    <div class="mini-row">
+      <div class="mini-card">
+        <div class="mini-ico pink">💎</div>
+        <div class="mini-info">
+          <div class="mini-label">Média de diamantes por membro</div>
+          <div class="mini-val" style="color:var(--pink)">297.612 💎</div>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-ico gold">📈</div>
+        <div class="mini-info">
+          <div class="mini-label">Média de faturamento por membro</div>
+          <div class="mini-val" style="color:var(--gold)">R$ 1.648/mês</div>
+        </div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-ico green">👤</div>
+        <div class="mini-info">
+          <div class="mini-label">Total de seguidores ganhos em Junho</div>
+          <div class="mini-val" style="color:var(--green)">+4,2M seguidores</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS TABLE -->
+    <div class="table-card">
+      <div class="table-top">
+        <div>
+          <div class="table-title">Clientes — Top 50 · Junho 2026</div>
+          <div class="table-meta">Ordenado por diamantes · atualizado há 3 min</div>
+        </div>
+        <input class="table-search" type="text" placeholder="Buscar cliente..." oninput="filterTable(this.value)"/>
+      </div>
+
+      <table id="clientTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Contas</th>
+            <th>Lives</th>
+            <th>Horas live</th>
+            <th>💎 Diamantes</th>
+            <th>👥 Seguidores</th>
+            <th>💰 Faturamento</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+
+      <div class="table-footer">
+        <span>Mostrando <strong>50</strong> de <strong>2.847</strong> clientes</span>
+        <span>Total de diamantes: <strong style="color:var(--pink)">847.312.490 💎</strong> · Total faturado: <strong style="color:var(--green)">R$ 4.718.204</strong></span>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ── BAR CHART ──
+(function() {
+  var months = ['Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun'];
+  var vals   = [1.2, 1.8, 2.1, 2.6, 3.0, 3.4, 4.1, 4.7];
+  var meta   = [1.5, 2.0, 2.2, 2.8, 3.2, 3.8, 4.2, 5.0];
+  var max    = 5.5;
+  var cont   = document.getElementById('barChart');
+  if (!cont) return;
+
+  months.forEach(function(m, i) {
+    var col = document.createElement('div');
+    col.className = 'bar-col';
+    col.style.position = 'relative';
+    col.style.height = '100%';
+
+    // meta bar (behind)
+    var metaBar = document.createElement('div');
+    metaBar.className = 'bar-fill';
+    metaBar.style.height = ((meta[i]/max)*100) + '%';
+    metaBar.style.background = 'rgba(77,159,255,0.2)';
+    metaBar.style.position = 'absolute';
+    metaBar.style.bottom = '0';
+    metaBar.style.width = '100%';
+    metaBar.style.borderRadius = '4px 4px 0 0';
+
+    // value bar
+    var bar = document.createElement('div');
+    bar.className = 'bar-fill';
+    bar.style.height = ((vals[i]/max)*100) + '%';
+    bar.style.background = i === months.length-1
+      ? 'linear-gradient(180deg,#FF2D6B,#ff5c8a)'
+      : 'rgba(255,45,107,0.55)';
+    bar.style.position = 'absolute';
+    bar.style.bottom = '0';
+    bar.style.width = '78%';
+    bar.style.left = '11%';
+    bar.style.borderRadius = '4px 4px 0 0';
+
+    // label
+    var lbl = document.createElement('div');
+    lbl.style.position = 'absolute';
+    lbl.style.bottom = '-22px';
+    lbl.style.left = '50%';
+    lbl.style.transform = 'translateX(-50%)';
+    lbl.style.fontSize = '0.6rem';
+    lbl.style.color = 'rgba(255,255,255,0.35)';
+    lbl.style.whiteSpace = 'nowrap';
+    lbl.textContent = m;
+
+    // top label
+    var top = document.createElement('div');
+    top.style.position = 'absolute';
+    top.style.bottom = ((vals[i]/max)*100+1) + '%';
+    top.style.left = '50%';
+    top.style.transform = 'translateX(-50%)';
+    top.style.fontSize = '0.6rem';
+    top.style.color = i === months.length-1 ? '#FF2D6B' : 'rgba(255,255,255,0.35)';
+    top.style.fontWeight = '700';
+    top.style.fontFamily = 'JetBrains Mono, monospace';
+    top.style.whiteSpace = 'nowrap';
+    top.textContent = 'R$' + vals[i] + 'M';
+
+    col.appendChild(metaBar);
+    col.appendChild(bar);
+    col.appendChild(lbl);
+    col.appendChild(top);
+    cont.appendChild(col);
+  });
+})();
+
+// ── TABLE DATA ──
+var clients = [
+  {name:'Ana Lima',       state:'SP', accounts:4, lives:94,  hours:487, diamonds:1104837, followers:31420, revenue:6165},
+  {name:'Carlos Mendes',  state:'RJ', accounts:4, lives:88,  hours:461, diamonds:1031492, followers:28740, revenue:5756},
+  {name:'Juliana Costa',  state:'MG', accounts:3, lives:81,  hours:432, diamonds:963751,  followers:26190, revenue:5379},
+  {name:'Rafael Torres',  state:'SP', accounts:4, lives:76,  hours:408, diamonds:897214,  followers:24580, revenue:5007},
+  {name:'Fernanda Souza', state:'BA', accounts:3, lives:72,  hours:389, diamonds:824638,  followers:22310, revenue:4604},
+  {name:'Henrique Neto',  state:'PR', accounts:4, lives:68,  hours:374, diamonds:763409,  followers:20870, revenue:4261},
+  {name:'Larissa Moura',  state:'RS', accounts:3, lives:65,  hours:358, diamonds:712853,  followers:19240, revenue:3979},
+  {name:'Bruno Alves',    state:'CE', accounts:4, lives:63,  hours:341, diamonds:671247,  followers:18030, revenue:3747},
+  {name:'Thayna Reis',    state:'GO', accounts:3, lives:59,  hours:326, diamonds:634918,  followers:17120, revenue:3543},
+  {name:'Mateus Silva',   state:'SC', accounts:3, lives:57,  hours:312, diamonds:601372,  followers:16280, revenue:3355},
+  {name:'Camila Gomes',   state:'SP', accounts:2, lives:54,  hours:298, diamonds:571840,  followers:15410, revenue:3192},
+  {name:'Diego Rocha',    state:'RJ', accounts:3, lives:52,  hours:284, diamonds:543291,  followers:14680, revenue:3031},
+  {name:'Patricia Lima',  state:'PE', accounts:2, lives:49,  hours:271, diamonds:514703,  followers:13920, revenue:2873},
+  {name:'Lucas Ferreira', state:'AM', accounts:3, lives:47,  hours:259, diamonds:487165,  followers:13140, revenue:2719},
+  {name:'Amanda Torres',  state:'MA', accounts:2, lives:45,  hours:247, diamonds:461834,  followers:12470, revenue:2578},
+  {name:'Vinicius Barros',state:'SP', accounts:3, lives:44,  hours:236, diamonds:437209,  followers:11820, revenue:2440},
+  {name:'Isabela Campos', state:'MG', accounts:2, lives:42,  hours:226, diamonds:413782,  followers:11190, revenue:2309},
+  {name:'Felipe Correia', state:'RJ', accounts:2, lives:40,  hours:216, diamonds:391354,  followers:10580, revenue:2184},
+  {name:'Natalia Araujo', state:'DF', accounts:2, lives:38,  hours:207, diamonds:370291,  followers:10010, revenue:2067},
+  {name:'Eduardo Santos', state:'SP', accounts:3, lives:37,  hours:198, diamonds:350618,  followers:9480,  revenue:1957},
+  {name:'Renata Freitas', state:'PR', accounts:2, lives:35,  hours:190, diamonds:331847,  followers:8980,  revenue:1852},
+  {name:'Guilherme Lopes',state:'RS', accounts:2, lives:34,  hours:182, diamonds:314203,  followers:8510,  revenue:1754},
+  {name:'Mariana Pinto',  state:'BA', accounts:1, lives:32,  hours:174, diamonds:297741,  followers:8070,  revenue:1662},
+  {name:'Thiago Carvalho',state:'GO', accounts:2, lives:31,  hours:167, diamonds:282163,  followers:7650,  revenue:1575},
+  {name:'Beatriz Moura',  state:'CE', accounts:1, lives:30,  hours:160, diamonds:267384,  followers:7260,  revenue:1493},
+  {name:'Leonardo Costa', state:'SC', accounts:2, lives:29,  hours:153, diamonds:253471,  followers:6890,  revenue:1415},
+  {name:'Gabriela Silva', state:'SP', accounts:1, lives:27,  hours:147, diamonds:240318,  followers:6540,  revenue:1342},
+  {name:'Rodrigo Dias',   state:'RJ', accounts:2, lives:26,  hours:141, diamonds:227904,  followers:6210,  revenue:1272},
+  {name:'Leticia Ramos',  state:'MG', accounts:1, lives:25,  hours:135, diamonds:216037,  followers:5900,  revenue:1207},
+  {name:'Anderson Nunes', state:'PE', accounts:2, lives:24,  hours:130, diamonds:204891,  followers:5610,  revenue:1144},
+  {name:'Sabrina Vieira', state:'AM', accounts:1, lives:23,  hours:124, diamonds:194317,  followers:5340,  revenue:1085},
+  {name:'Marcos Teixeira',state:'SP', accounts:2, lives:22,  hours:119, diamonds:184213,  followers:5080,  revenue:1028},
+  {name:'Caroline Melo',  state:'DF', accounts:1, lives:21,  hours:114, diamonds:174682,  followers:4840,  revenue:975},
+  {name:'Paulo Rezende',  state:'BA', accounts:1, lives:20,  hours:109, diamonds:165618,  followers:4610,  revenue:924},
+  {name:'Aline Santana',  state:'PR', accounts:1, lives:19,  hours:105, diamonds:156924,  followers:4390,  revenue:876},
+  {name:'Caio Monteiro',  state:'RS', accounts:2, lives:19,  hours:100, diamonds:148801,  followers:4190,  revenue:831},
+  {name:'Tatiana Borges', state:'GO', accounts:1, lives:18,  hours:96,  diamonds:141124,  followers:3990,  revenue:788},
+  {name:'Fábio Cunha',    state:'CE', accounts:1, lives:17,  hours:92,  diamonds:133841,  followers:3810,  revenue:747},
+  {name:'Priscila Farias',state:'SC', accounts:1, lives:16,  hours:88,  diamonds:126947,  followers:3630,  revenue:709},
+  {name:'Leandro Braga',  state:'SP', accounts:2, lives:16,  hours:84,  diamonds:120438,  followers:3460,  revenue:672},
+  {name:'Viviane Leal',   state:'RJ', accounts:1, lives:15,  hours:80,  diamonds:114217,  followers:3300,  revenue:638},
+  {name:'Sérgio Paiva',   state:'MG', accounts:1, lives:14,  hours:77,  diamonds:108381,  followers:3150,  revenue:605},
+  {name:'Juliana Matos',  state:'PE', accounts:1, lives:14,  hours:73,  diamonds:102739,  followers:3010,  revenue:574},
+  {name:'Davi Nogueira',  state:'BA', accounts:1, lives:13,  hours:70,  diamonds:97408,   followers:2870,  revenue:544},
+  {name:'Marcia Coelho',  state:'PR', accounts:1, lives:13,  hours:67,  diamonds:92383,   followers:2740,  revenue:516},
+  {name:'Robson Lima',    state:'AM', accounts:1, lives:12,  hours:64,  diamonds:87514,   followers:2620,  revenue:489},
+  {name:'Daniele Castro', state:'DF', accounts:1, lives:12,  hours:61,  diamonds:83018,   followers:2510,  revenue:464},
+  {name:'Ivan Macedo',    state:'RS', accounts:1, lives:11,  hours:58,  diamonds:78741,   followers:2400,  revenue:440},
+  {name:'Simone Aguiar',  state:'GO', accounts:1, lives:11,  hours:55,  diamonds:74683,   followers:2290,  revenue:417},
+  {name:'Flávio Rios',    state:'CE', accounts:1, lives:10,  hours:53,  diamonds:70847,   followers:2190,  revenue:395},
+];
+
+function statusBadge(i) {
+  if (i < 5)  return '<span class="status-badge status-online">● Destaque</span>';
+  if (i < 20) return '<span class="status-badge status-active">● Ativo</span>';
+  return '<span class="status-badge status-new">● Crescendo</span>';
+}
+
+function accountDots(n) {
+  var html = '<div class="td-accounts">';
+  for (var i=0;i<n;i++) html += '<div class="acc-dot"></div>';
+  html += '</div> <span style="color:var(--muted);font-size:0.7rem;">('+n+')</span>';
+  return html;
+}
+
+function fmt(n) {
+  return n.toLocaleString('pt-BR');
+}
+
+function renderTable(data) {
+  var tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  data.forEach(function(c, i) {
+    var rank = i+1;
+    var isTop3 = rank <= 3;
+    var medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    var tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="td-rank '+(isTop3?'top3':'')+'">'+medal+(isTop3?'':'#'+rank)+'</td>'+
+      '<td><div class="client-name">'+c.name+'</div><div class="client-state">'+c.state+'</div></td>'+
+      '<td>'+accountDots(c.accounts)+'</td>'+
+      '<td class="td-mono">'+c.lives+'</td>'+
+      '<td class="td-mono td-hours">'+c.hours+'h</td>'+
+      '<td class="td-mono td-diamonds">'+fmt(c.diamonds)+' 💎</td>'+
+      '<td class="td-mono td-followers">+'+fmt(c.followers)+'</td>'+
+      '<td class="td-mono td-revenue">R$ '+fmt(c.revenue)+'</td>'+
+      '<td>'+statusBadge(i)+'</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+renderTable(clients);
+
+function filterTable(q) {
+  var filtered = clients.filter(function(c) {
+    return c.name.toLowerCase().includes(q.toLowerCase()) || c.state.toLowerCase().includes(q.toLowerCase());
+  });
+  renderTable(filtered);
+}
+</script>
+
+</body>
+</html>
