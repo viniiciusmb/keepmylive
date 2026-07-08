@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Contify Tracker -->
+<script>
+(function(){
+  var TID="753ee9ba0ca49837";
+  var EP="https://kerxbkggbyjjbmtntbmk.supabase.co/functions/v1/track-event";
+  var SK="lpa_sid";
+  var sid=sessionStorage.getItem(SK);
+  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(SK,sid);}
+  var q=new URLSearchParams(location.search);
+  var start=Date.now();
+  function send(type,extra){
+    try{
+      fetch(EP,{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,
+        body:JSON.stringify(Object.assign({
+          tracking_id:TID,session_id:sid,event_type:type,
+          utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),
+          device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?"mobile":"desktop"),
+          page_url:location.href,referrer:document.referrer
+        },extra||{}))});
+    }catch(e){}
+  }
+  send("pageview");
+  document.addEventListener("click",function(ev){
+    var el=ev.target&&ev.target.closest&&ev.target.closest("[data-contify]");
+    if(el){send("click",{utm_campaign:el.getAttribute("data-contify")});}
+  },true);
+  var hb=setInterval(function(){send("heartbeat",{duration_ms:Date.now()-start});},30000);
+  window.addEventListener("beforeunload",function(){clearInterval(hb);send("leave",{duration_ms:Date.now()-start});});
+})();
+</script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Oferta Especial — KeepLive</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --pink: #FF2D6B;
+    --pink-light: #FF5C8A;
+    --pink-glow: rgba(255,45,107,0.3);
+    --gold: #FFB800;
+    --bg: #0A0A0A;
+    --card: #141414;
+    --border: rgba(255,255,255,0.06);
+    --text: #FFFFFF;
+    --muted: rgba(255,255,255,0.45);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 60px;
+  }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,200,80,0.1);
+    border: 1px solid rgba(0,200,80,0.3);
+    color: #00c850;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+  }
+  .badge-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #00c850;
+    animation: pulse 1.4s infinite;
+  }
+  @keyframes pulse {
+    0%,100%{opacity:1;transform:scale(1)}
+    50%{opacity:.5;transform:scale(1.4)}
+  }
+
+  /* HEADLINE */
+  .headline {
+    text-align: center;
+    margin-bottom: 32px;
+    max-width: 540px;
+  }
+  .headline h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+  .headline h1 span { color: var(--pink); }
+  .headline p {
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* OFFER BOX */
+  .offer-box {
+    width: 100%;
+    max-width: 540px;
+    background: var(--card);
+    border: 2px solid rgba(255,45,107,0.4);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .offer-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pink), var(--gold));
+  }
+
+  /* DISCOUNT TAG */
+  .discount-tag {
+    background: linear-gradient(90deg, var(--pink), #ff6b35);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    text-align: center;
+  }
+
+  .offer-inner {
+    padding: 24px 20px;
+  }
+
+  /* PRICE HEADER */
+  .price-header {
+    text-align: center;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .price-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .price-old {
+    font-size: 1rem;
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--pink);
+    margin-bottom: 4px;
+  }
+  .price-new {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .price-new .cur { font-size: 1.4rem; vertical-align: super; color: var(--pink); }
+  .price-sub {
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  /* PRODUCTS */
+  .products {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .product-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .product-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .product-info { flex: 1; }
+
+  .product-tag {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+  }
+  .tag-pink { background: rgba(255,45,107,0.15); color: var(--pink); }
+  .tag-gold { background: rgba(255,184,0,0.15); color: var(--gold); }
+  .tag-green { background: rgba(0,200,80,0.12); color: #00c850; }
+
+  .product-name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 4px;
+  }
+
+  .product-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .product-value {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 5px;
+    text-decoration: line-through;
+    text-decoration-color: rgba(255,255,255,0.2);
+  }
+
+  /* TOTAL */
+  .total-row {
+    background: rgba(255,184,0,0.06);
+    border: 1px solid rgba(255,184,0,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .total-label { font-size: 0.82rem; color: var(--muted); }
+  .total-label strong { color: var(--text); display: block; font-size: 0.88rem; }
+  .total-val {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--gold);
+    font-weight: 800;
+    text-align: right;
+  }
+  .total-val .big {
+    font-size: 1.5rem;
+    display: block;
+    line-height: 1;
+  }
+  .total-save {
+    font-size: 0.68rem;
+    color: #00c850;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+
+  /* CTA BUTTON */
+  .btn-cta {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, var(--pink), #ff6b35);
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 18px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    box-shadow: 0 0 36px rgba(255,45,107,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-bottom: 12px;
+  }
+  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 0 52px rgba(255,45,107,0.5); }
+
+  .trust {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .trust span { font-size: 0.7rem; color: #555; }
+
+  /* SKIP */
+  .skip {
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #444;
+    text-decoration: underline;
+    cursor: pointer;
+    padding-top: 4px;
+    padding-bottom: 8px;
+    transition: color 0.2s;
+  }
+  .skip:hover { color: #777; }
+
+  /* ACCESS BOX */
+  .access {
+    width: 100%;
+    max-width: 540px;
+    margin-top: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-align: center;
+  }
+  .access h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 8px 0 6px;
+  }
+  .access p { font-size: 0.82rem; color: var(--muted); margin-bottom: 14px; }
+  .access a {
+    display: inline-block;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .access a:hover { background: rgba(255,255,255,0.1); }
+
+  footer {
+    margin-top: 40px;
+    font-size: 0.75rem;
+    color: #333;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="badge"><span class="badge-dot"></span> Compra confirmada — acesso garantido</div>
+
+<div class="headline">
+  <h1>Oferta especial<br>para <span>novos membros</span></h1>
+  <p>Tudo que você precisa pra maximizar seus resultados desde o primeiro dia — em um único pacote.</p>
+</div>
+
+<div class="offer-box">
+
+  <div class="discount-tag">🔥 62% OFF — Só para novos membros · Aparece só uma vez</div>
+
+  <div class="offer-inner">
+
+    <!-- PRICE HEADER -->
+    <div class="price-header">
+      <div class="price-label">Oferta completa</div>
+      <div class="price-old">De R$ 127,00</div>
+      <div class="price-new"><span class="cur">R$</span>47,90</div>
+      <div class="price-sub">pagamento único · acesso imediato</div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="products">
+
+      <!-- PRODUTO 1: 50K VÍDEOS -->
+      <div class="product-item">
+        <img class="product-img" src="imagens/Gemini_Generated_Image_n3qxt1n3qxt1n3qx.png" alt="50K Vídeos Virais"/>
+        <div class="product-info">
+          <div class="product-tag tag-pink">Incluso</div>
+          <div class="product-name">Pack 50.000 Vídeos Virais</div>
+          <div class="product-desc">Trends mundiais, cortes engraçados, dicas rápidas, estilo de vida e desafios prontos pra postar no TikTok, Reels e Shorts. Zero edição — só baixar e postar.</div>
+          <div class="product-value">Valor separado: R$ 47,00</div>
+        </div>
+      </div>
+
+      <!-- PRODUTO 2: GUIA TIKTOK SHOP -->
+      <div class="product-item">
+        <img class="product-img" src="imagens/capattkcomia.png" alt="Guia TikTok Shop com IA"/>
+        <div class="product-info">
+          <div class="product-tag tag-gold">Incluso</div>
+          <div class="product-name">Guia TikTok Shop com IA</div>
+          <div class="product-desc">Passo a passo para vender todos os dias como afiliado usando IA — sem aparecer na câmera. Do zero ao R$3.000/mês com ChatGPT, CapCut IA e ElevenLabs.</div>
+          <div class="product-value">Valor separado: R$ 57,00</div>
+        </div>
+      </div>
+
+      <!-- PRODUTO 3: GUIA LUCRATIVIDADE (BÔNUS) -->
+      <div class="product-item">
+        <img class="product-img" src="imagens/Design_sem_nome__26_.png" alt="Guia de Lucratividade"/>
+        <div class="product-info">
+          <div class="product-tag tag-green">Bônus</div>
+          <div class="product-name">Guia de Lucratividade com Lives</div>
+          <div class="product-desc">Estratégias exclusivas para aumentar os diamantes e maximizar seus ganhos em cada sessão de live no TikTok. Vai direto ao ponto — sem enrolação.</div>
+          <div class="product-value">Valor separado: R$ 23,00</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-row">
+      <div class="total-label">
+        <strong>Total do pacote completo</strong>
+        3 produtos · acesso imediato
+      </div>
+      <div class="total-val">
+        <span class="big">R$ 47,90</span>
+        <span class="total-save">✓ Você economiza R$ 79,10</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <a class="btn-cta" href="https://go.perfectpay.com.br/PPU38CQCOQ0">🚀 Quero o pacote completo — R$ 47,90</a>
+
+    <div class="trust">
+      <span>🔒 Pagamento seguro</span>
+      <span>⚡ Acesso imediato</span>
+      <span>📧 Enviado por e-mail</span>
+    </div>
+
+    <a class="skip" href="#acesso">Não, prefiro ficar só com os jogos</a>
+
+  </div>
+</div>
+
+<!-- ACCESS -->
+<div class="access" id="acesso">
+  <p style="font-size:1.3rem;margin-bottom:2px;">🎮</p>
+  <h3>Seu acesso aos jogos</h3>
+  <p>Use o e-mail cadastrado na compra para fazer login.</p>
+  <a href="https://keepmy.live/login">Acessar meus jogos →</a>
+  <p style="font-size:.7rem;color:#333;margin-top:10px;">Não achou o e-mail? Verifique o spam.</p>
+</div>
+
+<footer>KeepLive · Não somos afiliados ao TikTok</footer>
+
+</body>
+</html>
