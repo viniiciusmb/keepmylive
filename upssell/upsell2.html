@@ -1,36 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <!-- Contify Tracker -->
-<script>
-(function(){
-  var TID="753ee9ba0ca49837";
-  var EP="https://kerxbkggbyjjbmtntbmk.supabase.co/functions/v1/track-event";
-  var SK="lpa_sid";
-  var sid=sessionStorage.getItem(SK);
-  if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(SK,sid);}
-  var q=new URLSearchParams(location.search);
-  var start=Date.now();
-  function send(type,extra){
-    try{
-      fetch(EP,{method:"POST",headers:{"Content-Type":"application/json"},keepalive:true,
-        body:JSON.stringify(Object.assign({
-          tracking_id:TID,session_id:sid,event_type:type,
-          utm_source:q.get("utm_source"),utm_medium:q.get("utm_medium"),utm_campaign:q.get("utm_campaign"),
-          device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)?"mobile":"desktop"),
-          page_url:location.href,referrer:document.referrer
-        },extra||{}))});
-    }catch(e){}
-  }
-  send("pageview");
-  document.addEventListener("click",function(ev){
-    var el=ev.target&&ev.target.closest&&ev.target.closest("[data-contify]");
-    if(el){send("click",{utm_campaign:el.getAttribute("data-contify")});}
-  },true);
-  var hb=setInterval(function(){send("heartbeat",{duration_ms:Date.now()-start});},30000);
-  window.addEventListener("beforeunload",function(){clearInterval(hb);send("leave",{duration_ms:Date.now()-start});});
-})();
-</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Oferta Especial — KeepLive</title>
@@ -437,7 +407,7 @@
     </div>
 
     <!-- CTA -->
-    <a class="btn-cta" href="https://go.perfectpay.com.br/PPU38CQCOQ0">🚀 Quero o pacote completo — R$ 47,90</a>
+    <a class="btn-cta" href="https://checkout.perfectpay.com.br/pay/PPU38CQE06L">🚀 Quero o pacote completo</a>
 
     <div class="trust">
       <span>🔒 Pagamento seguro</span>
@@ -455,7 +425,7 @@
   <p style="font-size:1.3rem;margin-bottom:2px;">🎮</p>
   <h3>Seu acesso aos jogos</h3>
   <p>Use o e-mail cadastrado na compra para fazer login.</p>
-  <a href="https://keepmy.live/login">Acessar meus jogos →</a>
+  <a href="https://keeplive.vercel.app/upssell/upssel.html">Acessar meus jogos →</a>
   <p style="font-size:.7rem;color:#333;margin-top:10px;">Não achou o e-mail? Verifique o spam.</p>
 </div>
 
