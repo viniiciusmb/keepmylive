@@ -1153,15 +1153,31 @@ function openPopup(c, idx) {
   var overlay = document.getElementById('clientPopup');
   var box     = document.getElementById('popupBox');
 
-  // monthly revenue data — random zigzag for this client
-  var monthKeys   = ['Mar','Abr','Mai','Jun'];
-  var base = c.revenue;
-  var monthVals = [
-    Math.round(base * (0.38 + Math.random()*0.15)),
-    Math.round(base * (0.55 + Math.random()*0.18)),
-    Math.round(base * (0.72 + Math.random()*0.14)),
-    base
-  ];
+  // monthly revenue data — only show months client was actually active
+  // days 1-30 = Jun only, 31-60 = Mai+Jun, 61-90 = Abr+Mai+Jun, 91+ = Mar+Abr+Mai+Jun
+  var allMonths = ['Mar','Abr','Mai','Jun'];
+  var activeMonths, monthVals;
+  if (c.days >= 91) {
+    activeMonths = ['Mar','Abr','Mai','Jun'];
+  } else if (c.days >= 61) {
+    activeMonths = ['Abr','Mai','Jun'];
+  } else if (c.days >= 31) {
+    activeMonths = ['Mai','Jun'];
+  } else {
+    activeMonths = ['Jun'];
+  }
+  // build values: Jun = full revenue, previous months grow backwards with randomness
+  monthVals = [];
+  var junVal = c.revenue;
+  for (var mi = activeMonths.length - 1; mi >= 0; mi--) {
+    if (mi === activeMonths.length - 1) {
+      monthVals.unshift(junVal);
+    } else {
+      // each prior month is lower — earlier = less mature = less revenue
+      var factor = 0.55 + (mi / (activeMonths.length - 1)) * 0.3 + (Math.random() * 0.1 - 0.05);
+      monthVals.unshift(Math.round(junVal * factor));
+    }
+  }
   var maxMV = Math.max.apply(null, monthVals) * 1.15;
 
   // per-account breakdown
@@ -1222,11 +1238,11 @@ function openPopup(c, idx) {
   // monthly chart
   html += '<div class="p-chart-card">';
   html += '<div class="p-chart-title">Faturamento mensal</div>';
-  html += '<div class="p-chart-sub">Últimos 4 meses · R$</div>';
+  html += '<div class="p-chart-sub">Meses como cliente · R$ (entrou há '+c.days+' dias)</div>';
   html += '<div class="p-bars">';
-  monthKeys.forEach(function(m, mi) {
+  activeMonths.forEach(function(m, mi) {
     var pct = (monthVals[mi] / maxMV) * 100;
-    var isLast = mi === monthKeys.length-1;
+    var isLast = mi === activeMonths.length-1;
     html += '<div class="p-bar-col">';
     html += '<div class="p-bar-top" style="bottom:'+(pct+2)+'%;color:'+(isLast?'#FF2D6B':'rgba(255,255,255,0.35)')+'">R$'+fmt(monthVals[mi])+'</div>';
     html += '<div class="p-bar" style="height:'+pct+'%;background:'+(isLast?'linear-gradient(180deg,#FF2D6B,#ff5c8a)':'rgba(255,45,107,0.45)')+'"></div>';
