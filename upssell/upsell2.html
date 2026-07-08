@@ -191,24 +191,24 @@
 
   .product-item {
     display: flex;
-    gap: 14px;
-    align-items: flex-start;
+    flex-direction: column;
     background: rgba(255,255,255,0.03);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 14px;
+    overflow: hidden;
   }
 
   .product-img {
-    width: 72px;
-    height: 72px;
-    border-radius: 10px;
+    width: 100%;
+    height: auto;
+    display: block;
     object-fit: cover;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid var(--border);
   }
 
-  .product-info { flex: 1; }
+  .product-info {
+    padding: 14px 16px;
+  }
 
   .product-tag {
     display: inline-block;
@@ -413,7 +413,7 @@
 
       <!-- PRODUTO 3: GUIA LUCRATIVIDADE (BÔNUS) -->
       <div class="product-item">
-        <img class="product-img" src="https://keeplive.vercel.app/imagens/Design_sem_nome__26_.png" alt="Guia de Lucratividade"/>
+        <img class="product-img" src="https://keeplive.vercel.app/imagens/capaguiaaumentodalucratividade.png" alt="Guia de Lucratividade"/>
         <div class="product-info">
           <div class="product-tag tag-green">Bônus</div>
           <div class="product-name">Guia de Lucratividade com Lives</div>
