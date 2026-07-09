@@ -873,15 +873,15 @@ td:last-child { padding-right: 20px; }
     <!-- CHARTS ROW -->
     <div class="charts-row">
 
-      <!-- BAR CHART - faturamento mensal -->
+      <!-- BAR CHART - diamantes mensais -->
       <div class="chart-card">
         <div class="chart-header">
           <div>
-            <div class="chart-title">Faturamento mensal dos membros</div>
-            <div class="chart-sub">Total em R$ · últimos 8 meses</div>
+            <div class="chart-title">Diamantes arrecadados · membros</div>
+            <div class="chart-sub">Total em milhões 💎 · últimos 8 meses</div>
           </div>
           <div class="chart-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div> Faturamento</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--pink)"></div> Diamantes</div>
             <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div> Meta</div>
           </div>
         </div>
@@ -1003,12 +1003,12 @@ td:last-child { padding-right: 20px; }
 </div>
 
 <script>
-// ── BAR CHART ──
+// ── BAR CHART — Diamantes arrecadados (milhões) ──
 (function() {
   var months = ['Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun'];
-  var vals   = [2.1, 1.4, 3.3, 2.7, 1.9, 4.1, 2.8, 4.7];
-  var meta   = [2.5, 2.5, 3.0, 3.0, 3.5, 3.8, 4.0, 4.5];
-  var max    = 5.5;
+  var vals   = [11.2, 13.8, 12.4, 15.7, 14.1, 18.3, 16.9, 22.4];
+  var meta   = [12.0, 14.0, 14.0, 16.0, 17.0, 19.0, 20.0, 24.0];
+  var max    = 27;
   var cont   = document.getElementById('barChart');
   if (!cont) return;
 
@@ -1030,7 +1030,7 @@ td:last-child { padding-right: 20px; }
 
     var top = document.createElement('div');
     top.style.cssText = 'position:absolute;left:50%;transform:translateX(-50%);font-size:0.6rem;font-weight:700;font-family:JetBrains Mono,monospace;white-space:nowrap;color:'+(i===months.length-1?'#FF2D6B':'rgba(255,255,255,0.35)')+';bottom:'+((vals[i]/max)*100+1)+'%';
-    top.textContent = 'R$'+vals[i]+'M';
+    top.textContent = vals[i] + 'M 💎';
 
     col.appendChild(metaBar);
     col.appendChild(bar);
