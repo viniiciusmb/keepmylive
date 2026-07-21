@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family: sans-serif; padding: 20px;">
+  <h2>Eventos da live em tempo real</h2>
+  <div id="eventos"></div>
+
+  <script>
+    const ws = new WebSocket('ws://72.61.219.94:4000?username=cearens33');
+    const div = document.getElementById('eventos');
+
+    ws.onopen = () => {
+      div.innerHTML += '<p>Conectado ao servidor!</p>';
+    };
+
+    ws.onmessage = (msg) => {
+      const evento = JSON.parse(msg.data);
+      div.innerHTML += '<p>' + JSON.stringify(evento) + '</p>';
+    };
+
+    ws.onerror = (err) => {
+      div.innerHTML += '<p style="color:red">Erro na conexão</p>';
+    };
+  </script>
+</body>
+</html>
