@@ -32,6 +32,15 @@
 
   #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
 
+  .camera-slot{
+    display:none; flex:0 0 auto; height:24%; margin:2vh 2.5vw 0;
+    border:2px dashed rgba(255,255,255,0.32); border-radius:14px;
+    align-items:center; justify-content:center; text-align:center;
+    color:rgba(244,251,243,0.55); font-size:clamp(10px,3vw,13px);
+    background:rgba(255,255,255,0.03); position:relative; z-index:2; gap:6px;
+  }
+  .camera-slot.on{ display:flex; }
+
   .frame-header{ flex:0 0 auto; text-align:center; padding:2vh 3vw 0.4vh; position:relative; z-index:2; }
   .title-row{ display:flex; align-items:center; justify-content:center; gap:8px; }
   .title{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(12px,4.4vw,18px); letter-spacing:0.5px; text-shadow:0 3px 10px rgba(0,0,0,0.6); }
@@ -122,6 +131,9 @@
   .ctrl-live-scores svg{ width:15px; height:15px; flex:0 0 auto; }
   .ctrl-live-scores .lname{ flex:1 1 auto; }
   .ctrl-live-scores .lpct{ font-weight:800; color:var(--badge-text); }
+  .ctrl-radio-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; padding:6px 0; cursor:pointer; }
+  .ctrl-radio-row input{ accent-color:var(--gold); width:15px; height:15px; }
+  .ctrl-hint{ font-size:10px; color:var(--text-dim); margin-top:4px; line-height:1.4; }
 </style>
 </head>
 <body>
@@ -391,6 +403,10 @@
   <canvas id="particles"></canvas>
   <div class="follow-toast" id="followToast"></div>
 
+  <div class="camera-slot" id="cameraSlot">
+    <span>📷 Espaço da câmera — configure sua câmera aqui pelo TikTok Live Studio</span>
+  </div>
+
   <div class="frame-header">
     <div class="title-row">
       <div class="title">⚔️ GUERRA DOS GIGANTES</div>
@@ -428,6 +444,13 @@
     <h4>Times da partida</h4>
     <div class="ctrl-teams-grid" id="ctrlTeamsGrid"></div>
     <div class="ctrl-count" id="ctrlCount">0 selecionados</div>
+  </div>
+
+  <div class="control-section">
+    <h4>Câmera</h4>
+    <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="none" checked> Sem câmera</label>
+    <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="with"> Com câmera</label>
+    <div class="ctrl-hint">Com câmera, um espaço fica reservado no topo da tela pra você posicionar sua câmera pelo TikTok Live Studio.</div>
   </div>
 
   <div class="control-section">
@@ -713,16 +736,16 @@
       const idx = row * COLS + col;
       const owner = grid[idx];
 
-      if(owner >= 0 && owner !== b.ownerIdx){
-        // território inimigo: converte, mas bate e volta (não passa por cima)
+      if(owner !== b.ownerIdx){
+        // território não é dela (vazio ou de outro time): converte, bate e volta como se fosse uma parede
         paintAround(col, row, b.ownerIdx, 1);
         const angle = Math.atan2(b.vy, b.vx) + Math.PI + (Math.random() - 0.5) * 1.2;
         const speed = Math.hypot(b.vx, b.vy);
         b.vx = Math.cos(angle) * speed;
         b.vy = Math.sin(angle) * speed;
       } else {
+        // já é território dela: transita livre
         b.x = nx; b.y = ny;
-        paintAround(col, row, b.ownerIdx, 1);
         if(Math.random() < 0.4 * dtSec){
           const angle = Math.atan2(b.vy, b.vx) + (Math.random() - 0.5) * 1.0;
           const speed = Math.hypot(b.vx, b.vy);
@@ -892,6 +915,12 @@
     document.getElementById('ctrlStartBtn').disabled = n < 2;
   }
   buildCtrlTeamChips();
+
+  document.querySelectorAll('input[name="cameraMode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      document.getElementById('cameraSlot').classList.toggle('on', e.target.value === 'with');
+    });
+  });
 
   function refreshCtrlButtons(){
     const startBtn = document.getElementById('ctrlStartBtn');
