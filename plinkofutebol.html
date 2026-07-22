@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Plinko dos Gigantes ⚽</title>
 <style>
   :root{
@@ -15,121 +15,98 @@
     --badge-text:#ffe07a;
     --text:#f4fbf3;
     --text-dim: rgba(244,251,243,0.7);
-    --pink:#ff6ec7;
-    --blue:#4fd1ff;
   }
 
   *{ box-sizing:border-box; }
 
   html,body{
-    margin:0; padding:0; min-height:100%;
-    background: repeating-linear-gradient(180deg, var(--pitch-1) 0px, var(--pitch-1) 60px, var(--pitch-2) 60px, var(--pitch-2) 120px);
+    margin:0; padding:0; height:100%;
+    background:#04060a;
     color:var(--text);
     font-family: system-ui, "Segoe UI", Arial, sans-serif;
-    overflow-x:hidden;
+    overflow:hidden;
   }
 
-  .pitch-circle{
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:min(85vw,640px); height:min(85vw,640px);
-    border:2px solid rgba(255,255,255,0.16); border-radius:50%;
-    pointer-events:none; z-index:0;
-  }
-  .pitch-halfway{
-    position:fixed; top:0; left:50%; width:2px; height:100%;
-    background:rgba(255,255,255,0.12); z-index:0; pointer-events:none;
+  body{
+    display:flex; align-items:center; justify-content:center;
   }
 
-  #particles{ position:fixed; inset:0; z-index:6; pointer-events:none; }
+  /* ---------- moldura 9:16 ---------- */
+  .game-frame{
+    position:relative;
+    width:min(100vw, calc(100vh * 9 / 16));
+    height:min(100vh, calc(100vw * 16 / 9));
+    overflow:hidden;
+    display:flex; flex-direction:column;
+    background: repeating-linear-gradient(180deg, var(--pitch-1) 0px, var(--pitch-1) 40px, var(--pitch-2) 40px, var(--pitch-2) 80px);
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  }
 
-  .top-bar{ position:relative; z-index:2; text-align:center; padding:18px 10px 6px; }
+  #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
+
+  .frame-header{ flex:0 0 auto; text-align:center; padding:3vh 3vw 0.5vh; position:relative; z-index:2; }
   .title{
     font-family:"Arial Black", Impact, sans-serif;
-    font-size:clamp(20px,4.2vw,32px);
-    letter-spacing:1px;
-    text-shadow:0 3px 12px rgba(0,0,0,0.6);
+    font-size:clamp(13px,5vw,20px);
+    letter-spacing:0.5px;
+    text-shadow:0 3px 10px rgba(0,0,0,0.6);
+  }
+  .hint{
+    margin-top:5px; font-size:clamp(9px,2.6vw,11px);
+    color:var(--text-dim); line-height:1.3; padding:0 2vw;
   }
 
-  .fans-panel{
-    position:fixed; top:16px; right:16px; width:200px; z-index:5;
-    background:var(--panel-bg); border:1px solid var(--panel-border);
-    border-radius:12px; padding:10px; backdrop-filter: blur(6px);
+  .scoreboard-row{
+    flex:0 0 auto; display:flex; justify-content:space-between;
+    padding:1.2vh 2.5vw; gap:1px; position:relative; z-index:2;
   }
-  .fans-title{ font-size:10px; letter-spacing:2px; color:var(--gold); opacity:0.9; margin-bottom:6px; }
-  .fans-list{ display:flex; flex-direction:column; gap:4px; }
-  .fan-item{
-    background:rgba(255,255,255,0.06); padding:5px 7px; border-radius:6px;
-    font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    animation: fanIn 0.3s ease;
-  }
-  @keyframes fanIn{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
-
-  .board-wrap{
-    position:relative; z-index:2;
-    width:min(760px,94vw); margin:18px auto 0;
-    background:var(--panel-bg); border:2px solid var(--panel-border);
-    border-radius:18px; padding:10px 10px 4px;
-    box-shadow:0 10px 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.35);
-    backdrop-filter: blur(3px);
-  }
-  #plinkoCanvas{ display:block; width:100%; height:320px; }
-
-  .slots-row{ display:flex; width:100%; padding-bottom:8px; }
-  .slot{ flex:1 1 0; display:flex; flex-direction:column; align-items:center; gap:5px; min-width:0; }
-  .slot-badge{
+  .score-item{ display:flex; flex-direction:column; align-items:center; flex:1 1 0; min-width:0; }
+  .score-badge{
+    font-family:"Arial Black", Impact, sans-serif; font-size:clamp(7px,2.2vw,10px);
     background:var(--badge-bg); color:var(--badge-text);
-    font-family:"Arial Black", Impact, sans-serif; font-size:13px;
-    padding:3px 7px; border-radius:6px; min-width:20px; text-align:center;
-    box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    padding:1px 3px; border-radius:5px; margin-bottom:2px; min-width:14px; text-align:center;
   }
-  .slot-badge.pulse{ animation: badgePulse 0.5s ease; }
-  @keyframes badgePulse{ 0%{transform:scale(1);} 40%{transform:scale(1.45); color:#fff;} 100%{transform:scale(1);} }
-  .slot-shield{ filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5)); max-width:100%; height:auto; }
+  .score-badge.pulse{ animation: badgePulse 0.5s ease; }
+  @keyframes badgePulse{ 0%{transform:scale(1);} 40%{transform:scale(1.5); color:#fff;} 100%{transform:scale(1);} }
+  .score-shield{ width:100%; max-width:7vw; height:auto; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+
+  .fans-ticker{
+    flex:0 0 auto; display:flex; gap:6px; overflow-x:auto;
+    padding:0 2.5vw 1vh; position:relative; z-index:2; scrollbar-width:none;
+  }
+  .fans-ticker::-webkit-scrollbar{ display:none; }
+  .fan-chip{
+    flex:0 0 auto; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12);
+    padding:3px 9px; border-radius:20px; font-size:clamp(8px,2.4vw,10px);
+    white-space:nowrap; animation: fanIn 0.3s ease;
+  }
+  @keyframes fanIn{ from{opacity:0; transform:translateX(-8px);} to{opacity:1; transform:translateX(0);} }
+
+  .board-area{
+    flex:1 1 auto; display:flex; flex-direction:column; min-height:0;
+    margin:0 2.5vw 2vh; background:var(--panel-bg); border:2px solid var(--panel-border);
+    border-radius:14px; overflow:hidden; position:relative; z-index:1; backdrop-filter: blur(2px);
+  }
+  #plinkoCanvas{ flex:1 1 auto; display:block; width:100%; min-height:0; }
+
+  .points-row{ flex:0 0 auto; display:flex; border-top:1px solid rgba(255,255,255,0.15); }
+  .point-badge{
+    flex:1 1 0; display:flex; align-items:center; justify-content:center;
+    font-family:"Arial Black", Impact, sans-serif; font-size:clamp(10px,3.4vw,15px);
+    padding:1.1vh 0; color:var(--gold); background:rgba(255,255,255,0.04);
+  }
+  .point-badge.high{ background:rgba(255,215,106,0.14); color:#fff; }
+  .point-badge.pulse{ animation: pointPulse 0.5s ease; }
+  @keyframes pointPulse{ 0%{transform:scale(1);} 40%{transform:scale(1.3); background:rgba(255,215,106,0.55); color:#fff;} 100%{transform:scale(1);} }
 
   .follow-toast{
-    position:fixed; top:70px; left:50%; transform:translate(-50%,-14px);
+    position:absolute; top:6vh; left:50%; transform:translate(-50%,-14px);
     background:linear-gradient(135deg,#6affa0,#2fa876); color:#04241a;
-    font-weight:800; font-size:14px; padding:9px 18px; border-radius:24px;
-    opacity:0; z-index:7; pointer-events:none;
-    box-shadow:0 6px 20px rgba(106,255,160,0.4);
-    transition: all 0.35s ease;
+    font-weight:800; font-size:clamp(10px,3vw,13px); padding:7px 16px; border-radius:22px;
+    opacity:0; z-index:8; pointer-events:none; transition:all 0.35s ease;
+    box-shadow:0 6px 18px rgba(106,255,160,0.4); white-space:nowrap;
   }
   .follow-toast.show{ opacity:1; transform:translate(-50%,0); }
-
-  .test-panel{ position:fixed; bottom:16px; right:16px; z-index:10; }
-  .test-toggle{
-    width:38px; height:38px; border-radius:50%;
-    border:1px solid var(--panel-border);
-    background:rgba(10,25,15,0.8); color:var(--text);
-    font-size:16px; cursor:pointer; backdrop-filter:blur(6px);
-  }
-  .test-buttons{
-    position:absolute; bottom:46px; right:0;
-    display:flex; flex-direction:column; gap:6px;
-    background:rgba(6,16,10,0.92);
-    border:1px solid var(--panel-border); border-radius:10px;
-    padding:10px; width:200px;
-    opacity:0; pointer-events:none; transform:translateY(10px);
-    transition:all 0.25s ease; backdrop-filter:blur(8px);
-  }
-  .test-buttons.open{ opacity:1; pointer-events:auto; transform:translateY(0); }
-  .test-buttons button{
-    background:rgba(255,255,255,0.06); border:1px solid var(--panel-border); color:var(--text);
-    padding:8px 10px; border-radius:6px; font-size:11.5px; cursor:pointer; text-align:left;
-  }
-  .test-buttons button:hover{ background:rgba(255,255,255,0.16); }
-  .test-label{ font-size:10px; color:var(--text-dim); letter-spacing:1px; margin-bottom:2px; }
-  .test-divider{ height:1px; background:var(--panel-border); margin:2px 0; }
-
-  @media (max-width:700px){
-    .fans-panel{ position:static; width:min(760px,94vw); margin:12px auto 0; }
-    .fans-list{ flex-direction:row; overflow-x:auto; }
-    .fan-item{ flex:0 0 auto; }
-  }
-  @media (max-width:480px){
-    #plinkoCanvas{ height:250px; }
-    .slot-badge{ font-size:11px; padding:2px 5px; }
-  }
 </style>
 </head>
 <body>
@@ -281,40 +258,21 @@
 	</symbol>
 </svg>
 
-<div class="pitch-circle"></div>
-<div class="pitch-halfway"></div>
-<canvas id="particles"></canvas>
+<div class="game-frame" id="gameFrame">
+  <canvas id="particles"></canvas>
+  <div class="follow-toast" id="followToast"></div>
 
-<div class="top-bar">
-  <div class="title">🏟️ PLINKO DOS GIGANTES</div>
-</div>
+  <div class="frame-header">
+    <div class="title">🏟️ PLINKO DOS GIGANTES</div>
+    <div class="hint">💬 Comente o nome do seu time pra torcer — depois seus likes e presentes soltam bolinhas dele!</div>
+  </div>
 
-<div class="fans-panel">
-  <div class="fans-title">TORCIDA AO VIVO</div>
-  <div class="fans-list" id="fansList"></div>
-</div>
+  <div class="scoreboard-row" id="scoreboardRow"></div>
+  <div class="fans-ticker" id="fansTicker"></div>
 
-<div class="board-wrap">
-  <canvas id="plinkoCanvas"></canvas>
-  <div class="slots-row" id="slotsRow"></div>
-</div>
-
-<div class="follow-toast" id="followToast"></div>
-
-<div class="test-panel">
-  <button class="test-toggle" id="testToggle" title="Mostrar/esconder testes">⚙</button>
-  <div class="test-buttons open" id="testButtons">
-    <div class="test-label">SIMULAR EVENTOS</div>
-    <button onclick="simulateComment('flamengo','Vamo Flamengo!!')">💬 Comentário Flamengo</button>
-    <button onclick="simulateComment('corinthians','Timão até morrer')">💬 Comentário Corinthians</button>
-    <button onclick="simulateComment('palmeiras','Verdão sempre!')">💬 Comentário Palmeiras</button>
-    <button onclick="simulateComment('vasco','Vasco da Gama guerreiro')">💬 Comentário Vasco</button>
-    <div class="test-divider"></div>
-    <button onclick="simulateLike()">👍 Simular 15 Likes</button>
-    <button onclick="simulateGift()">🎁 Simular Presente</button>
-    <button onclick="simulateFollow()">➕ Simular Seguidor</button>
-    <div class="test-divider"></div>
-    <button onclick="resetScores()">🔄 Resetar Placar</button>
+  <div class="board-area">
+    <canvas id="plinkoCanvas"></canvas>
+    <div class="points-row" id="pointsRow"></div>
   </div>
 </div>
 
@@ -343,6 +301,7 @@
     { id:'santos', name:'Santos' }
   ];
   const SLOTS = TEAMS.length;
+  const POINTS = [1,2,3,4,5,5,4,3,2,1];
   const TEAM_NAME = {};
   TEAMS.forEach(t => TEAM_NAME[t.id] = t.name);
 
@@ -381,70 +340,102 @@
   }
 
   /* =========================================================
-     DOM — geração dos slots
+     PLACAR + ESCUDOS NO TOPO
      ========================================================= */
-  const slotsRow = document.getElementById('slotsRow');
+  const scoreboardRow = document.getElementById('scoreboardRow');
+  const scores = {};
   TEAMS.forEach(team => {
-    const slot = document.createElement('div');
-    slot.className = 'slot';
-    slot.dataset.team = team.id;
-    slot.innerHTML = `
-      <div class="slot-badge" id="badge-${team.id}">0</div>
-      <svg class="slot-shield" viewBox="0 0 40 40" width="40" height="40"><use href="#${team.id}"></use></svg>
+    scores[team.id] = 0;
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.innerHTML = `
+      <div class="score-badge" id="score-${team.id}">0</div>
+      <svg class="score-shield" viewBox="0 0 40 40"><use href="#${team.id}"></use></svg>
     `;
-    slotsRow.appendChild(slot);
+    scoreboardRow.appendChild(item);
   });
 
-  const scores = {};
-  TEAMS.forEach(t => scores[t.id] = 0);
-
-  function updateSlotUI(teamId){
-    const badge = document.getElementById('badge-' + teamId);
+  function bumpScore(teamId, points){
+    scores[teamId] = (scores[teamId] || 0) + points;
+    const badge = document.getElementById('score-' + teamId);
     badge.textContent = scores[teamId];
     badge.classList.remove('pulse');
     void badge.offsetWidth;
     badge.classList.add('pulse');
   }
 
-  function resetScores(){
-    TEAMS.forEach(t => {
-      scores[t.id] = 0;
-      document.getElementById('badge-' + t.id).textContent = '0';
-    });
+  /* =========================================================
+     LINHA DE PONTOS (1 2 3 4 5 5 4 3 2 1)
+     ========================================================= */
+  const pointsRow = document.getElementById('pointsRow');
+  POINTS.forEach((val, i) => {
+    const b = document.createElement('div');
+    b.className = 'point-badge' + ((i === 4 || i === 5) ? ' high' : '');
+    b.id = 'point-' + i;
+    b.textContent = val;
+    pointsRow.appendChild(b);
+  });
+
+  function pulsePoint(slotIndex){
+    const b = document.getElementById('point-' + slotIndex);
+    b.classList.remove('pulse');
+    void b.offsetWidth;
+    b.classList.add('pulse');
   }
 
   /* =========================================================
-     TORCEDORES (fãs recentes)
+     TORCEDORES — quem torce por quem (com base no último comentário)
      ========================================================= */
-  const fansListEl = document.getElementById('fansList');
+  const fansTicker = document.getElementById('fansTicker');
   let fansList = [];
+  let userTeam = {};          // username -> teamId
+  let likeAccumulators = {};  // username -> likes acumulados (<15)
 
   function registerFan(user, teamId){
-    const existingIndex = fansList.findIndex(f => f.user === user);
-    if(existingIndex !== -1) fansList.splice(existingIndex, 1);
+    userTeam[user] = teamId;
+    const idx = fansList.findIndex(f => f.user === user);
+    if(idx !== -1) fansList.splice(idx, 1);
     fansList.unshift({ user, teamId });
     if(fansList.length > 8) fansList = fansList.slice(0, 8);
     renderFans();
   }
-
   function renderFans(){
-    fansListEl.innerHTML = '';
+    fansTicker.innerHTML = '';
     fansList.forEach(f => {
-      const div = document.createElement('div');
-      div.className = 'fan-item';
-      div.textContent = `${f.user} → ${TEAM_NAME[f.teamId]}`;
-      fansListEl.appendChild(div);
+      const chip = document.createElement('div');
+      chip.className = 'fan-chip';
+      chip.textContent = `${f.user} → ${TEAM_NAME[f.teamId]}`;
+      fansTicker.appendChild(chip);
     });
   }
 
   /* =========================================================
+     ESCUDOS RASTERIZADOS (pra desenhar dentro da bolinha no canvas)
+     ========================================================= */
+  const teamImages = {};
+  function loadTeamImages(){
+    TEAMS.forEach(team => {
+      const symbol = document.getElementById(team.id);
+      if(!symbol) return;
+      const viewBox = symbol.getAttribute('viewBox') || '0 0 100 100';
+      const vb = viewBox.split(/\s+/).map(Number);
+      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${symbol.innerHTML}</svg>`;
+      const img = new Image();
+      img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+      teamImages[team.id] = { img, vbW: vb[2], vbH: vb[3] };
+    });
+  }
+  loadTeamImages();
+
+  /* =========================================================
      PLINKO — tabuleiro
      ========================================================= */
+  const gameFrame = document.getElementById('gameFrame');
   const plinkoCanvas = document.getElementById('plinkoCanvas');
   const ctx = plinkoCanvas.getContext('2d');
-  const PIN_ROWS = SLOTS - 1; // 9 fileiras para 10 slots
+  const PIN_ROWS = SLOTS - 1; // 9 fileiras para 10 colunas
 
-  let displayWidth = 0, displayHeight = 0, unitWidth = 0;
+  let displayWidth = 0, displayHeight = 0, unitWidth = 0, ballRadius = 8;
   let pins = [];
   let pinFlashes = [];
   let balls = [];
@@ -454,6 +445,7 @@
     displayWidth = rect.width;
     displayHeight = rect.height;
     unitWidth = displayWidth / SLOTS;
+    ballRadius = Math.max(6, unitWidth * 0.32);
     const dpr = window.devicePixelRatio || 1;
     plinkoCanvas.width = displayWidth * dpr;
     plinkoCanvas.height = displayHeight * dpr;
@@ -469,13 +461,9 @@
     for(let r = 0; r < PIN_ROWS; r++){
       const y = marginTop + (usable * (r + 1)) / (PIN_ROWS + 1);
       if(r % 2 === 0){
-        for(let i = 0; i < SLOTS - 1; i++){
-          pins.push({ x: (i + 1) * unitWidth, y });
-        }
+        for(let i = 0; i < SLOTS - 1; i++) pins.push({ x: (i + 1) * unitWidth, y });
       } else {
-        for(let i = 1; i < SLOTS - 1; i++){
-          pins.push({ x: (i + 0.5) * unitWidth, y });
-        }
+        for(let i = 1; i < SLOTS - 1; i++) pins.push({ x: (i + 0.5) * unitWidth, y });
       }
     }
   }
@@ -509,11 +497,10 @@
     return { points, slotIndex };
   }
 
-  function spawnBall(){
+  function spawnBall(teamId){
     const { points, slotIndex } = planBall();
     balls.push({
-      points,
-      slotIndex,
+      points, slotIndex, teamId,
       start: performance.now(),
       duration: 1500 + Math.random() * 300,
       lastSeg: -1,
@@ -521,9 +508,9 @@
     });
   }
 
-  function dropBalls(n){
+  function dropBallsForTeam(n, teamId){
     for(let i = 0; i < n; i++){
-      setTimeout(() => spawnBall(), i * (160 + Math.random() * 140));
+      setTimeout(() => spawnBall(teamId), i * (160 + Math.random() * 140));
     }
   }
 
@@ -536,7 +523,7 @@
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
       ctx.shadowColor = 'rgba(255,255,255,0.4)';
       ctx.shadowBlur = 4;
-      ctx.arc(p.x, p.y, 3.2, 0, Math.PI*2);
+      ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
       ctx.fill();
     });
     ctx.shadowBlur = 0;
@@ -549,21 +536,31 @@
     });
   }
 
-  function drawBall(x, y){
+  function drawBall(x, y, teamId){
+    const r = ballRadius;
     ctx.save();
     ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.closePath();
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowColor = 'rgba(0,0,0,0.55)';
     ctx.shadowBlur = 6;
-    ctx.arc(x, y, 6, 0, Math.PI*2);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.fillStyle = '#111';
-    [[-2,-2],[2,-1],[0,2]].forEach(([dx,dy]) => {
-      ctx.beginPath();
-      ctx.arc(x+dx, y+dy, 1, 0, Math.PI*2);
-      ctx.fill();
-    });
+    ctx.save();
+    ctx.clip();
+    const info = teamImages[teamId];
+    if(info && info.img.complete && info.img.naturalWidth > 0){
+      const target = r * 1.55;
+      let dw, dh;
+      if(info.vbW >= info.vbH){ dw = target; dh = target * (info.vbH / info.vbW); }
+      else { dh = target; dw = target * (info.vbW / info.vbH); }
+      ctx.drawImage(info.img, x - dw/2, y - dh/2, dw, dh);
+    }
+    ctx.restore();
+    ctx.lineWidth = 1.3;
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.stroke();
     ctx.restore();
   }
 
@@ -571,23 +568,24 @@
     trail.forEach((p, i) => {
       const f = i / trail.length;
       ctx.beginPath();
-      ctx.fillStyle = `rgba(255,255,255,${f*0.3})`;
-      ctx.arc(p.x, p.y, 4*f, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(255,255,255,${f*0.25})`;
+      ctx.arc(p.x, p.y, ballRadius*0.6*f, 0, Math.PI*2);
       ctx.fill();
     });
   }
 
   function landBall(b){
-    const team = TEAMS[b.slotIndex];
-    scores[team.id]++;
-    updateSlotUI(team.id);
-    const slotEl = document.querySelector(`.slot[data-team="${team.id}"]`);
-    if(slotEl){
-      const rect = slotEl.getBoundingClientRect();
-      spawnParticles(rect.left + rect.width/2, rect.top, 18,
-        ['#ffd76a','#4fd1ff','#ff6ec7','#6affa0','#ffffff'],
-        { speed:6, gravity:0.25, life:50, size:5 });
-    }
+    const pts = POINTS[b.slotIndex];
+    bumpScore(b.teamId, pts);
+    pulsePoint(b.slotIndex);
+
+    const canvasRect = plinkoCanvas.getBoundingClientRect();
+    const frameRect = gameFrame.getBoundingClientRect();
+    const landPoint = b.points[b.points.length - 1];
+    const px = (canvasRect.left - frameRect.left) + landPoint.x;
+    const py = (canvasRect.top - frameRect.top) + landPoint.y;
+    spawnParticles(px, py, 16, ['#ffd76a','#4fd1ff','#ff6ec7','#6affa0','#ffffff'],
+      { speed:6, gravity:0.25, life:45, size:5 });
   }
 
   function plinkoLoop(now){
@@ -616,21 +614,26 @@
       b.trail.push({ x, y });
       if(b.trail.length > 6) b.trail.shift();
       drawTrail(b.trail);
-      drawBall(x, y);
+      drawBall(x, y, b.teamId);
     }
     requestAnimationFrame(plinkoLoop);
   }
 
   window.addEventListener('resize', resizePlinko);
+  window.addEventListener('load', resizePlinko);
   resizePlinko();
   requestAnimationFrame(plinkoLoop);
 
   /* =========================================================
-     PARTÍCULAS (confete, tela toda)
+     PARTÍCULAS (confete, dentro da moldura)
      ========================================================= */
   const pCanvas = document.getElementById('particles');
   const pCtx = pCanvas.getContext('2d');
-  function resizeParticleCanvas(){ pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+  function resizeParticleCanvas(){
+    const r = gameFrame.getBoundingClientRect();
+    pCanvas.width = r.width;
+    pCanvas.height = r.height;
+  }
   resizeParticleCanvas();
   window.addEventListener('resize', resizeParticleCanvas);
 
@@ -644,8 +647,8 @@
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - (opts.upBias || 3),
         gravity: opts.gravity !== undefined ? opts.gravity : 0.25,
-        life: (opts.life || 50) + Math.random() * 20,
-        maxLife: (opts.life || 50) + 20,
+        life: (opts.life || 45) + Math.random() * 20,
+        maxLife: (opts.life || 45) + 20,
         size: (opts.size || 4) + Math.random() * 4,
         color: colors[Math.floor(Math.random() * colors.length)],
         rot: Math.random() * Math.PI * 2,
@@ -685,42 +688,53 @@
     followToast.classList.add('show');
     clearTimeout(followTimer);
     followTimer = setTimeout(() => followToast.classList.remove('show'), 2200);
-    spawnParticles(window.innerWidth/2, 90, 20,
-      ['#6affa0','#4fd1ff','#ffd76a','#ffffff'],
-      { speed:5, gravity:0.2, life:45, size:5 });
+    spawnParticles(pCanvas.width/2, pCanvas.height*0.1, 18,
+      ['#6affa0','#4fd1ff','#ffd76a','#ffffff'], { speed:5, gravity:0.2, life:40, size:5 });
   }
 
   /* =========================================================
      TRATAMENTO DOS EVENTOS
-     Mesma função usada pelo WebSocket real e pelos botões de teste.
+     - COMMENT com nome de time: registra o usuário como torcedor
+       daquele time e já solta uma bolinha dele.
+     - LIKE: só solta bolinha se esse usuário já tiver um time
+       registrado (via comentário). Acumula 15 likes = 1 bolinha.
+     - GIFT: só solta bolinha (5 de uma vez) se o usuário já tiver
+       um time registrado.
+     - FOLLOW: efeito visual só.
      ========================================================= */
-  let likeAccumulator = 0;
-
   function handleEvent(evento){
     if(!evento || !evento.type) return;
+    const user = evento.user || 'alguém';
 
     switch(evento.type){
       case 'COMMENT': {
         const teamId = detectTeam(evento.message || '');
-        if(teamId) registerFan(evento.user || 'alguém', teamId);
+        if(teamId){
+          registerFan(user, teamId);
+          spawnBall(teamId);
+        }
         break;
       }
       case 'LIKE': {
-        likeAccumulator += (evento.count || 1);
-        let toDrop = 0;
-        while(likeAccumulator >= 15){
-          likeAccumulator -= 15;
-          toDrop++;
+        likeAccumulators[user] = (likeAccumulators[user] || 0) + (evento.count || 1);
+        const team = userTeam[user];
+        if(team){
+          let toDrop = 0;
+          while(likeAccumulators[user] >= 15){
+            likeAccumulators[user] -= 15;
+            toDrop++;
+          }
+          if(toDrop > 0) dropBallsForTeam(toDrop, team);
         }
-        if(toDrop > 0) dropBalls(toDrop);
         break;
       }
       case 'GIFT': {
-        dropBalls(5);
+        const team = userTeam[user];
+        if(team) dropBallsForTeam(5, team);
         break;
       }
       case 'FOLLOW': {
-        celebrateFollow(evento.user || 'alguém');
+        celebrateFollow(user);
         break;
       }
       default:
@@ -753,27 +767,6 @@
     }
   }
   connect();
-
-  /* =========================================================
-     BOTÕES DE TESTE
-     ========================================================= */
-  function simulateComment(teamHint, message){
-    handleEvent({ type:'COMMENT', user: 'torcedor_' + Math.floor(Math.random()*100), message });
-  }
-  function simulateLike(){
-    handleEvent({ type:'LIKE', user:'user_teste', count:15 });
-  }
-  function simulateGift(){
-    const gifts = ['Rosa','Coração','Coroa','Diamante'];
-    handleEvent({ type:'GIFT', user:'vip_' + Math.floor(Math.random()*100), gift: gifts[Math.floor(Math.random()*gifts.length)], amount:1 });
-  }
-  function simulateFollow(){
-    handleEvent({ type:'FOLLOW', user:'nova_fa_' + Math.floor(Math.random()*100) });
-  }
-
-  const testToggle = document.getElementById('testToggle');
-  const testButtons = document.getElementById('testButtons');
-  testToggle.addEventListener('click', () => testButtons.classList.toggle('open'));
 </script>
 </body>
 </html>
