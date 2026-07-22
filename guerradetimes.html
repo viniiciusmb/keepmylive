@@ -17,14 +17,15 @@
     --text-dim: rgba(244,251,243,0.7);
   }
   *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; height:100%; background:#04060a; color:var(--text); font-family:system-ui,"Segoe UI",Arial,sans-serif; overflow:hidden; }
-  body{ display:flex; align-items:center; justify-content:center; }
+  html,body{ margin:0; padding:0; height:100%; background:#000; color:var(--text); font-family:system-ui,"Segoe UI",Arial,sans-serif; }
+  body{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px; overflow:auto; padding:12px; }
 
+  /* ---------- moldura 9:16 (isso é o que aparece na live) ---------- */
   .game-frame{
     position:relative;
     width:min(100vw, calc(100vh * 9 / 16));
-    height:min(100vh, calc(100vw * 16 / 9));
-    overflow:hidden; display:flex; flex-direction:column;
+    height:min(96vh, calc(100vw * 16 / 9));
+    overflow:hidden; display:flex; flex-direction:column; flex-shrink:0;
     background: repeating-linear-gradient(180deg, var(--pitch-1) 0px, var(--pitch-1) 40px, var(--pitch-2) 40px, var(--pitch-2) 80px);
     box-shadow: 0 0 60px rgba(0,0,0,0.7);
   }
@@ -38,30 +39,25 @@
   .hint{ margin-top:4px; font-size:clamp(8px,2.3vw,10px); color:var(--text-dim); line-height:1.25; padding:0 3vw; }
 
   .scoreboard-row{ flex:0 0 auto; display:flex; flex-wrap:wrap; justify-content:center; gap:3px 4px; padding:0.8vh 3vw; position:relative; z-index:2; }
-  .score-item{ display:flex; flex-direction:column; align-items:center; width:38px; }
+  .score-item{ display:flex; flex-direction:column; align-items:center; width:34px; transition:opacity .3s ease, filter .3s ease; }
+  .score-item.eliminated{ opacity:0.35; filter:grayscale(1); }
   .score-badge{
     font-family:"Arial Black",Impact,sans-serif; font-size:clamp(6.5px,2vw,9px);
     background:var(--badge-bg); color:var(--badge-text); padding:1px 4px;
-    border-radius:5px; margin-bottom:2px; min-width:20px; text-align:center;
+    border-radius:5px; margin-bottom:2px; min-width:18px; text-align:center;
   }
-  .score-shield{ width:100%; max-width:24px; height:auto; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+  .score-shield{ width:100%; max-width:22px; height:auto; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
   .board-area{
     flex:1 1 auto; margin:0 2.5vw 2vh; background:var(--panel-bg);
     border:2px solid var(--panel-border); border-radius:14px; overflow:hidden;
     position:relative; z-index:1; backdrop-filter: blur(2px);
     background-image:
-      linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px);
-    background-size: var(--cw, 20px) var(--ch, 20px);
+      linear-gradient(to right, rgba(255,255,255,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: var(--cw, 14px) var(--ch, 14px);
   }
   #warCanvas{ display:block; width:100%; height:100%; }
-
-  .restart-btn{
-    position:absolute; top:2vh; right:3vw; width:32px; height:32px; border-radius:50%;
-    border:1px solid var(--panel-border); background:rgba(10,25,15,0.8); color:var(--text);
-    font-size:14px; z-index:9; cursor:pointer;
-  }
 
   .follow-toast{
     position:absolute; top:5vh; left:50%; transform:translate(-50%,-14px);
@@ -71,47 +67,61 @@
     box-shadow:0 6px 18px rgba(106,255,160,0.4); white-space:nowrap;
   }
   .follow-toast.show{ opacity:1; transform:translate(-50%,0); }
+  .follow-toast.elim{ background:linear-gradient(135deg,#ff4d4d,#a30000); color:#fff; box-shadow:0 6px 18px rgba(255,77,77,0.45); }
 
-  /* ---------- overlay inicial / resultado ---------- */
-  .start-overlay{
-    position:absolute; inset:0; background:rgba(2,10,5,0.88); z-index:15;
-    display:flex; align-items:center; justify-content:center; padding:6vw; text-align:center;
+  /* ---------- overlay informativo (sem botão — só pra quem assiste) ---------- */
+  .frame-status-overlay{
+    position:absolute; inset:0; background:rgba(2,10,5,0.6); z-index:5;
+    display:flex; align-items:center; justify-content:center; padding:7vw; text-align:center;
+    pointer-events:none;
   }
-  .start-card{ background:#0c1f14; border:1px solid var(--panel-border); border-radius:16px; padding:20px 16px; max-width:100%; width:100%; max-height:82vh; overflow-y:auto; }
-  .start-card h2{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(15px,4.8vw,20px); margin:0 0 10px; color:var(--gold); }
-  .start-card p{ font-size:clamp(10px,2.7vw,12px); color:var(--text-dim); margin:0 0 14px; line-height:1.4; }
-  .big-btn{ background:var(--gold); color:#1a1000; border:none; padding:12px 22px; border-radius:12px; font-weight:800; font-size:clamp(12px,3.2vw,15px); cursor:pointer; }
-
-  .results-list{ margin:8px 0 14px; text-align:left; }
+  .frame-status-card{ background:rgba(12,31,20,0.88); border:1px solid var(--panel-border); border-radius:16px; padding:18px 14px; max-height:80%; overflow-y:auto; }
+  .frame-status-card h2{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(15px,4.6vw,20px); margin:0 0 8px; color:var(--gold); }
+  .frame-status-card p{ font-size:clamp(10px,2.7vw,12px); color:var(--text-dim); margin:0; line-height:1.4; }
+  .results-list{ margin:6px 0 0; text-align:left; }
   .results-row{ display:flex; align-items:center; gap:8px; padding:4px 2px; font-size:clamp(10px,2.7vw,12px); border-bottom:1px solid rgba(255,255,255,0.06); }
   .results-row .rrank{ width:20px; color:var(--text-dim); font-weight:700; }
-  .results-row svg{ width:20px; height:20px; flex:0 0 auto; }
+  .results-row svg{ width:18px; height:18px; flex:0 0 auto; }
   .results-row .rname{ flex:1 1 auto; }
   .results-row .rpct{ font-weight:800; color:var(--badge-text); }
 
-  /* ---------- modal de seleção de times ---------- */
-  .modal-backdrop{
-    position:absolute; inset:0; background:rgba(0,0,0,0.8); z-index:20;
-    display:none; align-items:center; justify-content:center; padding:4vw;
+  /* ---------- painel do streamer (FORA da moldura 9:16 — não aparece na live) ---------- */
+  .control-panel{
+    width:280px; max-width:92vw; max-height:96vh; overflow-y:auto; flex-shrink:0;
+    background:#0c1410; border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+    padding:16px;
   }
-  .modal-card{ background:#0c1f14; border:1px solid var(--panel-border); border-radius:16px; padding:14px; width:100%; max-height:88%; overflow-y:auto; }
-  .modal-title{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(13px,4vw,16px); color:var(--gold); text-align:center; margin-bottom:2px; }
-  .modal-sub{ font-size:clamp(9px,2.3vw,10.5px); color:var(--text-dim); text-align:center; margin-bottom:10px; }
-  .team-picker-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
-  .team-chip{
-    display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px;
-    border-radius:10px; border:2px solid transparent; background:rgba(255,255,255,0.05);
+  .control-panel h3{ margin:0 0 2px; font-size:13.5px; letter-spacing:1px; color:var(--gold); }
+  .control-panel .sub{ font-size:10.5px; color:var(--text-dim); margin-bottom:12px; }
+  .control-section{ margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .control-section:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .control-section h4{ margin:0 0 8px; font-size:11px; letter-spacing:1px; color:var(--text-dim); text-transform:uppercase; }
+  .status-row{ display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; }
+  .status-dot{ width:8px; height:8px; border-radius:50%; background:#666; flex:0 0 auto; }
+  .status-dot.on{ background:#3ddc84; }
+  .status-dot.off{ background:#ff4d4d; }
+  .ctrl-timer{ font-family:"Arial Black",Impact,sans-serif; font-size:22px; color:var(--gold); }
+  .ctrl-state{ font-size:11px; color:var(--text-dim); margin-top:2px; }
+  .ctrl-btn{ width:100%; padding:11px; border-radius:10px; border:none; font-weight:800; cursor:pointer; font-size:13px; margin-top:8px; }
+  .ctrl-btn.primary{ background:var(--gold); color:#1a1000; }
+  .ctrl-btn.primary:disabled{ opacity:0.4; cursor:not-allowed; }
+  .ctrl-btn.danger{ background:#ff4d4d; color:#fff; }
+  .ctrl-teams-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+  .ctrl-team-chip{
+    display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 2px;
+    border-radius:8px; border:2px solid transparent; background:rgba(255,255,255,0.05);
     cursor:pointer; user-select:none;
   }
-  .team-chip.selected{ border-color:var(--gold); background:rgba(255,215,106,0.16); }
-  .team-chip svg{ width:24px; height:24px; }
-  .team-chip span{ font-size:8px; text-align:center; line-height:1.15; }
-  .modal-count{ text-align:center; font-size:10px; color:var(--text-dim); margin-top:8px; }
-  .modal-actions{ display:flex; gap:8px; margin-top:10px; }
-  .modal-btn{ flex:1; padding:10px; border-radius:10px; border:none; font-weight:800; cursor:pointer; font-size:clamp(10px,2.7vw,12px); }
-  .modal-btn.primary{ background:var(--gold); color:#1a1000; }
-  .modal-btn.primary:disabled{ opacity:0.4; cursor:not-allowed; }
-  .modal-btn.secondary{ background:rgba(255,255,255,0.1); color:var(--text); }
+  .ctrl-team-chip.selected{ border-color:var(--gold); background:rgba(255,215,106,0.16); }
+  .ctrl-team-chip svg{ width:20px; height:20px; }
+  .ctrl-team-chip span{ font-size:7px; text-align:center; line-height:1.1; }
+  .ctrl-count{ font-size:10px; color:var(--text-dim); text-align:center; margin-top:6px; }
+  .ctrl-live-scores{ display:flex; flex-direction:column; gap:5px; font-size:11px; max-height:200px; overflow-y:auto; }
+  .ctrl-live-scores .lrow{ display:flex; align-items:center; gap:6px; transition:opacity .3s ease; }
+  .ctrl-live-scores .lrow.eliminated{ opacity:0.4; text-decoration:line-through; }
+  .ctrl-live-scores svg{ width:15px; height:15px; flex:0 0 auto; }
+  .ctrl-live-scores .lname{ flex:1 1 auto; }
+  .ctrl-live-scores .lpct{ font-weight:800; color:var(--badge-text); }
 </style>
 </head>
 <body>
@@ -380,7 +390,6 @@
 <div class="game-frame" id="gameFrame">
   <canvas id="particles"></canvas>
   <div class="follow-toast" id="followToast"></div>
-  <button class="restart-btn" id="restartBtn" title="Configurar nova partida">⚙</button>
 
   <div class="frame-header">
     <div class="title-row">
@@ -396,20 +405,40 @@
     <canvas id="warCanvas"></canvas>
   </div>
 
-  <div class="start-overlay" id="startOverlay">
-    <div class="start-card" id="startCard"></div>
+  <div class="frame-status-overlay" id="frameStatusOverlay">
+    <div class="frame-status-card" id="frameStatusCard">
+      <h2>⚔️ Guerra dos Gigantes</h2>
+      <p>Aguardando o início da partida...</p>
+    </div>
+  </div>
+</div>
+
+<div class="control-panel">
+  <h3>🎛️ PAINEL DO STREAMER</h3>
+  <div class="sub">Esses controles são só seus — não aparecem na live.</div>
+
+  <div class="control-section">
+    <h4>Conexão</h4>
+    <div class="status-row"><span class="status-dot" id="wsStatusDot"></span><span id="wsStatusLabel">Conectando...</span></div>
+    <div class="ctrl-timer" id="ctrlTimer">5:00</div>
+    <div class="ctrl-state" id="ctrlState">Aguardando início</div>
   </div>
 
-  <div class="modal-backdrop" id="modalBackdrop">
-    <div class="modal-card">
-      <div class="modal-title">Escolha os times</div>
-      <div class="modal-sub">Selecione pelo menos 2 times pra essa partida</div>
-      <div class="team-picker-grid" id="teamPickerGrid"></div>
-      <div class="modal-count" id="modalCount">0 selecionados</div>
-      <div class="modal-actions">
-        <button class="modal-btn secondary" id="cancelBtn">Cancelar</button>
-        <button class="modal-btn primary" id="confirmBtn" disabled>Iniciar Partida</button>
-      </div>
+  <div class="control-section">
+    <h4>Times da partida</h4>
+    <div class="ctrl-teams-grid" id="ctrlTeamsGrid"></div>
+    <div class="ctrl-count" id="ctrlCount">0 selecionados</div>
+  </div>
+
+  <div class="control-section">
+    <button class="ctrl-btn primary" id="ctrlStartBtn">▶️ Iniciar Partida</button>
+    <button class="ctrl-btn danger" id="ctrlEndBtn" style="display:none;">⏹ Encerrar Partida</button>
+  </div>
+
+  <div class="control-section">
+    <h4>Placar ao vivo</h4>
+    <div class="ctrl-live-scores" id="ctrlLiveScores">
+      <div class="ctrl-state">Nenhuma partida em andamento.</div>
     </div>
   </div>
 </div>
@@ -499,10 +528,6 @@
     }
     return null;
   }
-  function truncate(str, max){
-    if(!str) return '';
-    return str.length > max ? str.slice(0, max) + '…' : str;
-  }
   function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
   function hexToRgba(hex, alpha){
     const h = hex.replace('#','');
@@ -531,20 +556,23 @@
   /* =========================================================
      ESTADO DO JOGO
      ========================================================= */
-  const COLS = 20, ROWS = 34;
+  const COLS = 28, ROWS = 48;
   let grid = new Int16Array(COLS*ROWS).fill(-1);
-  let activeTeams = [];       // times da partida atual: {id,name,baseColor,ownerIdx,spawnX,spawnY,spawnCol,spawnRow}
+  let activeTeams = [];        // {id,name,baseColor,ownerIdx,spawnX,spawnY,spawnCol,spawnRow,eliminated}
   let selectedTeamIds = new Set(['flamengo','corinthians','palmeiras','sao-paulo']);
-  let matchActive = false;
+  let matchState = 'idle';     // 'idle' | 'running' | 'ended'
   let matchTimeLeft = 300;
   let matchTimerInterval = null;
   let balls = [];
   const MAX_BALLS = 200;
 
-  let userTeam = {};          // username -> teamId (vale pra qualquer partida)
-  let likeAccumulators = {};  // username -> likes acumulados (<100)
+  let userTeam = {};           // username -> teamId (vale pra qualquer partida)
+  let likeAccumulators = {};   // username -> likes acumulados (<100)
 
-  function isTeamActive(teamId){ return activeTeams.some(t => t.id === teamId); }
+  function isTeamActive(teamId){
+    const t = activeTeams.find(x => x.id === teamId);
+    return !!t && !t.eliminated;
+  }
   function getActiveTeam(teamId){ return activeTeams.find(t => t.id === teamId); }
 
   /* =========================================================
@@ -555,7 +583,7 @@
   const warCanvas = document.getElementById('warCanvas');
   const ctx = warCanvas.getContext('2d');
 
-  let displayWidth = 0, displayHeight = 0, cellW = 10, cellH = 10, warBallRadius = 8, baseSpeed = 70;
+  let displayWidth = 0, displayHeight = 0, cellW = 10, cellH = 10, warBallRadius = 5, baseSpeed = 40, eliminationRadius = 20;
 
   function resizeWar(){
     const rect = warCanvas.getBoundingClientRect();
@@ -563,8 +591,9 @@
     displayHeight = rect.height;
     cellW = displayWidth / COLS;
     cellH = displayHeight / ROWS;
-    warBallRadius = Math.max(6, Math.min(cellW, cellH) * 1.3);
-    baseSpeed = displayWidth * 0.16;
+    warBallRadius = Math.max(4, Math.min(cellW, cellH) * 1.0);
+    baseSpeed = displayWidth * 0.09;
+    eliminationRadius = Math.max(cellW, cellH) * 2.2;
     const dpr = window.devicePixelRatio || 1;
     warCanvas.width = displayWidth * dpr;
     warCanvas.height = displayHeight * dpr;
@@ -588,7 +617,7 @@
 
   function assignSpawns(){
     const n = activeTeams.length;
-    const margin = Math.max(cellW, cellH) * 3.5;
+    const margin = Math.max(cellW, cellH) * 4.5;
     activeTeams.forEach((t, i) => {
       let px, py;
       if(n <= 4){
@@ -634,15 +663,18 @@
     activeTeams.forEach(t => {
       const info = teamImages[t.id];
       ctx.beginPath();
-      ctx.fillStyle = hexToRgba(t.baseColor, 0.35);
-      ctx.arc(t.spawnX, t.spawnY, warBallRadius * 2.2, 0, Math.PI*2);
+      ctx.fillStyle = hexToRgba(t.baseColor, t.eliminated ? 0.12 : 0.35);
+      ctx.arc(t.spawnX, t.spawnY, warBallRadius * 2.4, 0, Math.PI*2);
       ctx.fill();
       if(info && info.img.complete && info.img.naturalWidth > 0){
-        const target = warBallRadius * 2.6;
+        ctx.save();
+        if(t.eliminated) ctx.globalAlpha = 0.3;
+        const target = warBallRadius * 2.8;
         let dw, dh;
         if(info.vbW >= info.vbH){ dw = target; dh = target * (info.vbH/info.vbW); }
         else { dh = target; dw = target * (info.vbW/info.vbH); }
         ctx.drawImage(info.img, t.spawnX - dw/2, t.spawnY - dh/2, dw, dh);
+        ctx.restore();
       }
     });
   }
@@ -668,22 +700,48 @@
 
   function updateBalls(dtSec){
     balls.forEach(b => {
-      b.x += b.vx * dtSec;
-      b.y += b.vy * dtSec;
-      if(b.x - warBallRadius < 0){ b.x = warBallRadius; b.vx = Math.abs(b.vx); }
-      else if(b.x + warBallRadius > displayWidth){ b.x = displayWidth - warBallRadius; b.vx = -Math.abs(b.vx); }
-      if(b.y - warBallRadius < 0){ b.y = warBallRadius; b.vy = Math.abs(b.vy); }
-      else if(b.y + warBallRadius > displayHeight){ b.y = displayHeight - warBallRadius; b.vy = -Math.abs(b.vy); }
-      if(Math.random() < 0.5 * dtSec){
-        const angle = Math.atan2(b.vy, b.vx) + (Math.random() - 0.5) * 1.0;
+      let nx = b.x + b.vx * dtSec;
+      let ny = b.y + b.vy * dtSec;
+
+      if(nx - warBallRadius < 0){ nx = warBallRadius; b.vx = Math.abs(b.vx); }
+      else if(nx + warBallRadius > displayWidth){ nx = displayWidth - warBallRadius; b.vx = -Math.abs(b.vx); }
+      if(ny - warBallRadius < 0){ ny = warBallRadius; b.vy = Math.abs(b.vy); }
+      else if(ny + warBallRadius > displayHeight){ ny = displayHeight - warBallRadius; b.vy = -Math.abs(b.vy); }
+
+      const col = clamp(Math.floor(nx / cellW), 0, COLS - 1);
+      const row = clamp(Math.floor(ny / cellH), 0, ROWS - 1);
+      const idx = row * COLS + col;
+      const owner = grid[idx];
+
+      if(owner >= 0 && owner !== b.ownerIdx){
+        // território inimigo: converte, mas bate e volta (não passa por cima)
+        paintAround(col, row, b.ownerIdx, 1);
+        const angle = Math.atan2(b.vy, b.vx) + Math.PI + (Math.random() - 0.5) * 1.2;
         const speed = Math.hypot(b.vx, b.vy);
         b.vx = Math.cos(angle) * speed;
         b.vy = Math.sin(angle) * speed;
+      } else {
+        b.x = nx; b.y = ny;
+        paintAround(col, row, b.ownerIdx, 1);
+        if(Math.random() < 0.4 * dtSec){
+          const angle = Math.atan2(b.vy, b.vx) + (Math.random() - 0.5) * 1.0;
+          const speed = Math.hypot(b.vx, b.vy);
+          b.vx = Math.cos(angle) * speed;
+          b.vy = Math.sin(angle) * speed;
+        }
       }
-      const col = clamp(Math.floor(b.x / cellW), 0, COLS - 1);
-      const row = clamp(Math.floor(b.y / cellH), 0, ROWS - 1);
-      paintAround(col, row, b.ownerIdx, 1);
+
+      // eliminação: bolinha passou no ponto exato da base de outro time
+      activeTeams.forEach(team => {
+        if(team.eliminated || team.ownerIdx === b.ownerIdx) return;
+        const dx = b.x - team.spawnX, dy = b.y - team.spawnY;
+        if(dx*dx + dy*dy <= eliminationRadius*eliminationRadius){
+          eliminateTeam(team);
+        }
+      });
     });
+
+    balls = balls.filter(b => !activeTeams[b.ownerIdx].eliminated);
   }
 
   let lastFrameTime = null;
@@ -694,7 +752,7 @@
     ctx.clearRect(0, 0, displayWidth, displayHeight);
     drawGrid();
     drawBases();
-    if(matchActive) updateBalls(dtSec);
+    if(matchState === 'running') updateBalls(dtSec);
     drawBalls();
     requestAnimationFrame(warLoop);
   }
@@ -705,12 +763,30 @@
   requestAnimationFrame(warLoop);
 
   /* =========================================================
+     ELIMINAÇÃO
+     ========================================================= */
+  function eliminateTeam(team){
+    if(team.eliminated) return;
+    team.eliminated = true;
+    const scoreItem = document.querySelector(`.score-item[data-team="${team.id}"]`);
+    if(scoreItem) scoreItem.classList.add('eliminated');
+    const liveRow = document.querySelector(`.lrow[data-team="${team.id}"]`);
+    if(liveRow) liveRow.classList.add('eliminated');
+    announce(`💀 ${team.name} foi eliminado!`, 'elim');
+
+    const remaining = activeTeams.filter(t => !t.eliminated);
+    if(remaining.length <= 1 && matchState === 'running'){
+      endMatch();
+    }
+  }
+
+  /* =========================================================
      BOLINHAS — geradas pelos eventos
      ========================================================= */
   function spawnBall(teamId, speedMult){
-    if(!matchActive) return;
+    if(matchState !== 'running') return;
     const team = getActiveTeam(teamId);
-    if(!team) return;
+    if(!team || team.eliminated) return;
     if(balls.length >= MAX_BALLS) return;
     const angle = Math.random() * Math.PI * 2;
     const speed = baseSpeed * (speedMult || 1);
@@ -731,16 +807,25 @@
   }
 
   /* =========================================================
-     PLACAR
+     PLACAR (dentro do frame + espelhado no painel)
      ========================================================= */
   function buildScoreboard(){
     const row = document.getElementById('scoreboardRow');
+    const live = document.getElementById('ctrlLiveScores');
     row.innerHTML = '';
+    live.innerHTML = '';
     activeTeams.forEach(t => {
       const item = document.createElement('div');
       item.className = 'score-item';
+      item.dataset.team = t.id;
       item.innerHTML = `<div class="score-badge" id="pct-${t.id}">0%</div><svg class="score-shield" viewBox="0 0 40 40"><use href="#${t.id}"></use></svg>`;
       row.appendChild(item);
+
+      const lrow = document.createElement('div');
+      lrow.className = 'lrow';
+      lrow.dataset.team = t.id;
+      lrow.innerHTML = `<svg viewBox="0 0 40 40"><use href="#${t.id}"></use></svg><span class="lname">${t.name}</span><span class="lpct" id="lpct-${t.id}">0%</span>`;
+      live.appendChild(lrow);
     });
   }
   function computeCounts(){
@@ -756,8 +841,11 @@
     const counts = computeCounts();
     const total = COLS * ROWS;
     activeTeams.forEach((t, i) => {
+      const pct = Math.round(counts[i] / total * 100) + '%';
       const el = document.getElementById('pct-' + t.id);
-      if(el) el.textContent = Math.round(counts[i] / total * 100) + '%';
+      if(el) el.textContent = pct;
+      const lel = document.getElementById('lpct-' + t.id);
+      if(lel) lel.textContent = pct;
     });
   }
   setInterval(updateScoreboardPercentages, 500);
@@ -767,120 +855,122 @@
      ========================================================= */
   function updateTimerDisplay(){
     const m = Math.floor(matchTimeLeft / 60), s = matchTimeLeft % 60;
-    document.getElementById('timerDisplay').textContent = `⏱ ${m}:${String(s).padStart(2,'0')}`;
+    const text = `${m}:${String(s).padStart(2,'0')}`;
+    document.getElementById('timerDisplay').textContent = '⏱ ' + text;
+    document.getElementById('ctrlTimer').textContent = text;
   }
   function tickTimer(){
     matchTimeLeft--;
     updateTimerDisplay();
-    if(matchTimeLeft <= 0){
-      clearInterval(matchTimerInterval);
-      endMatch();
-    }
+    if(matchTimeLeft <= 0) endMatch();
   }
 
   /* =========================================================
-     INÍCIO / FIM DE PARTIDA
+     PAINEL DO STREAMER — seleção de times + início/fim
      ========================================================= */
-  const startOverlay = document.getElementById('startOverlay');
-  const startCard = document.getElementById('startCard');
-  const modalBackdrop = document.getElementById('modalBackdrop');
-
-  function showWelcomeCard(){
-    startCard.innerHTML = `
-      <h2>⚔️ Guerra dos Gigantes</h2>
-      <p>Escolha os times que vão disputar o território. Quem comentar o nome de um time entra na torcida dele — depois é likes e presentes pra mandar bolinhas pra guerra!</p>
-      <button class="big-btn" id="startBtn">▶️ Iniciar Partida</button>
-    `;
-    document.getElementById('startBtn').addEventListener('click', openTeamPicker);
-    startOverlay.style.display = 'flex';
-  }
-
-  function showResultsCard(ranking){
-    const rows = ranking.map((t, i) => `
-      <div class="results-row">
-        <span class="rrank">${i+1}º</span>
-        <svg viewBox="0 0 40 40"><use href="#${t.id}"></use></svg>
-        <span class="rname">${t.name}</span>
-        <span class="rpct">${t.pct.toFixed(1)}%</span>
-      </div>
-    `).join('');
-    startCard.innerHTML = `
-      <h2>🏁 Fim de Partida!</h2>
-      <div class="results-list">${rows}</div>
-      <button class="big-btn" id="startBtn">🔄 Nova Partida</button>
-    `;
-    document.getElementById('startBtn').addEventListener('click', openTeamPicker);
-    startOverlay.style.display = 'flex';
-  }
-
-  function buildTeamPickerChips(){
-    const gridEl = document.getElementById('teamPickerGrid');
+  function buildCtrlTeamChips(){
+    const gridEl = document.getElementById('ctrlTeamsGrid');
     gridEl.innerHTML = '';
     TEAMS.forEach(team => {
       const chip = document.createElement('div');
-      chip.className = 'team-chip' + (selectedTeamIds.has(team.id) ? ' selected' : '');
+      chip.className = 'ctrl-team-chip' + (selectedTeamIds.has(team.id) ? ' selected' : '');
       chip.innerHTML = `<svg viewBox="0 0 40 40"><use href="#${team.id}"></use></svg><span>${team.name}</span>`;
       chip.addEventListener('click', () => {
+        if(matchState === 'running') return;
         if(selectedTeamIds.has(team.id)) selectedTeamIds.delete(team.id);
         else selectedTeamIds.add(team.id);
         chip.classList.toggle('selected');
-        updateModalCount();
+        updateCtrlCount();
       });
       gridEl.appendChild(chip);
     });
-    updateModalCount();
+    updateCtrlCount();
   }
-  function updateModalCount(){
+  function updateCtrlCount(){
     const n = selectedTeamIds.size;
-    document.getElementById('modalCount').textContent = n + (n === 1 ? ' selecionado' : ' selecionados') + (n < 2 ? ' (mínimo 2)' : '');
-    document.getElementById('confirmBtn').disabled = n < 2;
+    document.getElementById('ctrlCount').textContent = n + (n === 1 ? ' selecionado' : ' selecionados') + (n < 2 ? ' (mínimo 2)' : '');
+    document.getElementById('ctrlStartBtn').disabled = n < 2;
   }
-  function openTeamPicker(){
-    buildTeamPickerChips();
-    modalBackdrop.style.display = 'flex';
+  buildCtrlTeamChips();
+
+  function refreshCtrlButtons(){
+    const startBtn = document.getElementById('ctrlStartBtn');
+    const endBtn = document.getElementById('ctrlEndBtn');
+    const stateLabel = document.getElementById('ctrlState');
+    if(matchState === 'running'){
+      startBtn.style.display = 'none';
+      endBtn.style.display = 'block';
+      stateLabel.textContent = 'Partida em andamento';
+    } else {
+      startBtn.style.display = 'block';
+      endBtn.style.display = 'none';
+      startBtn.textContent = matchState === 'ended' ? '🔄 Nova Partida' : '▶️ Iniciar Partida';
+      stateLabel.textContent = matchState === 'ended' ? 'Partida encerrada' : 'Aguardando início';
+    }
   }
-  function closeTeamPicker(){
-    modalBackdrop.style.display = 'none';
+
+  function updateFrameOverlay(rankingHtml){
+    const overlay = document.getElementById('frameStatusOverlay');
+    const card = document.getElementById('frameStatusCard');
+    if(matchState === 'running'){
+      overlay.style.display = 'none';
+      return;
+    }
+    overlay.style.display = 'flex';
+    if(matchState === 'idle'){
+      card.innerHTML = `<h2>⚔️ Guerra dos Gigantes</h2><p>Aguardando o início da partida...</p>`;
+    } else {
+      card.innerHTML = `<h2>🏁 Fim de Partida!</h2><div class="results-list">${rankingHtml}</div>`;
+    }
   }
 
   function startMatch(){
-    if(selectedTeamIds.size < 2) return;
-    closeTeamPicker();
-    startOverlay.style.display = 'none';
+    if(selectedTeamIds.size < 2 || matchState === 'running') return;
     if(matchTimerInterval) clearInterval(matchTimerInterval);
 
     const chosen = TEAMS.filter(t => selectedTeamIds.has(t.id));
     activeTeams = chosen.map((t, i) => ({
-      id: t.id, name: t.name, baseColor: t.baseColor, ownerIdx: i
+      id: t.id, name: t.name, baseColor: t.baseColor, ownerIdx: i, eliminated: false
     }));
     grid = new Int16Array(COLS * ROWS).fill(-1);
     balls = [];
     assignSpawns();
-    activeTeams.forEach(t => paintAround(t.spawnCol, t.spawnRow, t.ownerIdx, 3));
+    activeTeams.forEach(t => paintAround(t.spawnCol, t.spawnRow, t.ownerIdx, 4));
     buildScoreboard();
     updateScoreboardPercentages();
 
     matchTimeLeft = 300;
     updateTimerDisplay();
-    matchActive = true;
+    matchState = 'running';
     matchTimerInterval = setInterval(tickTimer, 1000);
+    refreshCtrlButtons();
+    updateFrameOverlay();
   }
 
   function endMatch(){
-    matchActive = false;
+    if(matchTimerInterval) clearInterval(matchTimerInterval);
+    matchState = 'ended';
     const counts = computeCounts();
     const total = COLS * ROWS;
     const ranking = activeTeams
-      .map((t, i) => ({ id:t.id, name:t.name, pct: counts[i] / total * 100 }))
+      .map((t, i) => ({ id:t.id, name:t.name, pct: counts[i] / total * 100, eliminated: t.eliminated }))
       .sort((a, b) => b.pct - a.pct);
-    showResultsCard(ranking);
+    const rankingHtml = ranking.map((t, i) => `
+      <div class="results-row">
+        <span class="rrank">${i+1}º</span>
+        <svg viewBox="0 0 40 40"><use href="#${t.id}"></use></svg>
+        <span class="rname">${t.eliminated ? '💀 ' : ''}${t.name}</span>
+        <span class="rpct">${t.pct.toFixed(1)}%</span>
+      </div>
+    `).join('');
+    updateFrameOverlay(rankingHtml);
+    refreshCtrlButtons();
   }
 
-  document.getElementById('cancelBtn').addEventListener('click', closeTeamPicker);
-  document.getElementById('confirmBtn').addEventListener('click', startMatch);
-  document.getElementById('restartBtn').addEventListener('click', openTeamPicker);
-
-  showWelcomeCard();
+  document.getElementById('ctrlStartBtn').addEventListener('click', startMatch);
+  document.getElementById('ctrlEndBtn').addEventListener('click', endMatch);
+  refreshCtrlButtons();
+  updateFrameOverlay();
 
   /* =========================================================
      PARTÍCULAS (confete, dentro da moldura)
@@ -937,15 +1027,21 @@
   requestAnimationFrame(particlesLoop);
 
   /* =========================================================
-     FOLLOW — celebração sutil
+     TOASTS — seguidor / eliminação
      ========================================================= */
   const followToast = document.getElementById('followToast');
-  let followTimer;
-  function celebrateFollow(user){
-    followToast.textContent = `🎉 ${user} seguiu!`;
+  let toastTimer;
+  function announce(text, variant){
+    followToast.textContent = text;
+    followToast.classList.remove('show','elim');
+    void followToast.offsetWidth;
+    if(variant === 'elim') followToast.classList.add('elim');
     followToast.classList.add('show');
-    clearTimeout(followTimer);
-    followTimer = setTimeout(() => followToast.classList.remove('show'), 2200);
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => followToast.classList.remove('show'), 2600);
+  }
+  function celebrateFollow(user){
+    announce(`🎉 ${user} seguiu!`, 'follow');
     spawnParticles(pCanvas.width/2, pCanvas.height*0.1, 18,
       ['#6affa0','#4fd1ff','#ffd76a','#ffffff'], { speed:5, gravity:0.2, life:40, size:5 });
   }
@@ -953,10 +1049,9 @@
   /* =========================================================
      TRATAMENTO DOS EVENTOS
      - COMMENT com nome de time: marca o usuário como torcedor
-       daquele time. Se o time estiver na partida atual, solta 1 bolinha.
-     - LIKE: acumula por usuário; a cada 100 likes solta 1 bolinha
-       (se o time do usuário estiver na partida).
-     - GIFT: solta 3 bolinhas mais rápidas (se o time estiver na partida).
+       daquele time. Se o time estiver ativo (e vivo), solta 1 bolinha.
+     - LIKE: acumula por usuário; a cada 100 likes solta 1 bolinha.
+     - GIFT: solta 3 bolinhas mais rápidas.
      - FOLLOW: efeito visual só.
      ========================================================= */
   function handleEvent(evento){
@@ -1003,10 +1098,16 @@
   /* =========================================================
      CONEXÃO WEBSOCKET — reconecta a cada 5s se cair
      ========================================================= */
+  const wsStatusDot = document.getElementById('wsStatusDot');
+  const wsStatusLabel = document.getElementById('wsStatusLabel');
   function connect(){
     try{
       const ws = new WebSocket(WS_URL);
-      ws.onopen = () => console.log('[Guerra dos Gigantes] conectado à Interactive Live');
+      ws.onopen = () => {
+        console.log('[Guerra dos Gigantes] conectado à Interactive Live');
+        wsStatusDot.className = 'status-dot on';
+        wsStatusLabel.textContent = 'Conectado';
+      };
       ws.onmessage = (msg) => {
         try{
           const evento = JSON.parse(msg.data);
@@ -1017,11 +1118,15 @@
       };
       ws.onclose = () => {
         console.log('[Guerra dos Gigantes] conexão fechada, tentando reconectar em 5s...');
+        wsStatusDot.className = 'status-dot off';
+        wsStatusLabel.textContent = 'Desconectado — reconectando...';
         setTimeout(connect, 5000);
       };
       ws.onerror = (e) => console.error('[Guerra dos Gigantes] erro no WebSocket', e);
     }catch(e){
       console.error('[Guerra dos Gigantes] não foi possível conectar', e);
+      wsStatusDot.className = 'status-dot off';
+      wsStatusLabel.textContent = 'Erro de conexão';
     }
   }
   connect();
