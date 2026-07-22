@@ -304,8 +304,9 @@
   /* =========================================================
      CONFIGURAÇÃO — troque pelos seus valores reais
      ========================================================= */
-  const USERNAME = 'SEU_USERNAME_AQUI';
-  const KEY = 'SUA_CHAVE_AQUI';
+  const params = new URLSearchParams(window.location.search);
+  const USERNAME = params.get('username') || 'SEU_USERNAME_AQUI';
+  const KEY = params.get('key') || 'SUA_CHAVE_AQUI';
   const WS_URL = `wss://api.interactivelive.online:8443?username=${USERNAME}&key=${KEY}`;
 
   /* Balanceamento — ajuste esses números à vontade */
