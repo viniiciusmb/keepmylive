@@ -508,7 +508,7 @@
       if(!symbol) return;
       const viewBox = symbol.getAttribute('viewBox') || '0 0 100 100';
       const vb = viewBox.split(/\s+/).map(Number);
-      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${symbol.innerHTML}</svg>`;
+      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${viewBox}">${symbol.innerHTML}</svg>`;
       const img = new Image();
       img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
       teamImages[team.id] = { img, vbW: vb[2], vbH: vb[3] };
