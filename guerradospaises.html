@@ -136,6 +136,37 @@
   .ctrl-live-scores svg{ width:15px; height:15px; flex:0 0 auto; }
   .ctrl-live-scores .lname{ flex:1 1 auto; }
   .ctrl-live-scores .lpct{ font-weight:800; color:var(--badge-text); }
+
+  .ctrl-select{
+    width:100%; padding:9px 10px; border-radius:8px; border:1px solid var(--panel-border);
+    background:rgba(255,255,255,0.06); color:var(--text); font-size:12.5px;
+  }
+  .ctrl-select:disabled{ opacity:0.5; }
+
+  .ranking-panel{
+    background:#0c1410; border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+    overflow:hidden; user-select:none; touch-action:none;
+  }
+  .ranking-panel.on-stream{
+    background:rgba(6,10,8,0.82); backdrop-filter:blur(4px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.55); width:170px;
+  }
+  .ranking-panel.dragging{ opacity:0.88; box-shadow:0 12px 30px rgba(0,0,0,0.6); }
+  .ranking-handle{
+    display:flex; align-items:center; gap:6px; padding:6px 10px;
+    background:rgba(255,255,255,0.07); cursor:grab; font-size:10.5px; font-weight:800;
+    color:var(--gold); letter-spacing:0.5px; white-space:nowrap;
+  }
+  .ranking-handle:active{ cursor:grabbing; }
+  .ranking-drag-hint{ margin-left:auto; font-size:8.5px; font-weight:400; color:var(--text-dim); }
+  .ranking-body{ padding:7px 9px; }
+  .ranking-section-title{ font-size:9px; letter-spacing:1px; color:var(--text-dim); margin:6px 0 3px; text-transform:uppercase; }
+  .ranking-section-title:first-child{ margin-top:0; }
+  .ranking-row{ display:flex; align-items:center; gap:6px; padding:1.5px 0; font-size:11px; }
+  .ranking-row .rk-rank{ width:15px; color:var(--text-dim); font-weight:700; flex:0 0 auto; }
+  .ranking-row .rk-user{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ranking-row .rk-val{ font-weight:800; color:var(--badge-text); flex:0 0 auto; }
+  .ranking-empty{ font-size:10px; color:var(--text-dim); font-style:italic; }
   .ctrl-radio-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; padding:6px 0; cursor:pointer; }
   .ctrl-radio-row input{ accent-color:var(--gold); width:15px; height:15px; }
   .ctrl-hint{ font-size:10px; color:var(--text-dim); margin-top:4px; line-height:1.4; }
@@ -394,8 +425,36 @@
   </div>
 
   <div class="control-section">
+    <h4>Duração da partida</h4>
+    <select class="ctrl-select" id="ctrlDuration">
+      <option value="120">2 minutos</option>
+      <option value="180">3 minutos</option>
+      <option value="300" selected>5 minutos</option>
+      <option value="420">7 minutos</option>
+      <option value="600">10 minutos</option>
+      <option value="900">15 minutos</option>
+    </select>
+  </div>
+
+  <div class="control-section">
     <button class="ctrl-btn primary" id="ctrlStartBtn">▶️ Iniciar Partida</button>
     <button class="ctrl-btn danger" id="ctrlEndBtn" style="display:none;">⏹ Encerrar Partida</button>
+  </div>
+
+  <div class="control-section" id="rankingDock">
+    <h4>Ranking</h4>
+    <div class="ranking-panel" id="rankingPanel">
+      <div class="ranking-handle" id="rankingHandle">
+        <span>⠿ RANKING</span>
+        <span class="ranking-drag-hint">arraste pra tela</span>
+      </div>
+      <div class="ranking-body">
+        <div class="ranking-section-title">🎁 Top presentes</div>
+        <div id="giftRankList"><div class="ranking-empty">Aguardando presentes...</div></div>
+        <div class="ranking-section-title">❤️ Top curtidas</div>
+        <div id="likeRankList"><div class="ranking-empty">Aguardando curtidas...</div></div>
+      </div>
+    </div>
   </div>
 
   <div class="control-section">
@@ -531,6 +590,8 @@
 
   let userTeam = {};           // username -> teamId (vale pra qualquer partida)
   let likeAccumulators = {};   // username -> likes acumulados (<100)
+  let giftCounts = {};         // username -> total de presentes (ranking)
+  let likeCounts = {};         // username -> total de curtidas (ranking)
 
   function isTeamActive(teamId){
     const t = activeTeams.find(x => x.id === teamId);
@@ -866,6 +927,8 @@
     const startBtn = document.getElementById('ctrlStartBtn');
     const endBtn = document.getElementById('ctrlEndBtn');
     const stateLabel = document.getElementById('ctrlState');
+    const durationSelect = document.getElementById('ctrlDuration');
+    if(durationSelect) durationSelect.disabled = matchState === 'running';
     if(matchState === 'running'){
       startBtn.style.display = 'none';
       endBtn.style.display = 'block';
@@ -908,7 +971,8 @@
     buildScoreboard();
     updateScoreboardPercentages();
 
-    matchTimeLeft = 300;
+    const durationSelect = document.getElementById('ctrlDuration');
+    matchTimeLeft = durationSelect ? parseInt(durationSelect.value, 10) : 300;
     updateTimerDisplay();
     matchState = 'running';
     matchTimerInterval = setInterval(tickTimer, 1000);
@@ -1038,6 +1102,8 @@
       }
       case 'LIKE': {
         const count = evento.count || 1;
+        likeCounts[user] = (likeCounts[user] || 0) + count;
+        updateLikeRanking();
         likeAccumulators[user] = (likeAccumulators[user] || 0) + count;
         const team = userTeam[user];
         if(team && isTeamActive(team)){
@@ -1051,6 +1117,9 @@
         break;
       }
       case 'GIFT': {
+        const amount = evento.amount || 1;
+        giftCounts[user] = (giftCounts[user] || 0) + amount;
+        updateGiftRanking();
         const team = userTeam[user];
         if(team && isTeamActive(team)) dropBallsForTeam(3, team, 1.6);
         break;
@@ -1063,6 +1132,116 @@
         console.warn('Tipo de evento desconhecido:', evento);
     }
   }
+
+  /* =========================================================
+     RANKING — top presentes e top curtidas
+     ========================================================= */
+  function renderRankList(elId, counts, emptyMsg){
+    const el = document.getElementById(elId);
+    if(!el) return;
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    el.innerHTML = '';
+    if(sorted.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'ranking-empty';
+      empty.textContent = emptyMsg;
+      el.appendChild(empty);
+      return;
+    }
+    sorted.forEach(([user, val], i) => {
+      const row = document.createElement('div');
+      row.className = 'ranking-row';
+      const rank = document.createElement('span');
+      rank.className = 'rk-rank';
+      rank.textContent = (i + 1) + 'º';
+      const uname = document.createElement('span');
+      uname.className = 'rk-user';
+      uname.textContent = user;
+      const val2 = document.createElement('span');
+      val2.className = 'rk-val';
+      val2.textContent = val;
+      row.append(rank, uname, val2);
+      el.appendChild(row);
+    });
+  }
+  function updateGiftRanking(){ renderRankList('giftRankList', giftCounts, 'Aguardando presentes...'); }
+  function updateLikeRanking(){ renderRankList('likeRankList', likeCounts, 'Aguardando curtidas...'); }
+
+  /* =========================================================
+     RANKING ARRASTÁVEL — o streamer pode arrastar o painel
+     de dentro do painel de controle pra dentro da tela 9:16
+     (aí ele passa a aparecer pra quem assiste a live)
+     ========================================================= */
+  function setupDraggablePanel(panel, handle, dock, frame){
+    let dragging = false, offsetX = 0, offsetY = 0;
+
+    function onDown(e){
+      const point = e.touches ? e.touches[0] : e;
+      dragging = true;
+      const rect = panel.getBoundingClientRect();
+      offsetX = point.clientX - rect.left;
+      offsetY = point.clientY - rect.top;
+      panel.style.position = 'fixed';
+      panel.style.left = rect.left + 'px';
+      panel.style.top = rect.top + 'px';
+      panel.style.width = rect.width + 'px';
+      panel.style.zIndex = '1000';
+      document.body.appendChild(panel);
+      panel.classList.add('dragging');
+      e.preventDefault();
+    }
+    function onMove(e){
+      if(!dragging) return;
+      const point = e.touches ? e.touches[0] : e;
+      panel.style.left = (point.clientX - offsetX) + 'px';
+      panel.style.top = (point.clientY - offsetY) + 'px';
+    }
+    function onUp(){
+      if(!dragging) return;
+      dragging = false;
+      panel.classList.remove('dragging');
+      const panelRect = panel.getBoundingClientRect();
+      const cx = panelRect.left + panelRect.width / 2;
+      const cy = panelRect.top + panelRect.height / 2;
+      const frameRect = frame.getBoundingClientRect();
+      const insideFrame = cx >= frameRect.left && cx <= frameRect.right && cy >= frameRect.top && cy <= frameRect.bottom;
+
+      if(insideFrame){
+        let left = panelRect.left - frameRect.left;
+        let top = panelRect.top - frameRect.top;
+        left = Math.max(4, Math.min(left, frameRect.width - panelRect.width - 4));
+        top = Math.max(4, Math.min(top, frameRect.height - panelRect.height - 4));
+        panel.style.position = 'absolute';
+        panel.style.left = left + 'px';
+        panel.style.top = top + 'px';
+        panel.style.width = '';
+        panel.style.zIndex = '9';
+        panel.classList.add('on-stream');
+        frame.appendChild(panel);
+      } else {
+        panel.style.position = '';
+        panel.style.left = '';
+        panel.style.top = '';
+        panel.style.width = '';
+        panel.style.zIndex = '';
+        panel.classList.remove('on-stream');
+        dock.appendChild(panel);
+      }
+    }
+
+    handle.addEventListener('mousedown', onDown);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
+    handle.addEventListener('touchstart', onDown, { passive:false });
+    window.addEventListener('touchmove', onMove, { passive:false });
+    window.addEventListener('touchend', onUp);
+  }
+  setupDraggablePanel(
+    document.getElementById('rankingPanel'),
+    document.getElementById('rankingHandle'),
+    document.getElementById('rankingDock'),
+    gameFrame
+  );
 
   /* =========================================================
      CONEXÃO WEBSOCKET — reconecta a cada 5s se cair
