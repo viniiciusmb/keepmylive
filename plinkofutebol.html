@@ -200,6 +200,11 @@
   .ranking-row .rk-user{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .ranking-row .rk-val{ font-weight:800; color:var(--badge-text); flex:0 0 auto; }
   .ranking-empty{ font-size:10px; color:var(--text-dim); font-style:italic; }
+
+  .tutorial-list{ display:flex; flex-direction:column; gap:8px; }
+  .tutorial-row{ display:flex; align-items:flex-start; gap:8px; font-size:11px; line-height:1.4; color:var(--text-dim); }
+  .tutorial-row b{ color:var(--text); }
+  .tt-icon{ flex:0 0 auto; font-size:14px; line-height:1.3; }
   .ctrl-radio-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; padding:6px 0; cursor:pointer; }
   .ctrl-radio-row input{ accent-color:var(--gold); width:15px; height:15px; }
   .ctrl-hint{ font-size:10px; color:var(--text-dim); margin-top:4px; line-height:1.4; }
@@ -507,6 +512,16 @@
   </div>
 
   <div class="control-section">
+    <h4>Como funciona</h4>
+    <div class="tutorial-list">
+      <div class="tutorial-row"><span class="tt-icon">💬</span><span><b>Comentário</b> com o nome de um time — a pessoa vira torcedora dele e já solta 1 bolinha na hora.</span></div>
+      <div class="tutorial-row"><span class="tt-icon">👍</span><span><b>A cada 15 curtidas</b> acumuladas por alguém que já torce por um time — solta mais 1 bolinha dele.</span></div>
+      <div class="tutorial-row"><span class="tt-icon">🎁</span><span><b>Presente</b> de quem já torce por um time — solta 5 bolinhas dele de uma vez.</span></div>
+      <div class="tutorial-row"><span class="tt-icon">🎯</span><span>A bolinha cai numa coluna de <b>1 a 5 pontos</b> — quanto mais perto do meio, mais vale.</span></div>
+    </div>
+  </div>
+
+  <div class="control-section">
     <h4>Câmera</h4>
     <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="none" checked> Sem câmera</label>
     <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="with"> Com câmera</label>
@@ -521,6 +536,8 @@
         <span class="ranking-drag-hint">arraste pra tela</span>
       </div>
       <div class="ranking-body">
+        <div class="ranking-section-title">🎁 Top presentes</div>
+        <div id="giftRankList"><div class="ranking-empty">Aguardando presentes...</div></div>
         <div class="ranking-section-title">❤️ Top curtidas</div>
         <div id="likeRankList"><div class="ranking-empty">Aguardando curtidas...</div></div>
       </div>
@@ -710,6 +727,7 @@
   let userTeam = {};          // username -> teamId
   let likeAccumulators = {};  // username -> likes acumulados (<15)
   let likeCounts = {};        // username -> total de curtidas (ranking)
+  let giftCounts = {};        // username -> total de presentes (ranking)
 
   /* =========================================================
      ESCUDOS RASTERIZADOS (pra desenhar dentro da bolinha no canvas)
@@ -1078,6 +1096,15 @@
         }
         break;
       }
+      case 'GIFT': {
+        const amount = evento.amount || 1;
+        logInteraction('🎁', `${user} enviou ${evento.gift || 'presente'} x${amount}`);
+        giftCounts[user] = (giftCounts[user] || 0) + amount;
+        updateGiftRanking();
+        const team = userTeam[user];
+        if(team && isTeamSelected(team)) dropBallsForTeam(5, team);
+        break;
+      }
       case 'FOLLOW': {
         logInteraction('🎉', `${user} seguiu`);
         celebrateFollow(user);
@@ -1160,6 +1187,7 @@
     });
   }
   function updateLikeRanking(){ renderRankList('likeRankList', likeCounts, 'Aguardando curtidas...'); }
+  function updateGiftRanking(){ renderRankList('giftRankList', giftCounts, 'Aguardando presentes...'); }
 
   /* =========================================================
      RANKING ARRASTÁVEL — o streamer pode arrastar o painel
