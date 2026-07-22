@@ -41,11 +41,11 @@
   #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
 
   .camera-slot{
-    display:none; flex:0 0 auto; height:19%; margin:1vh 2.5vw 0;
-    border:2px dashed rgba(255,255,255,0.32); border-radius:12px;
+    display:none; flex:0.42 1 0; min-height:0; margin:0 2.5vw 1vh;
+    border:2px dashed rgba(255,255,255,0.32); border-radius:10px;
     align-items:center; justify-content:center; text-align:center;
-    color:rgba(244,251,243,0.55); font-size:clamp(9px,2.6vw,12px);
-    background:rgba(255,255,255,0.03); position:relative; z-index:2; gap:6px;
+    color:rgba(244,251,243,0.55); font-size:clamp(8px,2.2vw,10px);
+    background:rgba(255,255,255,0.03); position:relative; z-index:2; gap:6px; padding:0 8px;
   }
   .camera-slot.on{ display:flex; }
 
@@ -333,10 +333,6 @@
   <canvas id="particles"></canvas>
   <div class="follow-toast" id="followToast"></div>
 
-  <div class="camera-slot" id="cameraSlot">
-    <span>📷 Espaço da câmera — configure sua câmera aqui pelo TikTok Live Studio</span>
-  </div>
-
   <div class="frame-header">
     <div class="title">🏆 CAMPEONATO DOS GIGANTES</div>
     <div class="hint">💬 Comente o nome do seu time pra torcer — depois seus likes soltam bolinhas dele!</div>
@@ -350,6 +346,9 @@
   </div>
 
   <div class="ambient-stage" id="ambientStage"></div>
+  <div class="camera-slot" id="cameraSlot">
+    <span>📷 Espaço da câmera — configure sua câmera aqui pelo TikTok Live Studio</span>
+  </div>
 
   <div class="interactions-panel">
     <div class="panel-title">📡 INTERAÇÕES AO VIVO</div>
@@ -548,7 +547,7 @@
       if(!symbol) return;
       const viewBox = symbol.getAttribute('viewBox') || '0 0 100 100';
       const vb = viewBox.split(/\s+/).map(Number);
-      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">${symbol.innerHTML}</svg>`;
+      const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="${viewBox}">${symbol.innerHTML}</svg>`;
       const img = new Image();
       img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
       teamImages[team.id] = { img, vbW: vb[2], vbH: vb[3] };
@@ -947,7 +946,9 @@
 
   document.querySelectorAll('input[name="cameraMode"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
-      document.getElementById('cameraSlot').classList.toggle('on', e.target.value === 'with');
+      const withCamera = e.target.value === 'with';
+      document.getElementById('cameraSlot').classList.toggle('on', withCamera);
+      document.getElementById('ambientStage').style.display = withCamera ? 'none' : '';
     });
   });
 
