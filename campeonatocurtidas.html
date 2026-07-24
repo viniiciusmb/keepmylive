@@ -68,10 +68,16 @@
   .podium-place{ display:flex; flex-direction:column; align-items:center; flex:1 1 0; min-width:0; }
   .podium-avatar{
     width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:11px; color:#fff; margin-bottom:2px; border:2px solid rgba(255,255,255,0.5);
-    flex:0 0 auto;
+    overflow:hidden; margin-bottom:2px; border:2px solid rgba(255,255,255,0.5);
+    flex:0 0 auto; background:rgba(255,255,255,0.1);
   }
-  .place-1 .podium-avatar{ width:32px; height:32px; font-size:13px; border-color:var(--gold); }
+  .place-1 .podium-avatar{ width:32px; height:32px; border-color:var(--gold); }
+  .podium-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .podium-avatar .fallback-initial{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:11px; color:#fff;
+  }
+  .place-1 .podium-avatar .fallback-initial{ font-size:13px; }
   .podium-name{
     font-size:clamp(6.5px,1.8vw,8px); max-width:100%; overflow:hidden; text-overflow:ellipsis;
     white-space:nowrap; font-weight:700;
@@ -93,7 +99,12 @@
   .rank-row .rr-rank{ width:13px; color:var(--text-dim); font-weight:700; flex:0 0 auto; }
   .rank-row .rr-avatar{
     width:14px; height:14px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:7px; font-weight:800; color:#fff; flex:0 0 auto;
+    overflow:hidden; flex:0 0 auto; background:rgba(255,255,255,0.1);
+  }
+  .rank-row .rr-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .rank-row .rr-avatar .fallback-initial{
+    width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+    font-size:7px; font-weight:800; color:#fff;
   }
   .rank-row .rr-name{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .rank-row .rr-val{ font-weight:800; color:var(--badge-text); flex:0 0 auto; }
@@ -170,19 +181,19 @@
       <div class="rank-panel-title">❤️ TOP CURTIDAS</div>
       <div class="podium">
         <div class="podium-place place-2">
-          <div class="podium-avatar" id="likeAvatar2">?</div>
+          <div class="podium-avatar" id="likeAvatar2"></div>
           <div class="podium-name" id="likeName2">—</div>
           <div class="podium-value" id="likeVal2">0</div>
           <div class="podium-block">🥈<span>2</span></div>
         </div>
         <div class="podium-place place-1">
-          <div class="podium-avatar" id="likeAvatar1">?</div>
+          <div class="podium-avatar" id="likeAvatar1"></div>
           <div class="podium-name" id="likeName1">—</div>
           <div class="podium-value" id="likeVal1">0</div>
           <div class="podium-block">🥇<span>1</span></div>
         </div>
         <div class="podium-place place-3">
-          <div class="podium-avatar" id="likeAvatar3">?</div>
+          <div class="podium-avatar" id="likeAvatar3"></div>
           <div class="podium-name" id="likeName3">—</div>
           <div class="podium-value" id="likeVal3">0</div>
           <div class="podium-block">🥉<span>3</span></div>
@@ -195,19 +206,19 @@
       <div class="rank-panel-title">🎁 TOP PRESENTES</div>
       <div class="podium">
         <div class="podium-place place-2">
-          <div class="podium-avatar" id="giftAvatar2">?</div>
+          <div class="podium-avatar" id="giftAvatar2"></div>
           <div class="podium-name" id="giftName2">—</div>
           <div class="podium-value" id="giftVal2">0</div>
           <div class="podium-block">🥈<span>2</span></div>
         </div>
         <div class="podium-place place-1">
-          <div class="podium-avatar" id="giftAvatar1">?</div>
+          <div class="podium-avatar" id="giftAvatar1"></div>
           <div class="podium-name" id="giftName1">—</div>
           <div class="podium-value" id="giftVal1">0</div>
           <div class="podium-block">🥇<span>1</span></div>
         </div>
         <div class="podium-place place-3">
-          <div class="podium-avatar" id="giftAvatar3">?</div>
+          <div class="podium-avatar" id="giftAvatar3"></div>
           <div class="podium-name" id="giftName3">—</div>
           <div class="podium-value" id="giftVal3">0</div>
           <div class="podium-block">🥉<span>3</span></div>
@@ -282,6 +293,7 @@
   let matchTimerInterval = null;
   let likeCounts = {};
   let giftCounts = {};
+  let userAvatars = {};   // username -> URL da foto (quando o evento trouxer)
   const avatarColors = {};
 
   function colorForUser(user){
@@ -298,9 +310,38 @@
     if(n >= 1000) return (n/1000).toFixed(1).replace('.0','') + 'k';
     return String(n);
   }
+  // guarda a foto do usuário se o evento trouxer (nomes de campo mais comuns)
+  function rememberAvatar(evento){
+    const url = evento.avatar || evento.avatarUrl || evento.avatar_url ||
+                evento.profilePictureUrl || evento.userAvatar || evento.photo;
+    if(url && evento.user) userAvatars[evento.user] = url;
+  }
+  // preenche um container de avatar com a foto real, ou cai pra inicial colorida
+  function renderAvatarInto(container, user){
+    container.innerHTML = '';
+    const url = userAvatars[user];
+    if(url){
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = user;
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => renderFallbackInitial(container, user);
+      container.appendChild(img);
+    } else {
+      renderFallbackInitial(container, user);
+    }
+  }
+  function renderFallbackInitial(container, user){
+    container.innerHTML = '';
+    const fb = document.createElement('div');
+    fb.className = 'fallback-initial';
+    fb.textContent = (user || '?').charAt(0).toUpperCase();
+    fb.style.background = colorForUser(user || '?');
+    container.appendChild(fb);
+  }
 
   /* =========================================================
-     RANKING — pódio (1º 2º 3º) + lista do 4º em diante
+     RANKING — pódio (1º 2º 3º) + lista do 4º até o fim
      ========================================================= */
   function renderPanel(prefix, counts, emptyMsg){
     const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
@@ -312,19 +353,17 @@
       const valEl = document.getElementById(prefix + 'Val' + place);
       if(entry){
         const [user, val] = entry;
-        avatarEl.textContent = user.charAt(0).toUpperCase();
-        avatarEl.style.background = colorForUser(user);
+        renderAvatarInto(avatarEl, user);
         nameEl.textContent = user;
         valEl.textContent = formatNum(val);
       } else {
-        avatarEl.textContent = '?';
-        avatarEl.style.background = 'rgba(255,255,255,0.15)';
+        avatarEl.innerHTML = '<div class="fallback-initial" style="background:rgba(255,255,255,0.15)">?</div>';
         nameEl.textContent = '—';
         valEl.textContent = '0';
       }
     }
     const listEl = document.getElementById(prefix + 'List');
-    const rest = sorted.slice(3, 8);
+    const rest = sorted.slice(3); // sem limite — a lista preenche até o fim do espaço disponível
     listEl.innerHTML = '';
     if(sorted.length === 0){
       const empty = document.createElement('div');
@@ -341,8 +380,7 @@
       rank.textContent = (idx + 4) + 'º';
       const avatar = document.createElement('span');
       avatar.className = 'rr-avatar';
-      avatar.textContent = user.charAt(0).toUpperCase();
-      avatar.style.background = colorForUser(user);
+      renderAvatarInto(avatar, user);
       const name = document.createElement('span');
       name.className = 'rr-name';
       name.textContent = user;
@@ -358,6 +396,17 @@
     renderPanel('gift', giftCounts, 'Aguardando presentes...');
   }
   renderRankings();
+
+  // atualiza o ranking no máximo a cada 400ms (não a cada evento) pra não travar
+  // a tela quando muita gente curte/presenteia ao mesmo tempo
+  let rankingsDirty = false;
+  function markRankingsDirty(){ rankingsDirty = true; }
+  setInterval(() => {
+    if(rankingsDirty){
+      rankingsDirty = false;
+      renderRankings();
+    }
+  }, 400);
 
   /* =========================================================
      CRONÔMETRO
@@ -548,19 +597,23 @@
     switch(evento.type){
       case 'LIKE': {
         if(matchState !== 'running') break;
+        rememberAvatar(evento);
         const count = evento.count || 1;
         likeCounts[user] = (likeCounts[user] || 0) + count;
-        renderRankings();
+        markRankingsDirty();
         break;
       }
       case 'GIFT': {
         if(matchState !== 'running') break;
+        rememberAvatar(evento);
         const amount = evento.amount || 1;
-        giftCounts[user] = (giftCounts[user] || 0) + amount;
-        renderRankings();
+        const value = evento.value || ((evento.diamondCount || 1) * amount);
+        giftCounts[user] = (giftCounts[user] || 0) + value;
+        markRankingsDirty();
         break;
       }
       case 'FOLLOW': {
+        rememberAvatar(evento);
         celebrateFollow(user);
         break;
       }
