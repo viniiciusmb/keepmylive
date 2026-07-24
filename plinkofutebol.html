@@ -1112,8 +1112,7 @@
       case 'GIFT': {
         const amount = evento.amount || 1;
         const value = evento.value || ((evento.diamondCount || 1) * amount);
-        const MAX_BALLS_PER_GIFT = 150; // ajuste ou remova esse teto se quiser
-        const impactUnits = Math.min(MAX_BALLS_PER_GIFT, Math.round(value * 3));
+        const impactUnits = Math.round(value * 3); // sem teto — o valor do presente reflete o impacto total
         logInteraction('🎁', `${user} enviou ${evento.gift || 'presente'} x${amount} (${value} moedas)`);
         giftCounts[user] = (giftCounts[user] || 0) + value;
         updateGiftRanking();
