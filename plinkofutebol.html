@@ -685,7 +685,7 @@
      INTERAÇÕES AO VIVO — feed geral de eventos
      ========================================================= */
   const interactionsList = document.getElementById('interactionsList');
-  const MAX_VISIBLE_INTERACTIONS = 8;
+  const MAX_VISIBLE_INTERACTIONS = 6;
   const interactionRows = [];
   for(let i = 0; i < MAX_VISIBLE_INTERACTIONS; i++){
     const row = document.createElement('div');
@@ -817,7 +817,10 @@
     return { points, slotIndex };
   }
 
+  const MAX_BALLS = 150; // trava de segurança pra não acumular bolinhas demais e travar a tela
+
   function spawnBall(teamId){
+    if(balls.length >= MAX_BALLS) return;
     const { points, slotIndex } = planBall();
     balls.push({
       points, slotIndex, teamId,
@@ -1098,11 +1101,14 @@
       }
       case 'GIFT': {
         const amount = evento.amount || 1;
-        logInteraction('🎁', `${user} enviou ${evento.gift || 'presente'} x${amount}`);
-        giftCounts[user] = (giftCounts[user] || 0) + amount;
+        const value = evento.value || ((evento.diamondCount || 1) * amount);
+        const MAX_BALLS_PER_GIFT = 150; // ajuste ou remova esse teto se quiser
+        const impactUnits = Math.min(MAX_BALLS_PER_GIFT, Math.round(value * 3));
+        logInteraction('🎁', `${user} enviou ${evento.gift || 'presente'} x${amount} (${value} moedas)`);
+        giftCounts[user] = (giftCounts[user] || 0) + value;
         updateGiftRanking();
         const team = userTeam[user];
-        if(team && isTeamSelected(team)) dropBallsForTeam(5, team);
+        if(team && isTeamSelected(team)) dropBallsForTeam(impactUnits, team);
         break;
       }
       case 'FOLLOW': {
