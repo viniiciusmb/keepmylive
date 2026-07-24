@@ -676,6 +676,7 @@
   });
   function pulsePoint(slotIndex){
     const b = document.getElementById('point-' + slotIndex);
+    if(!b) return;
     b.classList.remove('pulse');
     void b.offsetWidth;
     b.classList.add('pulse');
@@ -685,7 +686,7 @@
      INTERAÇÕES AO VIVO — feed geral de eventos
      ========================================================= */
   const interactionsList = document.getElementById('interactionsList');
-  const MAX_VISIBLE_INTERACTIONS = 6;
+  const MAX_VISIBLE_INTERACTIONS = 5;
   const interactionRows = [];
   for(let i = 0; i < MAX_VISIBLE_INTERACTIONS; i++){
     const row = document.createElement('div');
@@ -912,32 +913,37 @@
   }
 
   function plinkoLoop(now){
-    ctx.clearRect(0, 0, displayWidth, displayHeight);
-    drawPins();
-    for(let i = balls.length - 1; i >= 0; i--){
-      const b = balls[i];
-      const segCount = b.points.length - 1;
-      const t = (now - b.start) / b.duration;
-      if(t >= 1){
-        landBall(b);
-        balls.splice(i, 1);
-        continue;
+    try{
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+      drawPins();
+      for(let i = balls.length - 1; i >= 0; i--){
+        const b = balls[i];
+        const segCount = b.points.length - 1;
+        const t = (now - b.start) / b.duration;
+        if(t >= 1){
+          landBall(b);
+          balls.splice(i, 1);
+          continue;
+        }
+        const segF = t * segCount;
+        const seg = Math.min(segCount - 1, Math.floor(segF));
+        const localT = segF - seg;
+        const p0 = b.points[seg], p1 = b.points[seg+1];
+        const eased = easeInOutQuad(localT);
+        const x = p0.x + (p1.x - p0.x) * eased;
+        const y = p0.y + (p1.y - p0.y) * eased;
+        if(seg !== b.lastSeg){
+          b.lastSeg = seg;
+          pinFlashes.push({ x: p0.x, y: p0.y, life: 12 });
+        }
+        b.trail.push({ x, y });
+        if(b.trail.length > 6) b.trail.shift();
+        drawTrail(b.trail);
+        drawBall(x, y, b.teamId);
       }
-      const segF = t * segCount;
-      const seg = Math.min(segCount - 1, Math.floor(segF));
-      const localT = segF - seg;
-      const p0 = b.points[seg], p1 = b.points[seg+1];
-      const eased = easeInOutQuad(localT);
-      const x = p0.x + (p1.x - p0.x) * eased;
-      const y = p0.y + (p1.y - p0.y) * eased;
-      if(seg !== b.lastSeg){
-        b.lastSeg = seg;
-        pinFlashes.push({ x: p0.x, y: p0.y, life: 12 });
-      }
-      b.trail.push({ x, y });
-      if(b.trail.length > 6) b.trail.shift();
-      drawTrail(b.trail);
-      drawBall(x, y, b.teamId);
+    }catch(err){
+      // nunca deixa um erro inesperado travar o jogo de vez — só loga e segue pro próximo quadro
+      console.error('[Plinko] erro no loop de animação, recuperando:', err);
     }
     requestAnimationFrame(plinkoLoop);
   }
@@ -980,22 +986,26 @@
     }
   }
   function particlesLoop(){
-    pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-    particles = particles.filter(p => p.life > 0);
-    for(const p of particles){
-      p.vy += p.gravity;
-      p.x += p.vx;
-      p.y += p.vy;
-      p.rot += p.rotSpeed;
-      p.life--;
-      const alpha = Math.max(0, p.life / p.maxLife);
-      pCtx.save();
-      pCtx.globalAlpha = alpha;
-      pCtx.translate(p.x, p.y);
-      pCtx.rotate(p.rot);
-      pCtx.fillStyle = p.color;
-      pCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-      pCtx.restore();
+    try{
+      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      particles = particles.filter(p => p.life > 0);
+      for(const p of particles){
+        p.vy += p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.rotSpeed;
+        p.life--;
+        const alpha = Math.max(0, p.life / p.maxLife);
+        pCtx.save();
+        pCtx.globalAlpha = alpha;
+        pCtx.translate(p.x, p.y);
+        pCtx.rotate(p.rot);
+        pCtx.fillStyle = p.color;
+        pCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        pCtx.restore();
+      }
+    }catch(err){
+      console.error('[Plinko] erro no loop de partículas, recuperando:', err);
     }
     requestAnimationFrame(particlesLoop);
   }
