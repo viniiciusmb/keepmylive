@@ -616,7 +616,7 @@
     cellW = displayWidth / COLS;
     cellH = displayHeight / ROWS;
     warBallRadius = Math.max(4, Math.min(cellW, cellH) * 1.0);
-    baseSpeed = displayWidth * 0.09;
+    baseSpeed = displayWidth * 0.06;
     eliminationRadius = Math.max(cellW, cellH) * 2.2;
     const dpr = window.devicePixelRatio || 1;
     warCanvas.width = displayWidth * dpr;
@@ -627,16 +627,18 @@
     if(activeTeams.length) assignSpawns();
   }
 
-  function perimeterPoint(t, w, h){
-    const perim = 2 * (w + h);
+  function perimeterPoint(t, w, h, margin){
+    const iw = w - margin * 2;
+    const ih = h - margin * 2;
+    const perim = 2 * (iw + ih);
     let d = t * perim;
-    if(d < w) return { x:d, y:0 };
-    d -= w;
-    if(d < h) return { x:w, y:d };
-    d -= h;
-    if(d < w) return { x:w - d, y:h };
-    d -= w;
-    return { x:0, y:h - d };
+    if(d < iw) return { x: margin + d, y: margin };
+    d -= iw;
+    if(d < ih) return { x: w - margin, y: margin + d };
+    d -= ih;
+    if(d < iw) return { x: w - margin - d, y: h - margin };
+    d -= iw;
+    return { x: margin, y: h - margin - d };
   }
 
   function assignSpawns(){
@@ -645,14 +647,12 @@
     activeTeams.forEach((t, i) => {
       let px, py;
       if(n <= 4){
-        const corners = [{x:0,y:0},{x:displayWidth,y:0},{x:displayWidth,y:displayHeight},{x:0,y:displayHeight}];
+        const corners = [{x:margin,y:margin},{x:displayWidth-margin,y:margin},{x:displayWidth-margin,y:displayHeight-margin},{x:margin,y:displayHeight-margin}];
         px = corners[i].x; py = corners[i].y;
       } else {
-        const p = perimeterPoint(i / n, displayWidth, displayHeight);
+        const p = perimeterPoint(i / n, displayWidth, displayHeight, margin);
         px = p.x; py = p.y;
       }
-      px = clamp(px, margin, displayWidth - margin);
-      py = clamp(py, margin, displayHeight - margin);
       t.spawnX = px; t.spawnY = py;
       t.spawnCol = clamp(Math.floor(px / cellW), 0, COLS - 1);
       t.spawnRow = clamp(Math.floor(py / cellH), 0, ROWS - 1);
@@ -763,9 +763,19 @@
           eliminateTeam(team);
         }
       });
+
+      // detecta bolinha travada (bate e volta sem sair do lugar) e some com ela
+      b.stuckTimer = (b.stuckTimer || 0) + dtSec;
+      if(b.stuckTimer >= 1){
+        const moved = Math.hypot(b.x - (b.stuckCheckX ?? b.x), b.y - (b.stuckCheckY ?? b.y));
+        b.stuckStrikes = moved < Math.max(cellW, cellH) * 1.5 ? (b.stuckStrikes || 0) + 1 : 0;
+        b.stuckCheckX = b.x;
+        b.stuckCheckY = b.y;
+        b.stuckTimer = 0;
+      }
     });
 
-    balls = balls.filter(b => !activeTeams[b.ownerIdx].eliminated);
+    balls = balls.filter(b => (b.stuckStrikes || 0) < 3 && !activeTeams[b.ownerIdx].eliminated);
   }
 
   let lastFrameTime = null;
@@ -1118,10 +1128,12 @@
       }
       case 'GIFT': {
         const amount = evento.amount || 1;
-        giftCounts[user] = (giftCounts[user] || 0) + amount;
+        const value = evento.value || ((evento.diamondCount || 1) * amount);
+        const impactUnits = Math.round(value * 3); // sem teto — o valor do presente reflete o impacto total
+        giftCounts[user] = (giftCounts[user] || 0) + value;
         updateGiftRanking();
         const team = userTeam[user];
-        if(team && isTeamActive(team)) dropBallsForTeam(3, team, 1.6);
+        if(team && isTeamActive(team)) dropBallsForTeam(impactUnits, team, 1.6);
         break;
       }
       case 'FOLLOW': {
