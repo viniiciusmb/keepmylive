@@ -556,6 +556,15 @@
     const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
     return `rgba(${r},${g},${b},${alpha})`;
   }
+  // calcula o valor do presente de forma robusta (aceita número em texto,
+  // nomes de campo alternativos, e nunca deixa passar NaN/0 quebrado)
+  function extractGiftValue(evento){
+    const amount = Number(evento.amount ?? evento.repeatCount ?? evento.comboCount ?? 1) || 1;
+    const diamondCount = Number(evento.diamondCount ?? evento.diamond_count ?? evento.coinCount ?? evento.price ?? evento.diamonds ?? 1) || 1;
+    let value = Number(evento.value);
+    if(!value || isNaN(value)) value = diamondCount * amount;
+    return { amount, value };
+  }
 
   /* =========================================================
      ESCUDOS RASTERIZADOS (pra desenhar nas bases e bolinhas)
@@ -1127,8 +1136,8 @@
         break;
       }
       case 'GIFT': {
-        const amount = evento.amount || 1;
-        const value = evento.value || ((evento.diamondCount || 1) * amount);
+        console.log('[Guerra das Nações] presente recebido:', evento);
+        const { value } = extractGiftValue(evento);
         const impactUnits = Math.round(value * 3); // sem teto — o valor do presente reflete o impacto total
         giftCounts[user] = (giftCounts[user] || 0) + value;
         updateGiftRanking();
