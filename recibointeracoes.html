@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Recibo ao Vivo 🧾</title>
+<style>
+  :root{
+    --paper:#f6f1e4;
+    --ink:#201c14;
+    --ink-dim: rgba(32,28,20,0.55);
+    --gold:#b8860b;
+    --heart:#d43d3d;
+    --panel-bg: rgba(10,8,6,0.6);
+    --panel-border: rgba(255,255,255,0.14);
+    --text:#f4fbf3;
+    --text-dim: rgba(244,251,243,0.7);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; background:#000; color:var(--text); font-family:system-ui,"Segoe UI",Arial,sans-serif; }
+  body{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px; overflow:auto; padding:12px; }
+
+  /* ---------- moldura 9:16 (isso é o que aparece na live) ---------- */
+  .game-frame{
+    position:relative;
+    width:min(100vw, calc(100vh * 9 / 16));
+    height:min(96vh, calc(100vw * 16 / 9));
+    overflow:hidden; display:flex; flex-direction:column; flex-shrink:0;
+    background: linear-gradient(180deg, #241c14 0%, #0a0705 100%);
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  }
+
+  .camera-slot{
+    display:none; flex:0 0 auto; height:19%; margin:1vh 2.5vw 0;
+    border:2px dashed rgba(255,255,255,0.32); border-radius:12px;
+    align-items:center; justify-content:center; text-align:center;
+    color:rgba(244,251,243,0.55); font-size:clamp(9px,2.6vw,12px);
+    background:rgba(255,255,255,0.03); position:relative; z-index:2; gap:6px;
+  }
+  .camera-slot.on{ display:flex; }
+
+  .frame-header{ flex:0 0 auto; text-align:center; padding:1.4vh 4vw 0.8vh; position:relative; z-index:2; }
+  .title{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(11px,4vw,15px); letter-spacing:0.3px; text-shadow:0 3px 10px rgba(0,0,0,0.6); }
+
+  /* ---------- destaque do último presente ---------- */
+  .gift-spotlight{
+    flex:0 0 auto; margin:0 4vw 1vh; padding:8px 10px; border-radius:12px;
+    background: rgba(20,14,8,0.55); border:1px solid rgba(255,255,255,0.14);
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    position:relative; z-index:2;
+  }
+  .gift-spotlight.pop{ animation: spotlightPop 0.5s ease; }
+  @keyframes spotlightPop{ 0%{ transform:scale(0.85); } 50%{ transform:scale(1.05); } 100%{ transform:scale(1); } }
+  .spotlight-empty{ font-size:clamp(9px,2.5vw,11px); color:var(--text-dim); padding:10px 0; }
+  .spotlight-avatar{
+    width:56px; height:56px; border-radius:50%; overflow:hidden; margin-bottom:4px;
+    border:3px solid var(--gold); display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.1);
+  }
+  .spotlight-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .spotlight-avatar .fallback-initial{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:22px; color:#fff; }
+  .spotlight-name{ font-weight:800; font-size:clamp(10px,2.8vw,13px); color:var(--text); }
+  .spotlight-gift{ margin-top:2px; font-size:clamp(9px,2.6vw,12px); color:var(--gold); font-weight:700; }
+  .spotlight-gift-icon{ font-size:1.3em; }
+
+  /* ---------- o recibo de papel ---------- */
+  .receipt-wrap{ flex:1 1 auto; margin:0 4vw 2vh; min-height:0; position:relative; z-index:2; display:flex; flex-direction:column; }
+  .receipt-strip{
+    flex:1 1 auto; min-height:0; background:var(--paper); color:var(--ink);
+    font-family:"Courier New", monospace;
+    background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.025) 0px, rgba(0,0,0,0.025) 1px, transparent 1px, transparent 3px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.5);
+    clip-path: polygon(0% 0%, 5% 2.2%, 10% 0%, 15% 2.2%, 20% 0%, 25% 2.2%, 30% 0%, 35% 2.2%, 40% 0%, 45% 2.2%, 50% 0%, 55% 2.2%, 60% 0%, 65% 2.2%, 70% 0%, 75% 2.2%, 80% 0%, 85% 2.2%, 90% 0%, 95% 2.2%, 100% 0%, 100% 100%, 0% 100%);
+    padding:14px 10px 8px;
+    overflow-y:auto;
+    display:flex; flex-direction:column; gap:0;
+  }
+  .receipt-row{
+    padding:4px 2px; font-size:clamp(8.5px,2.3vw,10.5px); line-height:1.35;
+    border-bottom:1px dashed rgba(0,0,0,0.18);
+  }
+  .receipt-row:last-child{ border-bottom:none; }
+  .receipt-row-join{ color:var(--ink-dim); }
+  .receipt-row-follow{ color:var(--gold); font-weight:700; }
+  .receipt-row-comment{ color:var(--ink); }
+  .receipt-row-like{ color:var(--heart); font-weight:700; }
+  .receipt-row-gift{
+    display:flex; align-items:center; gap:6px; padding:6px 2px;
+    font-weight:800; color:var(--ink);
+  }
+  .receipt-gift-avatar{
+    width:22px; height:22px; border-radius:50%; overflow:hidden; flex:0 0 auto;
+    border:1px solid rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.08);
+  }
+  .receipt-gift-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .receipt-gift-avatar .fallback-initial{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:10px; color:#fff; }
+  .receipt-gift-text{ flex:1 1 auto; }
+  .receipt-gift-icon{ font-size:1.1em; flex:0 0 auto; }
+  .receipt-empty{ color:var(--ink-dim); font-size:11px; text-align:center; padding:20px 0; }
+
+  /* ---------- painel do streamer (FORA da moldura 9:16 — não aparece na live) ---------- */
+  .control-panel{
+    width:280px; max-width:92vw; max-height:96vh; overflow-y:auto; flex-shrink:0;
+    background:#100c08; border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+    padding:16px;
+  }
+  .control-panel h3{ margin:0 0 2px; font-size:13.5px; letter-spacing:1px; color:var(--gold); }
+  .control-panel .sub{ font-size:10.5px; color:var(--text-dim); margin-bottom:12px; }
+  .control-section{ margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .control-section:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .control-section h4{ margin:0 0 8px; font-size:11px; letter-spacing:1px; color:var(--text-dim); text-transform:uppercase; }
+  .status-row{ display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; }
+  .status-dot{ width:8px; height:8px; border-radius:50%; background:#666; flex:0 0 auto; }
+  .status-dot.on{ background:#3ddc84; }
+  .status-dot.off{ background:#ff4d4d; }
+  .ctrl-btn{ width:100%; padding:11px; border-radius:10px; border:none; font-weight:800; cursor:pointer; font-size:13px; margin-top:8px; }
+  .ctrl-btn.secondary{ background:rgba(255,255,255,0.1); color:var(--text); }
+  .ctrl-radio-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; padding:5px 0; cursor:pointer; }
+  .ctrl-radio-row input{ accent-color:var(--gold); width:15px; height:15px; }
+  .ctrl-hint{ font-size:10px; color:var(--text-dim); margin-top:4px; line-height:1.4; }
+</style>
+</head>
+<body>
+
+<div class="game-frame" id="gameFrame">
+  <div class="camera-slot" id="cameraSlot">
+    <span>📷 Espaço da câmera — configure sua câmera aqui pelo TikTok Live Studio</span>
+  </div>
+
+  <div class="frame-header">
+    <div class="title">🧾 RECIBO AO VIVO</div>
+  </div>
+
+  <div class="gift-spotlight" id="giftSpotlight">
+    <div class="spotlight-empty">Aguardando o primeiro presente...</div>
+  </div>
+
+  <div class="receipt-wrap">
+    <div class="receipt-strip" id="receiptStrip">
+      <div class="receipt-empty">— aguardando a live começar —</div>
+    </div>
+  </div>
+</div>
+
+<div class="control-panel">
+  <h3>🎛️ PAINEL DO STREAMER</h3>
+  <div class="sub">Esses controles são só seus — não aparecem na live.</div>
+
+  <div class="control-section">
+    <h4>Conexão</h4>
+    <div class="status-row"><span class="status-dot" id="wsStatusDot"></span><span id="wsStatusLabel">Conectando...</span></div>
+  </div>
+
+  <div class="control-section">
+    <h4>Câmera</h4>
+    <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="none" checked> Sem câmera</label>
+    <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="with"> Com câmera</label>
+    <div class="ctrl-hint">Com câmera, um espaço fica reservado no topo da tela pra você posicionar sua câmera pelo TikTok Live Studio.</div>
+  </div>
+
+  <div class="control-section">
+    <button class="ctrl-btn secondary" id="ctrlClearBtn">🧹 Limpar Recibo</button>
+  </div>
+</div>
+
+<script>
+  /* =========================================================
+     CONFIGURAÇÃO — lê username/key da URL, com fallback fixo
+     ========================================================= */
+  const params = new URLSearchParams(window.location.search);
+  const USERNAME = params.get('username') || 'SEU_USERNAME_AQUI';
+  const KEY = params.get('key') || 'SUA_CHAVE_AQUI';
+  const WS_URL = `wss://api.interactivelive.online:8443?username=${USERNAME}&key=${KEY}`;
+
+  document.querySelectorAll('input[name="cameraMode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      document.getElementById('cameraSlot').classList.toggle('on', e.target.value === 'with');
+    });
+  });
+
+  /* =========================================================
+     AVATARES — foto real do usuário quando o evento trouxer,
+     com fallback pra inicial colorida
+     ========================================================= */
+  let userAvatars = {};
+  const avatarColors = {};
+  function colorForUser(user){
+    if(!avatarColors[user]){
+      let hash = 0;
+      for(let i = 0; i < user.length; i++) hash = user.charCodeAt(i) + ((hash << 5) - hash);
+      avatarColors[user] = `hsl(${Math.abs(hash) % 360}, 62%, 45%)`;
+    }
+    return avatarColors[user];
+  }
+  function rememberAvatar(evento){
+    const url = evento.avatar || evento.avatarUrl || evento.avatar_url ||
+                evento.profilePictureUrl || evento.userAvatar || evento.photo;
+    if(url && evento.user) userAvatars[evento.user] = url;
+  }
+  function renderAvatarInto(container, user){
+    container.innerHTML = '';
+    const url = userAvatars[user];
+    if(url){
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = user;
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => renderFallbackInitial(container, user);
+      container.appendChild(img);
+    } else {
+      renderFallbackInitial(container, user);
+    }
+  }
+  function renderFallbackInitial(container, user){
+    container.innerHTML = '';
+    const fb = document.createElement('div');
+    fb.className = 'fallback-initial';
+    fb.textContent = (user || '?').charAt(0).toUpperCase();
+    fb.style.background = colorForUser(user || '?');
+    container.appendChild(fb);
+  }
+
+  /* =========================================================
+     EMOJI DO PRESENTE — tenta adivinhar pelo nome, senão usa 🎁
+     ========================================================= */
+  function emojiForGift(name){
+    const n = (name || '').toLowerCase();
+    if(n.includes('rosa') || n.includes('rose')) return '🌹';
+    if(n.includes('coracao') || n.includes('coração') || n.includes('heart')) return '❤️';
+    if(n.includes('coroa') || n.includes('crown')) return '👑';
+    if(n.includes('diamante') || n.includes('diamond')) return '💎';
+    if(n.includes('foguete') || n.includes('rocket')) return '🚀';
+    if(n.includes('leao') || n.includes('leão') || n.includes('lion')) return '🦁';
+    if(n.includes('foto') || n.includes('camera') || n.includes('câmera')) return '📸';
+    if(n.includes('anel') || n.includes('ring')) return '💍';
+    if(n.includes('carro') || n.includes('car')) return '🚗';
+    if(n.includes('universo') || n.includes('universe')) return '🌌';
+    if(n.includes('bolo') || n.includes('cake')) return '🍰';
+    if(n.includes('sorvete') || n.includes('ice')) return '🍦';
+    return '🎁';
+  }
+  function truncate(str, max){
+    if(!str) return '';
+    return str.length > max ? str.slice(0, max) + '…' : str;
+  }
+  function formatNum(n){
+    if(n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+    if(n >= 1000) return (n/1000).toFixed(1).replace('.0','') + 'k';
+    return String(n);
+  }
+
+  /* =========================================================
+     DESTAQUE DO ÚLTIMO PRESENTE
+     ========================================================= */
+  function showGiftSpotlight(evento){
+    const el = document.getElementById('giftSpotlight');
+    el.innerHTML = '';
+    const avatarWrap = document.createElement('div');
+    avatarWrap.className = 'spotlight-avatar';
+    renderAvatarInto(avatarWrap, evento.user || 'alguém');
+    const name = document.createElement('div');
+    name.className = 'spotlight-name';
+    name.textContent = evento.user || 'alguém';
+    const giftLine = document.createElement('div');
+    giftLine.className = 'spotlight-gift';
+    giftLine.innerHTML = `<span class="spotlight-gift-icon">${emojiForGift(evento.gift)}</span> ENVIOU ${evento.amount || 1} x ${(evento.gift || 'PRESENTE').toUpperCase()}`;
+    el.append(avatarWrap, name, giftLine);
+    el.classList.remove('pop');
+    void el.offsetWidth;
+    el.classList.add('pop');
+  }
+
+  /* =========================================================
+     O RECIBO — fila de eventos, atualizada em lote pra nunca travar
+     ========================================================= */
+  const receiptStrip = document.getElementById('receiptStrip');
+  const MAX_ROWS = 60;
+  let eventQueue = [];
+  let receiptStarted = false;
+
+  function queueEvent(entry){
+    eventQueue.push(entry);
+  }
+
+  function buildRow(entry){
+    const row = document.createElement('div');
+    row.className = 'receipt-row receipt-row-' + entry.type.toLowerCase();
+    if(entry.type === 'GIFT'){
+      const avatarWrap = document.createElement('span');
+      avatarWrap.className = 'receipt-gift-avatar';
+      renderAvatarInto(avatarWrap, entry.user);
+      const text = document.createElement('span');
+      text.className = 'receipt-gift-text';
+      text.textContent = `${entry.user} ENVIOU ${entry.amount} x ${(entry.gift || 'PRESENTE').toUpperCase()}`;
+      const icon = document.createElement('span');
+      icon.className = 'receipt-gift-icon';
+      icon.textContent = emojiForGift(entry.gift);
+      row.append(avatarWrap, text, icon);
+    } else {
+      row.textContent = entry.text;
+    }
+    return row;
+  }
+
+  function flushEvents(){
+    if(eventQueue.length === 0) return;
+    if(!receiptStarted){
+      receiptStrip.innerHTML = '';
+      receiptStarted = true;
+    }
+    const toAdd = eventQueue.splice(0, eventQueue.length);
+    toAdd.forEach(entry => receiptStrip.appendChild(buildRow(entry)));
+    while(receiptStrip.children.length > MAX_ROWS){
+      receiptStrip.removeChild(receiptStrip.firstChild);
+    }
+    receiptStrip.scrollTop = receiptStrip.scrollHeight;
+  }
+  setInterval(flushEvents, 250);
+
+  document.getElementById('ctrlClearBtn').addEventListener('click', () => {
+    eventQueue = [];
+    receiptStarted = false;
+    receiptStrip.innerHTML = '<div class="receipt-empty">— recibo limpo —</div>';
+    document.getElementById('giftSpotlight').innerHTML = '<div class="spotlight-empty">Aguardando o primeiro presente...</div>';
+  });
+
+  /* =========================================================
+     TRATAMENTO DOS EVENTOS
+     - JOIN: pessoa entrou na live (nome do tipo é um "melhor palpite" —
+       me avise se o seu WebSocket usar outro nome pra esse evento).
+     - COMMENT: mostra o comentário.
+     - LIKE: mostra quantas curtidas.
+     - GIFT: linha maior no recibo + destaque grande com foto no topo.
+     - FOLLOW: linha de destaque dourada.
+     ========================================================= */
+  function handleEvent(evento){
+    if(!evento || !evento.type) return;
+    const user = evento.user || 'alguém';
+
+    switch(evento.type){
+      case 'JOIN': {
+        queueEvent({ type:'JOIN', text: `${user} ENTROU` });
+        break;
+      }
+      case 'COMMENT': {
+        queueEvent({ type:'COMMENT', text: `${user}: ${truncate(evento.message || '', 60)}` });
+        break;
+      }
+      case 'LIKE': {
+        const count = evento.count || 1;
+        queueEvent({ type:'LIKE', text: `${user} ENVIOU ${formatNum(count)} LIKES` });
+        break;
+      }
+      case 'GIFT': {
+        rememberAvatar(evento);
+        const amount = evento.amount || 1;
+        queueEvent({ type:'GIFT', user, amount, gift: evento.gift });
+        showGiftSpotlight(evento);
+        break;
+      }
+      case 'FOLLOW': {
+        queueEvent({ type:'FOLLOW', text: `⭐ ${user} SEGUIU A LIVE` });
+        break;
+      }
+      default:
+        console.warn('Tipo de evento desconhecido:', evento);
+    }
+  }
+
+  /* =========================================================
+     CONEXÃO WEBSOCKET — reconecta a cada 5s se cair
+     ========================================================= */
+  const wsStatusDot = document.getElementById('wsStatusDot');
+  const wsStatusLabel = document.getElementById('wsStatusLabel');
+  function connect(){
+    try{
+      const ws = new WebSocket(WS_URL);
+      ws.onopen = () => {
+        console.log('[Recibo ao Vivo] conectado à Interactive Live');
+        wsStatusDot.className = 'status-dot on';
+        wsStatusLabel.textContent = 'Conectado';
+      };
+      ws.onmessage = (msg) => {
+        try{
+          const evento = JSON.parse(msg.data);
+          handleEvent(evento);
+        }catch(e){
+          console.error('[Recibo ao Vivo] evento inválido recebido', e);
+        }
+      };
+      ws.onclose = () => {
+        console.log('[Recibo ao Vivo] conexão fechada, tentando reconectar em 5s...');
+        wsStatusDot.className = 'status-dot off';
+        wsStatusLabel.textContent = 'Desconectado — reconectando...';
+        setTimeout(connect, 5000);
+      };
+      ws.onerror = (e) => console.error('[Recibo ao Vivo] erro no WebSocket', e);
+    }catch(e){
+      console.error('[Recibo ao Vivo] não foi possível conectar', e);
+      wsStatusDot.className = 'status-dot off';
+      wsStatusLabel.textContent = 'Erro de conexão';
+    }
+  }
+  connect();
+</script>
+</body>
+</html>
