@@ -3,16 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Pirâmide da Sorte 🔺</title>
+<title>Queda da Sorte 🎯</title>
 <style>
   :root{
-    --sand-1:#c9a15c;
-    --sand-2:#4a3018;
-    --panel-bg: rgba(20,12,4,0.6);
-    --panel-border: rgba(255,255,255,0.14);
+    --blue-1:#3b5bfd;
+    --purple-1:#8b2fd6;
+    --deep-1:#180a3d;
+    --deep-2:#050318;
+    --panel-bg: rgba(35,20,80,0.5);
+    --panel-border: rgba(180,140,255,0.28);
     --gold:#ffd76a;
-    --badge-bg:#12244a;
-    --badge-text:#ffe07a;
+    --badge-bg:#2a1a6e;
+    --badge-text:#c9b6ff;
     --text:#f4fbf3;
     --text-dim: rgba(244,251,243,0.7);
   }
@@ -27,8 +29,9 @@
     height:min(96vh, calc(100vw * 16 / 9));
     overflow:hidden; display:flex; flex-direction:column; flex-shrink:0;
     background:
-      radial-gradient(ellipse 70% 35% at 50% 0%, rgba(255,215,106,0.12), transparent 65%),
-      linear-gradient(180deg, var(--sand-1) 0%, var(--sand-2) 55%, #1a1006 100%);
+      radial-gradient(ellipse 70% 35% at 50% 0%, rgba(139,47,214,0.35), transparent 65%),
+      radial-gradient(ellipse 60% 30% at 50% 100%, rgba(59,91,253,0.3), transparent 65%),
+      linear-gradient(180deg, var(--purple-1) 0%, var(--blue-1) 45%, var(--deep-1) 80%, var(--deep-2) 100%);
     box-shadow: 0 0 60px rgba(0,0,0,0.7);
   }
 
@@ -80,11 +83,11 @@
   .follow-toast.show{ opacity:1; transform:translate(-50%,0); }
 
   .frame-status-overlay{
-    position:absolute; inset:0; background:rgba(10,6,2,0.6); z-index:5;
+    position:absolute; inset:0; background:rgba(10,4,30,0.6); z-index:5;
     display:flex; align-items:center; justify-content:center; padding:7vw; text-align:center;
     pointer-events:none;
   }
-  .frame-status-card{ background:rgba(20,12,4,0.9); border:1px solid var(--panel-border); border-radius:16px; padding:18px 14px; max-height:80%; overflow-y:auto; }
+  .frame-status-card{ background:rgba(28,14,60,0.9); border:1px solid var(--panel-border); border-radius:16px; padding:18px 14px; max-height:80%; overflow-y:auto; }
   .frame-status-card h2{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(14px,4.4vw,19px); margin:0 0 8px; color:var(--gold); }
   .frame-status-card p{ font-size:clamp(10px,2.7vw,12px); color:var(--text-dim); margin:0 0 4px; line-height:1.4; }
   .champion-row{ font-size:clamp(10px,2.8vw,13px); margin-top:6px; font-weight:700; }
@@ -92,7 +95,7 @@
   /* ---------- painel do streamer (FORA da moldura 9:16 — não aparece na live) ---------- */
   .control-panel{
     width:280px; max-width:92vw; max-height:96vh; overflow-y:auto; flex-shrink:0;
-    background:#120c06; border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+    background:#160a35; border:1px solid rgba(180,140,255,0.2); border-radius:14px;
     padding:16px;
   }
   .control-panel h3{ margin:0 0 2px; font-size:13.5px; letter-spacing:1px; color:var(--gold); }
@@ -148,7 +151,7 @@
   /* ---------- ranking FIXO dentro da tela (pódio 1-2-3 + 4º ao 10º) ---------- */
   .top-ranking{
     flex:0 0 auto; margin:0.4vh 3vw 0.6vh; padding:6px 8px; position:relative; z-index:2;
-    background:rgba(10,6,2,0.4); border:1px solid var(--panel-border); border-radius:12px;
+    background:rgba(20,10,50,0.45); border:1px solid var(--panel-border); border-radius:12px;
   }
   .top-ranking-title{ text-align:center; font-size:clamp(8px,2.2vw,10px); font-weight:800; letter-spacing:1px; color:var(--gold); margin-bottom:4px; }
   .podium{ display:flex; align-items:flex-end; justify-content:center; gap:4px; margin-bottom:5px; }
@@ -213,10 +216,19 @@
 
   <div class="frame-header">
     <div class="title-row">
-      <div class="title">🔺 PIRÂMIDE DA SORTE</div>
+      <div class="title">🎯 QUEDA DA SORTE</div>
       <div class="timer" id="timerDisplay">⏱ --:--</div>
     </div>
   </div>
+
+  <div class="rules-ticker">
+    <div class="rules-ticker-track" id="rulesTrack"></div>
+  </div>
+
+  <div class="board-area" id="boardArea">
+    <canvas id="plinkoCanvas"></canvas>
+  </div>
+  <div class="points-row" id="pointsRow"></div>
 
   <div class="top-ranking" id="topRanking">
     <div class="top-ranking-title">🏆 RANKING</div>
@@ -243,18 +255,9 @@
     <div class="rank-rest-list" id="rankRestList"><div class="ranking-empty">Aguardando jogadores...</div></div>
   </div>
 
-  <div class="rules-ticker">
-    <div class="rules-ticker-track" id="rulesTrack"></div>
-  </div>
-
-  <div class="board-area" id="boardArea">
-    <canvas id="plinkoCanvas"></canvas>
-  </div>
-  <div class="points-row" id="pointsRow"></div>
-
   <div class="frame-status-overlay" id="frameStatusOverlay">
     <div class="frame-status-card" id="frameStatusCard">
-      <h2>🔺 Pirâmide da Sorte</h2>
+      <h2>🎯 Queda da Sorte</h2>
       <p>Aguardando o início da partida...</p>
     </div>
   </div>
@@ -571,7 +574,7 @@
     balls.push({
       points, slotIndex, user,
       start: performance.now(),
-      duration: 1500 + Math.random() * 300,
+      duration: 2500 + Math.random() * 500,
       lastSeg: -1,
       trail: []
     });
@@ -685,7 +688,7 @@
         drawBall(x, y, b.user);
       }
     }catch(err){
-      console.error('[Pirâmide da Sorte] erro no loop de animação, recuperando:', err);
+      console.error('[Queda da Sorte] erro no loop de animação, recuperando:', err);
     }
     requestAnimationFrame(plinkoLoop);
   }
@@ -727,7 +730,7 @@
     }
     startOverlay.style.display = 'flex';
     if(matchState === 'idle'){
-      startCard.innerHTML = `<h2>🔺 Pirâmide da Sorte</h2><p>Aguardando o início da partida...</p>`;
+      startCard.innerHTML = `<h2>🎯 Queda da Sorte</h2><p>Aguardando o início da partida...</p>`;
     } else {
       const top = Object.entries(userScores).sort((a,b)=>b[1]-a[1])[0];
       startCard.innerHTML = `<h2>🏁 Fim de Partida!</h2><div class="champion-row">🏆 ${top ? top[0] + ' — ' + formatNum(top[1]) + ' pts' : 'ninguém pontuou :('}</div>`;
@@ -875,7 +878,7 @@
         pCtx.restore();
       }
     }catch(err){
-      console.error('[Pirâmide da Sorte] erro no loop de partículas, recuperando:', err);
+      console.error('[Queda da Sorte] erro no loop de partículas, recuperando:', err);
     }
     requestAnimationFrame(particlesLoop);
   }
@@ -957,7 +960,7 @@
     try{
       const ws = new WebSocket(WS_URL);
       ws.onopen = () => {
-        console.log('[Pirâmide da Sorte] conectado à Interactive Live');
+        console.log('[Queda da Sorte] conectado à Interactive Live');
         wsStatusDot.className = 'status-dot on';
         wsStatusLabel.textContent = 'Conectado';
       };
@@ -966,18 +969,18 @@
           const evento = JSON.parse(msg.data);
           handleEvent(evento);
         }catch(e){
-          console.error('[Pirâmide da Sorte] evento inválido recebido', e);
+          console.error('[Queda da Sorte] evento inválido recebido', e);
         }
       };
       ws.onclose = () => {
-        console.log('[Pirâmide da Sorte] conexão fechada, tentando reconectar em 5s...');
+        console.log('[Queda da Sorte] conexão fechada, tentando reconectar em 5s...');
         wsStatusDot.className = 'status-dot off';
         wsStatusLabel.textContent = 'Desconectado — reconectando...';
         setTimeout(connect, 5000);
       };
-      ws.onerror = (e) => console.error('[Pirâmide da Sorte] erro no WebSocket', e);
+      ws.onerror = (e) => console.error('[Queda da Sorte] erro no WebSocket', e);
     }catch(e){
-      console.error('[Pirâmide da Sorte] não foi possível conectar', e);
+      console.error('[Queda da Sorte] não foi possível conectar', e);
       wsStatusDot.className = 'status-dot off';
       wsStatusLabel.textContent = 'Erro de conexão';
     }
