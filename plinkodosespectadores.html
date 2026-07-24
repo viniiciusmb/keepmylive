@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pirâmide da Sorte 🔺</title>
+<style>
+  :root{
+    --sand-1:#c9a15c;
+    --sand-2:#4a3018;
+    --panel-bg: rgba(20,12,4,0.6);
+    --panel-border: rgba(255,255,255,0.14);
+    --gold:#ffd76a;
+    --badge-bg:#12244a;
+    --badge-text:#ffe07a;
+    --text:#f4fbf3;
+    --text-dim: rgba(244,251,243,0.7);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; background:#000; color:var(--text); font-family:system-ui,"Segoe UI",Arial,sans-serif; }
+  body{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:16px; overflow:auto; padding:12px; }
+
+  /* ---------- moldura 9:16 (isso é o que aparece na live) ---------- */
+  .game-frame{
+    position:relative;
+    width:min(100vw, calc(100vh * 9 / 16));
+    height:min(96vh, calc(100vw * 16 / 9));
+    overflow:hidden; display:flex; flex-direction:column; flex-shrink:0;
+    background:
+      radial-gradient(ellipse 70% 35% at 50% 0%, rgba(255,215,106,0.12), transparent 65%),
+      linear-gradient(180deg, var(--sand-1) 0%, var(--sand-2) 55%, #1a1006 100%);
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  }
+
+  #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
+
+  .camera-slot{
+    display:none; flex:0 0 auto; height:19%; margin:1vh 2.5vw 0;
+    border:2px dashed rgba(255,255,255,0.32); border-radius:12px;
+    align-items:center; justify-content:center; text-align:center;
+    color:rgba(244,251,243,0.55); font-size:clamp(9px,2.6vw,12px);
+    background:rgba(255,255,255,0.03); position:relative; z-index:2; gap:6px;
+  }
+  .camera-slot.on{ display:flex; }
+
+  .frame-header{ flex:0 0 auto; text-align:center; padding:1.4vh 4vw 0.4vh; position:relative; z-index:2; }
+  .title-row{ display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; }
+  .title{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(11px,4vw,15px); letter-spacing:0.2px; text-shadow:0 3px 10px rgba(0,0,0,0.6); }
+  .timer{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(9px,3vw,12px); color:var(--gold); background:rgba(0,0,0,0.35); padding:2px 8px; border-radius:8px; }
+
+  .rules-ticker{ flex:0 0 auto; overflow:hidden; white-space:nowrap; background:rgba(0,0,0,0.4); padding:3px 0; position:relative; z-index:2; }
+  .rules-ticker-track{ display:inline-flex; animation: marquee 18s linear infinite; }
+  .rules-ticker-text{ padding-right:36px; font-size:clamp(7.5px,2.1vw,9.5px); color:var(--gold); font-weight:700; }
+  @keyframes marquee{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+  .board-area{
+    flex:1 1 auto; margin:0.6vh 2.5vw 0; min-height:0; position:relative; z-index:1;
+    background:rgba(0,0,0,0.2); border:1px solid var(--panel-border); border-radius:14px 14px 0 0;
+    overflow:hidden; backdrop-filter: blur(1px);
+  }
+  #plinkoCanvas{ display:block; width:100%; height:100%; }
+
+  .points-row{ flex:0 0 auto; display:flex; margin:0 2.5vw 2vh; border-radius:0 0 14px 14px; overflow:hidden; border:1px solid var(--panel-border); border-top:none; position:relative; z-index:1; }
+  .point-badge{
+    flex:1 1 0; display:flex; align-items:center; justify-content:center;
+    font-family:"Arial Black",Impact,sans-serif; font-size:clamp(7px,2.2vw,10px);
+    padding:0.9vh 0; color:var(--gold); background:rgba(0,0,0,0.35);
+  }
+  .point-badge.jackpot{ background:rgba(255,215,106,0.25); color:#fff; font-size:clamp(7.5px,2.4vw,10.5px); }
+  .point-badge.pulse{ animation: pointPulse 0.5s ease; }
+  @keyframes pointPulse{ 0%{transform:scale(1);} 40%{transform:scale(1.35); background:rgba(255,215,106,0.6); color:#fff;} 100%{transform:scale(1);} }
+
+  .follow-toast{
+    position:absolute; top:5vh; left:50%; transform:translate(-50%,-14px);
+    background:linear-gradient(135deg,#6affa0,#2fa876); color:#04241a;
+    font-weight:800; font-size:clamp(10px,2.8vw,13px); padding:6px 15px; border-radius:22px;
+    opacity:0; z-index:8; pointer-events:none; transition:all 0.35s ease;
+    box-shadow:0 6px 18px rgba(106,255,160,0.4); white-space:nowrap;
+  }
+  .follow-toast.show{ opacity:1; transform:translate(-50%,0); }
+
+  .frame-status-overlay{
+    position:absolute; inset:0; background:rgba(10,6,2,0.6); z-index:5;
+    display:flex; align-items:center; justify-content:center; padding:7vw; text-align:center;
+    pointer-events:none;
+  }
+  .frame-status-card{ background:rgba(20,12,4,0.9); border:1px solid var(--panel-border); border-radius:16px; padding:18px 14px; max-height:80%; overflow-y:auto; }
+  .frame-status-card h2{ font-family:"Arial Black",Impact,sans-serif; font-size:clamp(14px,4.4vw,19px); margin:0 0 8px; color:var(--gold); }
+  .frame-status-card p{ font-size:clamp(10px,2.7vw,12px); color:var(--text-dim); margin:0 0 4px; line-height:1.4; }
+  .champion-row{ font-size:clamp(10px,2.8vw,13px); margin-top:6px; font-weight:700; }
+
+  /* ---------- painel do streamer (FORA da moldura 9:16 — não aparece na live) ---------- */
+  .control-panel{
+    width:280px; max-width:92vw; max-height:96vh; overflow-y:auto; flex-shrink:0;
+    background:#120c06; border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+    padding:16px;
+  }
+  .control-panel h3{ margin:0 0 2px; font-size:13.5px; letter-spacing:1px; color:var(--gold); }
+  .control-panel .sub{ font-size:10.5px; color:var(--text-dim); margin-bottom:12px; }
+  .control-section{ margin-bottom:14px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); }
+  .control-section:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .control-section h4{ margin:0 0 8px; font-size:11px; letter-spacing:1px; color:var(--text-dim); text-transform:uppercase; }
+  .status-row{ display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:6px; }
+  .status-dot{ width:8px; height:8px; border-radius:50%; background:#666; flex:0 0 auto; }
+  .status-dot.on{ background:#3ddc84; }
+  .status-dot.off{ background:#ff4d4d; }
+  .ctrl-state{ font-size:11px; color:var(--text-dim); margin-top:2px; }
+  .ctrl-btn{ width:100%; padding:11px; border-radius:10px; border:none; font-weight:800; cursor:pointer; font-size:13px; margin-top:8px; }
+  .ctrl-btn.primary{ background:var(--gold); color:#1a1000; }
+  .ctrl-btn.danger{ background:#ff4d4d; color:#fff; }
+  .ctrl-radio-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; padding:5px 0; cursor:pointer; }
+  .ctrl-radio-row input{ accent-color:var(--gold); width:15px; height:15px; }
+  .ctrl-hint{ font-size:10px; color:var(--text-dim); margin-top:4px; line-height:1.4; }
+  .ctrl-num-row{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+  .ctrl-num-row input{
+    width:70px; padding:8px 10px; border-radius:8px; border:1px solid var(--panel-border);
+    background:rgba(255,255,255,0.06); color:var(--text); font-size:13px;
+  }
+
+  .ranking-empty{ font-size:10px; color:var(--text-dim); font-style:italic; text-align:center; padding:4px 0; }
+
+  /* ---------- animações ambiente automáticas ---------- */
+  .game-frame::before{
+    content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+    background: radial-gradient(ellipse 60% 26% at 50% 8%, rgba(255,215,106,0.22), transparent 62%);
+    animation: bgPulse 4.5s ease-in-out infinite;
+  }
+  @keyframes bgPulse{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
+  .ambient-layer{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+  .ambient-spark{
+    position:absolute; bottom:0; font-size:15px; opacity:0;
+    animation-name: floatUpFade; animation-timing-function: ease-out; animation-fill-mode:forwards;
+    filter: drop-shadow(0 0 4px rgba(255,215,106,0.6));
+  }
+  @keyframes floatUpFade{
+    0%{ opacity:0; transform:translateY(0) scale(0.7) rotate(0deg); }
+    15%{ opacity:0.9; transform:translateY(-14%) scale(1) rotate(20deg); }
+    85%{ opacity:0.6; }
+    100%{ opacity:0; transform:translateY(-118%) scale(0.85) rotate(-15deg); }
+  }
+
+  .title{ animation: titleGlow 2.6s ease-in-out infinite; }
+  @keyframes titleGlow{
+    0%,100%{ text-shadow:0 3px 10px rgba(0,0,0,0.6), 0 0 6px rgba(255,215,106,0.25); }
+    50%{ text-shadow:0 3px 10px rgba(0,0,0,0.6), 0 0 16px rgba(255,215,106,0.75); }
+  }
+
+  /* ---------- ranking FIXO dentro da tela (pódio 1-2-3 + 4º ao 10º) ---------- */
+  .top-ranking{
+    flex:0 0 auto; margin:0.4vh 3vw 0.6vh; padding:6px 8px; position:relative; z-index:2;
+    background:rgba(10,6,2,0.4); border:1px solid var(--panel-border); border-radius:12px;
+  }
+  .top-ranking-title{ text-align:center; font-size:clamp(8px,2.2vw,10px); font-weight:800; letter-spacing:1px; color:var(--gold); margin-bottom:4px; }
+  .podium{ display:flex; align-items:flex-end; justify-content:center; gap:4px; margin-bottom:5px; }
+  .podium-place{ display:flex; flex-direction:column; align-items:center; flex:1 1 0; min-width:0; }
+  .podium-avatar{
+    width:26px; height:26px; border-radius:50%; overflow:hidden; margin-bottom:2px;
+    border:2px solid rgba(255,255,255,0.5); flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.1);
+  }
+  .place-1 .podium-avatar{ width:32px; height:32px; border-color:var(--gold); animation:podiumGlow 1.8s ease-in-out infinite; }
+  @keyframes podiumGlow{ 0%,100%{ box-shadow:0 0 4px rgba(255,215,106,0.4);} 50%{ box-shadow:0 0 14px rgba(255,215,106,0.9);} }
+  .podium-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .podium-avatar .fallback-initial{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; }
+  .place-1 .podium-avatar .fallback-initial{ font-size:13px; }
+  .podium-name{ font-size:clamp(6.5px,1.8vw,8px); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+  .podium-value{ font-size:clamp(7px,2vw,8.5px); color:var(--gold); font-weight:800; margin-bottom:2px; }
+  .podium-block{
+    width:100%; border-radius:6px 6px 0 0; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; font-weight:900; color:#fff; font-size:9px; gap:1px;
+  }
+  .place-1 .podium-block{ height:34px; background:linear-gradient(180deg,#ffe28a,#c99a2e); font-size:11px; }
+  .place-2 .podium-block{ height:26px; background:linear-gradient(180deg,#e6e6e6,#9a9a9a); }
+  .place-3 .podium-block{ height:19px; background:linear-gradient(180deg,#e2a86a,#a5713a); }
+  .rank-rest-list{ display:flex; flex-direction:column; gap:2px; }
+  .rank-rest-row{ display:flex; align-items:center; gap:5px; padding:2px 5px; font-size:clamp(7px,1.9vw,9px); background:rgba(255,255,255,0.05); border-radius:5px; }
+  .rrr-rank{ width:14px; color:var(--text-dim); font-weight:700; flex:0 0 auto; }
+  .rrr-avatar{ width:14px; height:14px; border-radius:50%; overflow:hidden; flex:0 0 auto; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.1); }
+  .rrr-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .rrr-avatar .fallback-initial{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:7px; font-weight:800; color:#fff; }
+  .rrr-name{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rrr-val{ font-weight:800; color:var(--badge-text); flex:0 0 auto; }
+
+  /* ---------- popup de presente ---------- */
+  .gift-toast{
+    position:absolute; top:42%; left:50%; transform:translate(-50%,-50%) scale(0.5);
+    background:linear-gradient(135deg, var(--gold), #c99a2e); color:#1a1000;
+    font-weight:900; font-size:clamp(10px,3vw,14px); padding:9px 18px; border-radius:16px;
+    opacity:0; z-index:9; pointer-events:none; white-space:nowrap; text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  }
+  .gift-toast.show{ animation: giftPop 2.3s ease forwards; }
+  @keyframes giftPop{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(0.5); }
+    15%{ opacity:1; transform:translate(-50%,-50%) scale(1.12); }
+    25%{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+    80%{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-62%) scale(0.92); }
+  }
+</style>
+</head>
+<body>
+
+<div class="game-frame" id="gameFrame">
+  <div class="ambient-layer" id="ambientLayer"></div>
+  <div class="gift-toast" id="giftToast"></div>
+  <canvas id="particles"></canvas>
+  <div class="follow-toast" id="followToast"></div>
+
+  <div class="camera-slot" id="cameraSlot">
+    <span>📷 Espaço da câmera — configure sua câmera aqui pelo TikTok Live Studio</span>
+  </div>
+
+  <div class="frame-header">
+    <div class="title-row">
+      <div class="title">🔺 PIRÂMIDE DA SORTE</div>
+      <div class="timer" id="timerDisplay">⏱ --:--</div>
+    </div>
+  </div>
+
+  <div class="top-ranking" id="topRanking">
+    <div class="top-ranking-title">🏆 RANKING</div>
+    <div class="podium">
+      <div class="podium-place place-2">
+        <div class="podium-avatar" id="rankAvatar2"></div>
+        <div class="podium-name" id="rankName2">—</div>
+        <div class="podium-value" id="rankVal2">0</div>
+        <div class="podium-block">🥈<span>2</span></div>
+      </div>
+      <div class="podium-place place-1">
+        <div class="podium-avatar" id="rankAvatar1"></div>
+        <div class="podium-name" id="rankName1">—</div>
+        <div class="podium-value" id="rankVal1">0</div>
+        <div class="podium-block">🥇<span>1</span></div>
+      </div>
+      <div class="podium-place place-3">
+        <div class="podium-avatar" id="rankAvatar3"></div>
+        <div class="podium-name" id="rankName3">—</div>
+        <div class="podium-value" id="rankVal3">0</div>
+        <div class="podium-block">🥉<span>3</span></div>
+      </div>
+    </div>
+    <div class="rank-rest-list" id="rankRestList"><div class="ranking-empty">Aguardando jogadores...</div></div>
+  </div>
+
+  <div class="rules-ticker">
+    <div class="rules-ticker-track" id="rulesTrack"></div>
+  </div>
+
+  <div class="board-area" id="boardArea">
+    <canvas id="plinkoCanvas"></canvas>
+  </div>
+  <div class="points-row" id="pointsRow"></div>
+
+  <div class="frame-status-overlay" id="frameStatusOverlay">
+    <div class="frame-status-card" id="frameStatusCard">
+      <h2>🔺 Pirâmide da Sorte</h2>
+      <p>Aguardando o início da partida...</p>
+    </div>
+  </div>
+</div>
+
+<div class="control-panel">
+  <h3>🎛️ PAINEL DO STREAMER</h3>
+  <div class="sub">Esses controles são só seus — não aparecem na live.</div>
+
+  <div class="control-section">
+    <h4>Conexão</h4>
+    <div class="status-row"><span class="status-dot" id="wsStatusDot"></span><span id="wsStatusLabel">Conectando...</span></div>
+    <div class="ctrl-state" id="ctrlState">Aguardando início</div>
+  </div>
+
+  <div class="control-section">
+    <h4>Duração da partida</h4>
+    <label class="ctrl-radio-row"><input type="radio" name="durationMode" value="timed" checked> Com tempo</label>
+    <label class="ctrl-radio-row"><input type="radio" name="durationMode" value="untimed"> Sem tempo (encerro manual)</label>
+    <div class="ctrl-num-row">
+      <input type="number" id="ctrlMinutes" min="1" max="60" value="5" step="1">
+      <span>minutos</span>
+    </div>
+  </div>
+
+  <div class="control-section">
+    <h4>Câmera</h4>
+    <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="none" checked> Sem câmera</label>
+    <label class="ctrl-radio-row"><input type="radio" name="cameraMode" value="with"> Com câmera</label>
+    <div class="ctrl-hint">Com câmera, um espaço fica reservado no topo da tela pra você posicionar sua câmera pelo TikTok Live Studio.</div>
+  </div>
+
+  <div class="control-section">
+    <button class="ctrl-btn primary" id="ctrlStartBtn">▶️ Iniciar Partida</button>
+    <button class="ctrl-btn danger" id="ctrlEndBtn" style="display:none;">⏹ Encerrar Partida</button>
+  </div>
+</div>
+
+<script>
+  /* =========================================================
+     CONFIGURAÇÃO — lê username/key da URL, com fallback fixo
+     ========================================================= */
+  const params = new URLSearchParams(window.location.search);
+  const USERNAME = params.get('username') || 'SEU_USERNAME_AQUI';
+  const KEY = params.get('key') || 'SUA_CHAVE_AQUI';
+  const WS_URL = `wss://api.interactivelive.online:8443?username=${USERNAME}&key=${KEY}`;
+
+  const gameFrame = document.getElementById('gameFrame');
+
+  /* =========================================================
+     TICKER DE REGRAS — texto animado explicando o jogo
+     ========================================================= */
+  const RULES_TEXT = '💬 1 comentário = 1 bolinha&nbsp;&nbsp;•&nbsp;&nbsp;👍 15 curtidas = 1 bolinha&nbsp;&nbsp;•&nbsp;&nbsp;🎁 1 moeda de presente = 5 bolinhas&nbsp;&nbsp;•&nbsp;&nbsp;⭐ seguiu = 10 bolinhas&nbsp;&nbsp;•&nbsp;&nbsp;🚪 entrou na live = 1 bolinha&nbsp;&nbsp;•&nbsp;&nbsp;';
+  const rulesTrack = document.getElementById('rulesTrack');
+  rulesTrack.innerHTML = `<span class="rules-ticker-text">${RULES_TEXT}</span><span class="rules-ticker-text">${RULES_TEXT}</span>`;
+
+  /* =========================================================
+     AVATARES — foto real do usuário quando o evento trouxer
+     ========================================================= */
+  let userAvatars = {};
+  const avatarColors = {};
+  const userAvatarImages = {};
+  function colorForUser(user){
+    if(!avatarColors[user]){
+      let hash = 0;
+      for(let i = 0; i < user.length; i++) hash = user.charCodeAt(i) + ((hash << 5) - hash);
+      avatarColors[user] = `hsl(${Math.abs(hash) % 360}, 62%, 45%)`;
+    }
+    return avatarColors[user];
+  }
+  function rememberAvatar(evento){
+    const url = evento.avatar || evento.avatarUrl || evento.avatar_url ||
+                evento.profilePictureUrl || evento.userAvatar || evento.photo;
+    if(url && evento.user) userAvatars[evento.user] = url;
+  }
+  function renderAvatarInto(container, user){
+    container.innerHTML = '';
+    const url = userAvatars[user];
+    if(url){
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = user;
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => renderFallbackInitial(container, user);
+      container.appendChild(img);
+    } else {
+      renderFallbackInitial(container, user);
+    }
+  }
+  function renderFallbackInitial(container, user){
+    container.innerHTML = '';
+    const fb = document.createElement('div');
+    fb.className = 'fallback-initial';
+    fb.textContent = (user || '?').charAt(0).toUpperCase();
+    fb.style.background = colorForUser(user || '?');
+    container.appendChild(fb);
+  }
+  // pra desenhar a foto dentro da bolinha no canvas
+  function getUserAvatarImage(user){
+    const url = userAvatars[user];
+    if(!url) return null;
+    if(!userAvatarImages[user]){
+      const img = new Image();
+      img.referrerPolicy = 'no-referrer';
+      const entry = { img, loaded:false, failed:false };
+      img.onload = () => { entry.loaded = true; };
+      img.onerror = () => { entry.failed = true; };
+      img.src = url;
+      userAvatarImages[user] = entry;
+    }
+    const entry = userAvatarImages[user];
+    return (entry.loaded && !entry.failed) ? entry.img : null;
+  }
+
+  function extractGiftValue(evento){
+    const amount = Number(evento.amount ?? evento.repeatCount ?? evento.comboCount ?? 1) || 1;
+    const diamondCount = Number(evento.diamondCount ?? evento.diamond_count ?? evento.coinCount ?? evento.price ?? evento.diamonds ?? 1) || 1;
+    let value = Number(evento.value);
+    if(!value || isNaN(value)) value = diamondCount * amount;
+    return { amount, value };
+  }
+  function formatNum(n){
+    if(n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M';
+    if(n >= 1000) return (n/1000).toFixed(1).replace('.0','') + 'k';
+    return String(n);
+  }
+
+  /* =========================================================
+     PLACAR — pontuação por linha da pirâmide
+     ========================================================= */
+  const POINTS = [100, 64, 16, 8, 2, 1, 2, 8, 16, 64, 100];
+  const SLOTS = POINTS.length; // 11 colunas fixas
+  const pointsRow = document.getElementById('pointsRow');
+  POINTS.forEach((val, i) => {
+    const b = document.createElement('div');
+    const jackpot = (i === 0 || i === POINTS.length - 1);
+    b.className = 'point-badge' + (jackpot ? ' jackpot' : '');
+    b.id = 'point-' + i;
+    b.textContent = jackpot ? ('×' + val) : val;
+    pointsRow.appendChild(b);
+  });
+  function pulsePoint(slotIndex){
+    const b = document.getElementById('point-' + slotIndex);
+    if(!b) return;
+    b.classList.remove('pulse');
+    void b.offsetWidth;
+    b.classList.add('pulse');
+  }
+
+  let userScores = {};
+  function bumpScore(user, points){
+    userScores[user] = (userScores[user] || 0) + points;
+    markRankingDirty();
+  }
+
+  /* =========================================================
+     RANKING — top jogadores por pontos
+     ========================================================= */
+  function renderRanking(){
+    const sorted = Object.entries(userScores).sort((a, b) => b[1] - a[1]);
+    for(let i = 0; i < 3; i++){
+      const place = i + 1;
+      const entry = sorted[i];
+      const avatarEl = document.getElementById('rankAvatar' + place);
+      const nameEl = document.getElementById('rankName' + place);
+      const valEl = document.getElementById('rankVal' + place);
+      if(entry){
+        const [user, val] = entry;
+        renderAvatarInto(avatarEl, user);
+        nameEl.textContent = user;
+        valEl.textContent = formatNum(val);
+      } else {
+        avatarEl.innerHTML = '<div class="fallback-initial" style="background:rgba(255,255,255,0.15)">?</div>';
+        nameEl.textContent = '—';
+        valEl.textContent = '0';
+      }
+    }
+    const restEl = document.getElementById('rankRestList');
+    const rest = sorted.slice(3, 10); // 4º ao 10º
+    restEl.innerHTML = '';
+    if(sorted.length === 0){
+      restEl.innerHTML = '<div class="ranking-empty">Aguardando jogadores...</div>';
+      return;
+    }
+    rest.forEach(([user, val], idx) => {
+      const row = document.createElement('div');
+      row.className = 'rank-rest-row';
+      const rank = document.createElement('span');
+      rank.className = 'rrr-rank';
+      rank.textContent = (idx + 4) + 'º';
+      const avatar = document.createElement('span');
+      avatar.className = 'rrr-avatar';
+      renderAvatarInto(avatar, user);
+      const name = document.createElement('span');
+      name.className = 'rrr-name';
+      name.textContent = user;
+      const valEl = document.createElement('span');
+      valEl.className = 'rrr-val';
+      valEl.textContent = formatNum(val);
+      row.append(rank, avatar, name, valEl);
+      restEl.appendChild(row);
+    });
+  }
+  let rankingDirty = false;
+  function markRankingDirty(){ rankingDirty = true; }
+  setInterval(() => { if(rankingDirty){ rankingDirty = false; renderRanking(); } }, 400);
+  renderRanking();
+
+  /* =========================================================
+     TABULEIRO — pirâmide (canvas)
+     ========================================================= */
+  const boardArea = document.getElementById('boardArea');
+  const plinkoCanvas = document.getElementById('plinkoCanvas');
+  const ctx = plinkoCanvas.getContext('2d');
+  const PIN_ROWS = SLOTS - 1; // 10 fileiras pra 11 colunas
+  const CENTER = (SLOTS - 1) / 2; // 5
+
+  let displayWidth = 0, displayHeight = 0, unitWidth = 0, ballRadius = 8;
+  let pins = [];
+  let pinFlashes = [];
+  let balls = [];
+  const MAX_BALLS = 150; // trava de segurança contra travamento
+
+  function resizePlinko(){
+    const rect = plinkoCanvas.getBoundingClientRect();
+    displayWidth = rect.width;
+    displayHeight = rect.height;
+    unitWidth = displayWidth / SLOTS;
+    ballRadius = Math.max(7, unitWidth * 0.38);
+    const dpr = window.devicePixelRatio || 1;
+    plinkoCanvas.width = displayWidth * dpr;
+    plinkoCanvas.height = displayHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    generatePins();
+  }
+
+  function pixelX(colUnit){ return (colUnit + 0.5) * unitWidth; }
+
+  function generatePins(){
+    pins = [];
+    const marginTop = displayHeight * 0.1;
+    const marginBottom = displayHeight * 0.1;
+    const usable = displayHeight - marginTop - marginBottom;
+    for(let r = 0; r < PIN_ROWS; r++){
+      const y = marginTop + (usable * (r + 1)) / (PIN_ROWS + 1);
+      const reach = (r + 1) * 0.5;
+      if(r % 2 === 0){
+        for(let off = 0.5; off <= reach + 0.01; off += 1){
+          pins.push({ x: pixelX(CENTER + off), y });
+          pins.push({ x: pixelX(CENTER - off), y });
+        }
+      } else {
+        pins.push({ x: pixelX(CENTER), y });
+        for(let off = 1; off <= reach + 0.01; off += 1){
+          pins.push({ x: pixelX(CENTER + off), y });
+          pins.push({ x: pixelX(CENTER - off), y });
+        }
+      }
+    }
+  }
+
+  function drawPyramidOutline(now){
+    const apexY = displayHeight * 0.03;
+    const baseY = displayHeight * 0.92;
+    const apexX = pixelX(CENTER);
+    const baseLeftX = pixelX(0) - unitWidth * 0.4;
+    const baseRightX = pixelX(SLOTS - 1) + unitWidth * 0.4;
+    const pulse = 0.22 + Math.sin((now || 0) / 900) * 0.08; // respira suavemente
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(apexX, apexY);
+    ctx.lineTo(baseRightX, baseY);
+    ctx.lineTo(baseLeftX, baseY);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255,215,106,0.05)';
+    ctx.fill();
+    ctx.strokeStyle = `rgba(255,215,106,${pulse})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function planBall(){
+    let colUnit = CENTER;
+    const colUnits = [colUnit];
+    for(let i = 0; i < PIN_ROWS; i++){
+      colUnit += Math.random() < 0.5 ? -0.5 : 0.5;
+      colUnits.push(colUnit);
+    }
+    const slotIndex = Math.max(0, Math.min(SLOTS - 1, Math.round(colUnits[colUnits.length - 1])));
+    colUnits[colUnits.length - 1] = slotIndex;
+
+    const marginTop = displayHeight * 0.05;
+    const marginBottom = displayHeight * 0.03;
+    const pinMarginTop = displayHeight * 0.1;
+    const pinMarginBottom = displayHeight * 0.1;
+    const usable = displayHeight - pinMarginTop - pinMarginBottom;
+
+    const points = colUnits.map((cu, i) => {
+      let y;
+      if(i === 0) y = marginTop;
+      else if(i === colUnits.length - 1) y = displayHeight - marginBottom;
+      else y = pinMarginTop + (usable * i) / (PIN_ROWS + 1);
+      return { x: pixelX(cu), y };
+    });
+
+    return { points, slotIndex };
+  }
+
+  function spawnBall(user){
+    if(matchState !== 'running') return;
+    if(balls.length >= MAX_BALLS) return;
+    const { points, slotIndex } = planBall();
+    balls.push({
+      points, slotIndex, user,
+      start: performance.now(),
+      duration: 1500 + Math.random() * 300,
+      lastSeg: -1,
+      trail: []
+    });
+  }
+  function dropBallsForUser(n, user){
+    for(let i = 0; i < n; i++){
+      setTimeout(() => spawnBall(user), i * (140 + Math.random() * 120));
+    }
+  }
+
+  function easeInOutQuad(t){ return t < 0.5 ? 2*t*t : -1 + (4 - 2*t) * t; }
+
+  function drawPins(){
+    pinFlashes = pinFlashes.filter(f => f.life > 0);
+    pins.forEach(p => {
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.shadowColor = 'rgba(255,255,255,0.4)';
+      ctx.shadowBlur = 4;
+      ctx.arc(p.x, p.y, 2.6, 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    pinFlashes.forEach(f => {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,215,106,${f.life/12})`;
+      ctx.arc(f.x, f.y, 6*(1 - f.life/12) + 3, 0, Math.PI*2);
+      ctx.fill();
+      f.life--;
+    });
+  }
+
+  function drawBall(x, y, user){
+    const r = ballRadius;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.closePath();
+    ctx.fillStyle = colorForUser(user);
+    ctx.fill();
+    const img = getUserAvatarImage(user);
+    if(img){
+      ctx.save();
+      ctx.clip();
+      ctx.drawImage(img, x - r, y - r, r*2, r*2);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = '#fff';
+      ctx.font = `${Math.round(r*1.05)}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText((user || '?').charAt(0).toUpperCase(), x, y + 1);
+    }
+    ctx.lineWidth = 1.3;
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawTrail(trail){
+    trail.forEach((p, i) => {
+      const f = i / trail.length;
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,${f*0.25})`;
+      ctx.arc(p.x, p.y, ballRadius*0.5*f, 0, Math.PI*2);
+      ctx.fill();
+    });
+  }
+
+  function landBall(b){
+    const pts = POINTS[b.slotIndex];
+    bumpScore(b.user, pts);
+    pulsePoint(b.slotIndex);
+    const canvasRect = plinkoCanvas.getBoundingClientRect();
+    const frameRect = gameFrame.getBoundingClientRect();
+    const landPoint = b.points[b.points.length - 1];
+    const px = (canvasRect.left - frameRect.left) + landPoint.x;
+    const py = (canvasRect.top - frameRect.top) + landPoint.y;
+    spawnParticles(px, py, 14, ['#ffd76a','#4fd1ff','#ff6ec7','#6affa0','#ffffff'],
+      { speed:6, gravity:0.25, life:45, size:5 });
+  }
+
+  function plinkoLoop(now){
+    try{
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+      drawPyramidOutline(now);
+      drawPins();
+      for(let i = balls.length - 1; i >= 0; i--){
+        const b = balls[i];
+        const segCount = b.points.length - 1;
+        const t = (now - b.start) / b.duration;
+        if(t >= 1){
+          landBall(b);
+          balls.splice(i, 1);
+          continue;
+        }
+        const segF = t * segCount;
+        const seg = Math.min(segCount - 1, Math.floor(segF));
+        const localT = segF - seg;
+        const p0 = b.points[seg], p1 = b.points[seg+1];
+        const eased = easeInOutQuad(localT);
+        const x = p0.x + (p1.x - p0.x) * eased;
+        const y = p0.y + (p1.y - p0.y) * eased;
+        if(seg !== b.lastSeg){
+          b.lastSeg = seg;
+          pinFlashes.push({ x: p0.x, y: p0.y, life: 12 });
+        }
+        b.trail.push({ x, y });
+        if(b.trail.length > 6) b.trail.shift();
+        drawTrail(b.trail);
+        drawBall(x, y, b.user);
+      }
+    }catch(err){
+      console.error('[Pirâmide da Sorte] erro no loop de animação, recuperando:', err);
+    }
+    requestAnimationFrame(plinkoLoop);
+  }
+
+  window.addEventListener('resize', resizePlinko);
+  window.addEventListener('load', resizePlinko);
+  resizePlinko();
+  requestAnimationFrame(plinkoLoop);
+
+  /* =========================================================
+     ESTADO DA PARTIDA
+     ========================================================= */
+  let matchState = 'idle'; // idle | running | ended
+  let matchTimed = true;
+  let matchTimeLeft = 300;
+  let matchTimerInterval = null;
+  let likeAccumulators = {};
+
+  function updateTimerDisplay(){
+    if(!matchTimed || matchState !== 'running'){
+      document.getElementById('timerDisplay').textContent = matchState === 'running' ? '🔴 AO VIVO' : '⏱ --:--';
+      return;
+    }
+    const m = Math.floor(matchTimeLeft / 60), s = matchTimeLeft % 60;
+    document.getElementById('timerDisplay').textContent = `⏱ ${m}:${String(s).padStart(2,'0')}`;
+  }
+  function tickTimer(){
+    matchTimeLeft--;
+    updateTimerDisplay();
+    if(matchTimeLeft <= 0) endMatch();
+  }
+
+  const startOverlay = document.getElementById('frameStatusOverlay');
+  const startCard = document.getElementById('frameStatusCard');
+  function updateFrameOverlay(){
+    if(matchState === 'running'){
+      startOverlay.style.display = 'none';
+      return;
+    }
+    startOverlay.style.display = 'flex';
+    if(matchState === 'idle'){
+      startCard.innerHTML = `<h2>🔺 Pirâmide da Sorte</h2><p>Aguardando o início da partida...</p>`;
+    } else {
+      const top = Object.entries(userScores).sort((a,b)=>b[1]-a[1])[0];
+      startCard.innerHTML = `<h2>🏁 Fim de Partida!</h2><div class="champion-row">🏆 ${top ? top[0] + ' — ' + formatNum(top[1]) + ' pts' : 'ninguém pontuou :('}</div>`;
+    }
+  }
+
+  function refreshCtrlButtons(){
+    const startBtn = document.getElementById('ctrlStartBtn');
+    const endBtn = document.getElementById('ctrlEndBtn');
+    const stateLabel = document.getElementById('ctrlState');
+    const running = matchState === 'running';
+    document.querySelectorAll('input[name="durationMode"]').forEach(r => r.disabled = running);
+    document.getElementById('ctrlMinutes').disabled = running;
+    if(running){
+      startBtn.style.display = 'none';
+      endBtn.style.display = 'block';
+      stateLabel.textContent = 'Partida em andamento';
+    } else {
+      startBtn.style.display = 'block';
+      endBtn.style.display = 'none';
+      startBtn.textContent = matchState === 'ended' ? '🔄 Nova Partida' : '▶️ Iniciar Partida';
+      stateLabel.textContent = matchState === 'ended' ? 'Partida encerrada' : 'Aguardando início';
+    }
+  }
+
+  function startMatch(){
+    if(matchState === 'running') return;
+    if(matchTimerInterval) clearInterval(matchTimerInterval);
+    userScores = {};
+    likeAccumulators = {};
+    balls = [];
+    renderRanking();
+    matchTimed = document.querySelector('input[name="durationMode"]:checked').value === 'timed';
+    if(matchTimed){
+      matchTimeLeft = Math.max(1, parseInt(document.getElementById('ctrlMinutes').value, 10) || 5) * 60;
+      matchTimerInterval = setInterval(tickTimer, 1000);
+    }
+    matchState = 'running';
+    updateTimerDisplay();
+    refreshCtrlButtons();
+    updateFrameOverlay();
+  }
+  function endMatch(){
+    if(matchTimerInterval) clearInterval(matchTimerInterval);
+    matchState = 'ended';
+    refreshCtrlButtons();
+    updateFrameOverlay();
+    updateTimerDisplay();
+  }
+  document.getElementById('ctrlStartBtn').addEventListener('click', startMatch);
+  document.getElementById('ctrlEndBtn').addEventListener('click', endMatch);
+  refreshCtrlButtons();
+  updateFrameOverlay();
+  updateTimerDisplay();
+
+  document.querySelectorAll('input[name="cameraMode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      document.getElementById('cameraSlot').classList.toggle('on', e.target.value === 'with');
+    });
+  });
+
+  /* =========================================================
+     ANIMAÇÕES AMBIENTE AUTOMÁTICAS — brilhos flutuando sozinhos
+     ========================================================= */
+  const ambientLayer = document.getElementById('ambientLayer');
+  const AMBIENT_EMOJI = ['✨','🪙','⭐','💫','🔺'];
+  function spawnAmbientSpark(){
+    const el = document.createElement('div');
+    el.className = 'ambient-spark';
+    el.textContent = AMBIENT_EMOJI[Math.floor(Math.random() * AMBIENT_EMOJI.length)];
+    el.style.left = (5 + Math.random() * 88) + '%';
+    el.style.animationDuration = (4 + Math.random() * 3) + 's';
+    ambientLayer.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+  function scheduleAmbientSpark(){
+    setTimeout(() => { spawnAmbientSpark(); scheduleAmbientSpark(); }, 700 + Math.random() * 1300);
+  }
+  scheduleAmbientSpark();
+
+  /* =========================================================
+     POPUP DE PRESENTE — "usuário doou Nx presente"
+     ========================================================= */
+  let giftToastTimer;
+  function showGiftToast(user, giftName, amount){
+    const el = document.getElementById('giftToast');
+    el.textContent = `🎁 ${user} doou ${amount}x ${giftName || 'presente'}!`;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+    clearTimeout(giftToastTimer);
+    spawnParticles(pCanvas.width/2, pCanvas.height*0.42, 22,
+      ['#ffd76a','#c99a2e','#ffffff','#4fd1ff'], { speed:7, gravity:0.22, life:50, size:5 });
+  }
+
+  /* =========================================================
+     PARTÍCULAS (confete, dentro da moldura)
+     ========================================================= */
+  const pCanvas = document.getElementById('particles');
+  const pCtx = pCanvas.getContext('2d');
+  function resizeParticleCanvas(){
+    const r = gameFrame.getBoundingClientRect();
+    pCanvas.width = r.width;
+    pCanvas.height = r.height;
+  }
+  resizeParticleCanvas();
+  window.addEventListener('resize', resizeParticleCanvas);
+
+  let particles = [];
+  function spawnParticles(x, y, count, colors, opts = {}){
+    for(let i = 0; i < count; i++){
+      const angle = Math.random() * Math.PI * 2;
+      const speed = (opts.speed || 6) * Math.random() + 2;
+      particles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - (opts.upBias || 3),
+        gravity: opts.gravity !== undefined ? opts.gravity : 0.25,
+        life: (opts.life || 45) + Math.random() * 20,
+        maxLife: (opts.life || 45) + 20,
+        size: (opts.size || 4) + Math.random() * 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rot: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.3
+      });
+    }
+  }
+  function particlesLoop(){
+    try{
+      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      particles = particles.filter(p => p.life > 0);
+      for(const p of particles){
+        p.vy += p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.rotSpeed;
+        p.life--;
+        const alpha = Math.max(0, p.life / p.maxLife);
+        pCtx.save();
+        pCtx.globalAlpha = alpha;
+        pCtx.translate(p.x, p.y);
+        pCtx.rotate(p.rot);
+        pCtx.fillStyle = p.color;
+        pCtx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        pCtx.restore();
+      }
+    }catch(err){
+      console.error('[Pirâmide da Sorte] erro no loop de partículas, recuperando:', err);
+    }
+    requestAnimationFrame(particlesLoop);
+  }
+  requestAnimationFrame(particlesLoop);
+
+  /* =========================================================
+     FOLLOW — celebração sutil
+     ========================================================= */
+  const followToast = document.getElementById('followToast');
+  let followTimer;
+  function celebrateFollow(user){
+    followToast.textContent = `🎉 ${user} seguiu!`;
+    followToast.classList.add('show');
+    clearTimeout(followTimer);
+    followTimer = setTimeout(() => followToast.classList.remove('show'), 2200);
+    spawnParticles(pCanvas.width/2, pCanvas.height*0.1, 18,
+      ['#6affa0','#4fd1ff','#ffd76a','#ffffff'], { speed:5, gravity:0.2, life:40, size:5 });
+  }
+
+  /* =========================================================
+     TRATAMENTO DOS EVENTOS
+     - JOIN: entrou na live = 1 bolinha (nome do tipo é um "melhor
+       palpite" — avise se o seu WebSocket usar outro nome).
+     - COMMENT: 1 comentário = 1 bolinha.
+     - LIKE: 15 curtidas acumuladas = 1 bolinha.
+     - FOLLOW: 10 bolinhas + efeito visual.
+     - GIFT: 1 moeda = 5 bolinhas (sem teto).
+     Só conta enquanto a partida está rodando.
+     ========================================================= */
+  function handleEvent(evento){
+    if(!evento || !evento.type) return;
+    const user = evento.user || 'alguém';
+    if(matchState !== 'running') return;
+    rememberAvatar(evento);
+
+    switch(evento.type){
+      case 'JOIN': {
+        dropBallsForUser(1, user);
+        break;
+      }
+      case 'COMMENT': {
+        dropBallsForUser(1, user);
+        break;
+      }
+      case 'LIKE': {
+        const count = evento.count || 1;
+        likeAccumulators[user] = (likeAccumulators[user] || 0) + count;
+        let toDrop = 0;
+        while(likeAccumulators[user] >= 15){
+          likeAccumulators[user] -= 15;
+          toDrop++;
+        }
+        if(toDrop > 0) dropBallsForUser(toDrop, user);
+        break;
+      }
+      case 'FOLLOW': {
+        dropBallsForUser(10, user);
+        celebrateFollow(user);
+        break;
+      }
+      case 'GIFT': {
+        const { value, amount } = extractGiftValue(evento);
+        const ballCount = Math.round(value * 5); // sem teto — o valor do presente reflete o impacto total
+        showGiftToast(user, evento.gift, amount);
+        dropBallsForUser(ballCount, user);
+        break;
+      }
+      default:
+        console.warn('Tipo de evento desconhecido:', evento);
+    }
+  }
+
+  /* =========================================================
+     CONEXÃO WEBSOCKET — reconecta a cada 5s se cair
+     ========================================================= */
+  const wsStatusDot = document.getElementById('wsStatusDot');
+  const wsStatusLabel = document.getElementById('wsStatusLabel');
+  function connect(){
+    try{
+      const ws = new WebSocket(WS_URL);
+      ws.onopen = () => {
+        console.log('[Pirâmide da Sorte] conectado à Interactive Live');
+        wsStatusDot.className = 'status-dot on';
+        wsStatusLabel.textContent = 'Conectado';
+      };
+      ws.onmessage = (msg) => {
+        try{
+          const evento = JSON.parse(msg.data);
+          handleEvent(evento);
+        }catch(e){
+          console.error('[Pirâmide da Sorte] evento inválido recebido', e);
+        }
+      };
+      ws.onclose = () => {
+        console.log('[Pirâmide da Sorte] conexão fechada, tentando reconectar em 5s...');
+        wsStatusDot.className = 'status-dot off';
+        wsStatusLabel.textContent = 'Desconectado — reconectando...';
+        setTimeout(connect, 5000);
+      };
+      ws.onerror = (e) => console.error('[Pirâmide da Sorte] erro no WebSocket', e);
+    }catch(e){
+      console.error('[Pirâmide da Sorte] não foi possível conectar', e);
+      wsStatusDot.className = 'status-dot off';
+      wsStatusLabel.textContent = 'Erro de conexão';
+    }
+  }
+  connect();
+</script>
+</body>
+</html>
