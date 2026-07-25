@@ -54,8 +54,12 @@
     transition: width .25s ease, height .25s ease;
   }
   .game-frame.pc-mode{
-    width:min(94vw, calc(96vh * 16 / 9));
-    height:min(96vh, calc(94vw * 9 / 16));
+    width:min(58vw, calc(82vh * 16 / 9));
+    height:min(82vh, calc(58vw * 9 / 16));
+  }
+
+  .main-view{
+    display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; justify-content:center;
   }
 
   #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
@@ -197,9 +201,11 @@
 
   /* ---------- responsivo: abas no mobile ---------- */
   @media (max-width:1024px){
+    html, body{ height:100%; overflow:hidden; overscroll-behavior:none; }
     body{ flex-direction:column; align-items:stretch; justify-content:flex-start; padding:0; gap:0; }
+    .main-view{ display:contents; }
     .tab-bar{
-      display:flex; position:sticky; top:0; z-index:100; background:#0c1410;
+      display:flex; flex:0 0 auto; position:sticky; top:0; z-index:100; background:#0c1410;
       border-bottom:1px solid rgba(255,255,255,0.12);
     }
     .tab-btn{
@@ -207,11 +213,17 @@
       font-size:11px; font-weight:700; cursor:pointer; border-bottom:3px solid transparent;
     }
     .tab-btn.active{ color:var(--gold); border-bottom-color:var(--gold); }
-    .screen{ display:none !important; width:100%; max-width:100% !important; }
-    .game-frame.screen.active{ display:flex !important; width:100vw !important; height:calc(100vh - 46px) !important; }
+    .screen{ display:none !important; }
+    .screen.active{
+      width:100% !important; max-width:100% !important;
+      height:calc(100vh - 46px) !important;
+      overflow-y:auto !important; -webkit-overflow-scrolling:touch;
+      -ms-overflow-style: -ms-autohiding-scrollbar;
+    }
+    .game-frame.screen.active{ display:flex !important; }
     .control-panel.screen.active,
     .tabela-panel.screen.active,
-    .gift-config-panel.screen.active{ display:block !important; }
+    .gift-config-panel.screen.active{ display:block !important; max-height:none !important; }
   }
 </style>
 </head>
@@ -792,6 +804,7 @@
   <button class="tab-btn" data-tab="presentes">🎁 Presentes</button>
 </div>
 
+<div class="main-view">
 <div class="game-frame screen active" id="gameFrame" data-screen="torneio">
   <canvas id="particles"></canvas>
   <div class="follow-toast" id="followToast"></div>
@@ -832,6 +845,7 @@
     <span style="width:28px;text-align:center;">Pts</span>
   </div>
   <div id="tableBody"></div>
+</div>
 </div>
 
 <div class="control-panel screen" data-screen="live">
@@ -1007,6 +1021,27 @@
   let giftOfTeam = {};        // só times SELECIONADOS têm presente atribuído
   let availableGifts = GIFT_LIST.slice(); // "estoque" de presentes livres
 
+  // o nome que aparece no app (PT) pode não ser o mesmo que chega no evento
+  // do WebSocket (geralmente em EN) — aceita os dois
+  const GIFT_ALIASES = {
+    'Rosa': ['Rose'],
+    'Fatia de bolo': ['Cake Slice'],
+    'Presente da Comunidade': ['Community Gift', 'Community Heart'],
+    'Casquinha de sorvete': ['Ice Cream Cone'],
+    'Bom jogo': ['GG'],
+    'Bastão brilhante': ['Glow Stick'],
+    'Rosa branca': ['White Rose'],
+    'Amo você': ['Love you', 'Love You', 'Love you so much'],
+    'Incrível': ['Amazing'],
+    'Clássicas': ['Oldies'],
+    'Estilo livre': ['Freestyle'],
+    'Piscadinha': ['Wink wink', 'Wink Wink'],
+    'Um fragmento de esperança': ['A Shard of Hope'],
+    'Palmas': ['Clap Clap'],
+    'Fogo': ['Fire'],
+    'Bom trabalho': ['Good Job']
+  };
+
   function normalizeGiftName(str){
     return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
   }
@@ -1015,6 +1050,9 @@
     TEAM_BY_GIFT = {};
     Object.entries(giftOfTeam).forEach(([teamId, gift]) => {
       TEAM_BY_GIFT[normalizeGiftName(gift)] = teamId;
+      (GIFT_ALIASES[gift] || []).forEach(alias => {
+        TEAM_BY_GIFT[normalizeGiftName(alias)] = teamId;
+      });
     });
   }
   rebuildTeamByGift();
@@ -1552,7 +1590,10 @@
         console.log('[Copa do Brasil] presente recebido:', evento);
         if(tState !== 'running') break;
         const teamId = teamForGift(evento.gift);
-        if(!teamId) break;
+        if(!teamId){
+          console.warn('[Copa do Brasil] presente não reconhecido:', JSON.stringify(evento.gift), '— nomes aceitos:', Object.keys(TEAM_BY_GIFT));
+          break;
+        }
         const match = roundMatches.find(m => !m.winner && (m.a === teamId || m.b === teamId));
         if(!match) break;
         const { amount } = extractGiftValue(evento);
