@@ -54,12 +54,24 @@
     transition: width .25s ease, height .25s ease;
   }
   .game-frame.pc-mode{
-    width:min(58vw, calc(82vh * 16 / 9));
-    height:min(82vh, calc(58vw * 9 / 16));
+    width:min(72vw, calc(88vh * 16 / 9));
+    height:min(88vh, calc(72vw * 9 / 16));
   }
 
   .main-view{
     display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; justify-content:center;
+  }
+
+  .config-toggle-btn{
+    position:fixed; top:16px; right:16px; z-index:200;
+    background:#0c1410; color:var(--gold); border:1px solid var(--panel-border);
+    border-radius:10px; padding:10px 16px; cursor:pointer; font-weight:800; font-size:13px;
+  }
+  .config-toggle-btn:hover{ background:rgba(255,215,106,0.12); }
+  .config-drawer{ display:none; }
+  .config-drawer.open{
+    display:flex; gap:16px; flex-wrap:wrap; justify-content:center;
+    width:100%; margin-top:60px;
   }
 
   #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
@@ -201,11 +213,11 @@
 
   /* ---------- responsivo: abas no mobile ---------- */
   @media (max-width:1024px){
-    html, body{ height:100%; overflow:hidden; overscroll-behavior:none; }
-    body{ flex-direction:column; align-items:stretch; justify-content:flex-start; padding:0; gap:0; }
+    body{ flex-direction:column; align-items:stretch; justify-content:flex-start; padding:0; gap:0; overflow-y:auto; }
     .main-view{ display:contents; }
+    .config-drawer{ display:contents; }
     .tab-bar{
-      display:flex; flex:0 0 auto; position:sticky; top:0; z-index:100; background:#0c1410;
+      display:flex; position:sticky; top:0; z-index:100; background:#0c1410;
       border-bottom:1px solid rgba(255,255,255,0.12);
     }
     .tab-btn{
@@ -213,17 +225,12 @@
       font-size:11px; font-weight:700; cursor:pointer; border-bottom:3px solid transparent;
     }
     .tab-btn.active{ color:var(--gold); border-bottom-color:var(--gold); }
-    .screen{ display:none !important; }
-    .screen.active{
-      width:100% !important; max-width:100% !important;
-      height:calc(100vh - 46px) !important;
-      overflow-y:auto !important; -webkit-overflow-scrolling:touch;
-      -ms-overflow-style: -ms-autohiding-scrollbar;
-    }
-    .game-frame.screen.active{ display:flex !important; }
+    .config-toggle-btn{ display:none; }
+    .screen{ display:none !important; width:100%; max-width:100% !important; }
+    .game-frame.screen.active{ display:flex !important; width:100vw !important; height:calc(100vh - 46px) !important; }
     .control-panel.screen.active,
     .tabela-panel.screen.active,
-    .gift-config-panel.screen.active{ display:block !important; max-height:none !important; }
+    .gift-config-panel.screen.active{ display:block !important; }
   }
 </style>
 </head>
@@ -848,6 +855,10 @@
 </div>
 </div>
 
+<button class="config-toggle-btn" id="configToggleBtn">⚙️ Configurações</button>
+
+<div class="config-drawer" id="configDrawer">
+
 <div class="control-panel screen" data-screen="live">
   <h3>🎛️ CONFIG DA LIVE</h3>
   <div class="sub">Esses controles são só seus — não aparecem na live.</div>
@@ -911,6 +922,8 @@
   <div id="giftConfigList"></div>
 </div>
 
+</div>
+
 <script>
   /* =========================================================
      CONFIGURAÇÃO — lê username/key da URL, com fallback fixo
@@ -931,6 +944,10 @@
   }
   document.getElementById('choosePcBtn').addEventListener('click', () => chooseDevice('pc'));
   document.getElementById('chooseMobileBtn').addEventListener('click', () => chooseDevice('mobile'));
+
+  document.getElementById('configToggleBtn').addEventListener('click', () => {
+    document.getElementById('configDrawer').classList.toggle('open');
+  });
 
   /* =========================================================
      ABAS (mobile)
@@ -1117,11 +1134,17 @@
   function ensureTableEntry(teamId){
     if(!leagueTable[teamId]) leagueTable[teamId] = { played:0, wins:0, draws:0, losses:0, points:0 };
   }
+  function syncTableWithSelection(){
+    if(tState !== 'idle') return; // não mexe na tabela com o torneio já rolando
+    leagueTable = {};
+    Array.from(selectedTeamIds).forEach(id => ensureTableEntry(id));
+    renderTable();
+  }
   function renderTable(){
     const el = document.getElementById('tableBody');
     const rows = Object.entries(leagueTable)
       .map(([id, s]) => ({ id, ...s }))
-      .sort((a, b) => b.points - a.points || b.wins - a.wins);
+      .sort((a, b) => b.points - a.points || b.wins - a.wins || TEAM_NAME[a.id].localeCompare(TEAM_NAME[b.id]));
     el.innerHTML = '';
     if(rows.length === 0){
       el.innerHTML = '<div class="table-empty">Nenhuma partida disputada ainda.</div>';
@@ -1198,6 +1221,7 @@
         chip.classList.toggle('selected');
         updateCtrlCount();
         renderGiftConfigPanel();
+        syncTableWithSelection();
       });
       gridEl.appendChild(chip);
     });
@@ -1210,6 +1234,7 @@
   }
   buildCtrlTeamChips();
   renderGiftConfigPanel();
+  syncTableWithSelection();
 
   document.querySelectorAll('input[name="bracketMode"]').forEach(r => {
     r.addEventListener('change', e => { bracketMode = e.target.value; });
@@ -1226,6 +1251,7 @@
     championId = null;
     roundNum = 0;
     leagueTable = {};
+    Array.from(selectedTeamIds).forEach(id => ensureTableEntry(id));
     renderTable();
     prepareRound();
   }
