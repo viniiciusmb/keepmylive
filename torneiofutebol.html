@@ -44,34 +44,22 @@
   /* ---------- moldura do torneio (isso é o que aparece na live) ---------- */
   .game-frame{
     position:relative;
-    width:min(100vw, calc(100vh * 9 / 16));
-    height:min(96vh, calc(100vw * 16 / 9));
+    width:min(100vw, calc(98vh * 9 / 16));
+    height:min(98vh, calc(100vw * 16 / 9));
     overflow:hidden; display:flex; flex-direction:column; flex-shrink:0;
     background:
       radial-gradient(ellipse 65% 30% at 50% 0%, rgba(255,215,106,0.14), transparent 65%),
       repeating-linear-gradient(180deg, var(--pitch-1) 0px, var(--pitch-1) 40px, var(--pitch-2) 40px, var(--pitch-2) 80px);
     box-shadow: 0 0 60px rgba(0,0,0,0.7);
-    transition: width .25s ease, height .25s ease;
-  }
-  .game-frame.pc-mode{
-    width:min(72vw, calc(88vh * 16 / 9));
-    height:min(88vh, calc(72vw * 9 / 16));
   }
 
   .main-view{
     display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; justify-content:center;
   }
 
-  .config-toggle-btn{
-    position:fixed; top:16px; right:16px; z-index:200;
-    background:#0c1410; color:var(--gold); border:1px solid var(--panel-border);
-    border-radius:10px; padding:10px 16px; cursor:pointer; font-weight:800; font-size:13px;
-  }
-  .config-toggle-btn:hover{ background:rgba(255,215,106,0.12); }
-  .config-drawer{ display:none; }
-  .config-drawer.open{
+  .config-drawer{
     display:flex; gap:16px; flex-wrap:wrap; justify-content:center;
-    width:100%; margin-top:60px;
+    width:100%; margin-top:20px;
   }
 
   #particles{ position:absolute; inset:0; z-index:6; pointer-events:none; }
@@ -112,19 +100,22 @@
   @keyframes winnerPop{ 0%{ transform:scale(1); } 45%{ transform:scale(1.22); text-shadow:0 0 14px var(--gold); } 100%{ transform:scale(1); } }
   .winner-trophy{ margin:0 2px; }
 
-  .bracket-round-heading{
-    font-size:11px; font-weight:800; color:var(--gold); letter-spacing:0.5px;
-    margin:10px 0 4px; text-transform:uppercase;
+  .bracket-columns{ display:flex; gap:10px; overflow-x:auto; padding-bottom:8px; }
+  .bracket-col{ flex:0 0 auto; width:128px; display:flex; flex-direction:column; gap:12px; }
+  .bracket-col-title{
+    font-size:9px; font-weight:800; color:var(--gold); text-align:center;
+    letter-spacing:0.5px; text-transform:uppercase;
   }
-  .bracket-round-heading:first-child{ margin-top:0; }
-  .bracket-hist-row{
-    display:flex; align-items:center; justify-content:space-between; gap:6px;
-    padding:4px 6px; font-size:11px; border-radius:6px; margin-bottom:2px;
-    background:rgba(255,255,255,0.04);
-  }
-  .bracket-hist-row.decided{ background:rgba(255,215,106,0.06); animation:none; }
-  .bracket-hist-row.bye{ color:var(--text-dim); font-style:italic; justify-content:flex-start; }
-  .bh-score{ font-weight:800; color:var(--gold); flex:0 0 auto; }
+  .bracket-card{ background:rgba(255,255,255,0.05); border-radius:8px; padding:6px; font-size:9.5px; }
+  .bracket-card.decided{ background:rgba(255,215,106,0.1); }
+  .bracket-card-team{ display:flex; align-items:center; gap:4px; padding:2px 0; }
+  .bracket-card-team span:not(.bracket-card-score){ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bracket-card-team.winner{ color:var(--gold); font-weight:800; }
+  .bracket-card-team.loser{ opacity:0.5; text-decoration:line-through; }
+  .bracket-card-crest{ width:16px; height:16px; flex:0 0 auto; }
+  .bracket-card-score{ font-weight:800; color:var(--text-dim); margin-left:auto; flex:0 0 auto; }
+  .bracket-card-vs{ border-top:1px dashed rgba(255,255,255,0.15); margin:2px 0; }
+  .bracket-bye-card{ background:rgba(255,255,255,0.03); color:var(--text-dim); font-style:italic; font-size:8.5px; padding:6px; border-radius:8px; text-align:center; }
   .match-team-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
   .match-team-name.winner{ color:var(--gold); font-weight:800; }
   .match-team-name.loser{ opacity:0.5; text-decoration:line-through; }
@@ -245,7 +236,6 @@
       font-size:11px; font-weight:700; cursor:pointer; border-bottom:3px solid transparent;
     }
     .tab-btn.active{ color:var(--gold); border-bottom-color:var(--gold); }
-    .config-toggle-btn{ display:none; }
     .screen{ display:none !important; width:100%; max-width:100% !important; }
     .game-frame.screen.active{ display:flex !important; width:100vw !important; height:calc(100vh - 46px) !important; }
     .control-panel.screen.active,
@@ -813,18 +803,7 @@
 	</symbol>
 </svg>
 
-<div class="device-modal" id="deviceModal">
-  <div class="device-modal-card">
-    <h2>🏆 Copa do Brasil</h2>
-    <p>Você está transmitindo do PC ou do celular?</p>
-    <div class="device-modal-buttons">
-      <button class="device-btn" id="choosePcBtn">🖥️ PC</button>
-      <button class="device-btn" id="chooseMobileBtn">📱 Celular</button>
-    </div>
-  </div>
-</div>
-
-<div class="device-modal" id="modeModal" style="display:none;">
+<div class="device-modal" id="modeModal">
   <div class="device-modal-card">
     <h2>⚽ Formato do campeonato</h2>
     <p>Como você quer jogar?</p>
@@ -885,8 +864,6 @@
   <div id="tableBody"></div>
 </div>
 </div>
-
-<button class="config-toggle-btn" id="configToggleBtn">⚙️ Configurações</button>
 
 <div class="config-drawer" id="configDrawer">
 
@@ -970,17 +947,9 @@
   const gameFrame = document.getElementById('gameFrame');
 
   /* =========================================================
-     POPUP INICIAL — PC/celular, depois formato do campeonato
+     POPUP INICIAL — formato do campeonato
      ========================================================= */
   let gameMode = 'copa'; // 'copa' | 'brasileirao'
-  function chooseDevice(mode){
-    document.getElementById('deviceModal').style.display = 'none';
-    gameFrame.classList.toggle('pc-mode', mode === 'pc');
-    document.getElementById('modeModal').style.display = 'flex';
-  }
-  document.getElementById('choosePcBtn').addEventListener('click', () => chooseDevice('pc'));
-  document.getElementById('chooseMobileBtn').addEventListener('click', () => chooseDevice('mobile'));
-
   function chooseGameMode(mode){
     gameMode = mode;
     document.getElementById('modeModal').style.display = 'none';
@@ -988,10 +957,6 @@
   }
   document.getElementById('chooseCopaBtn').addEventListener('click', () => chooseGameMode('copa'));
   document.getElementById('chooseLigaBtn').addEventListener('click', () => chooseGameMode('brasileirao'));
-
-  document.getElementById('configToggleBtn').addEventListener('click', () => {
-    document.getElementById('configDrawer').classList.toggle('open');
-  });
 
   /* =========================================================
      ABAS (mobile)
@@ -1217,35 +1182,54 @@
      ========================================================= */
   let bracketHistory = []; // [{roundNum, matches:[{a,b,goalsA,goalsB,winner}], byes:[...]}]
   function renderBracketHistory(){
-    const el = document.getElementById('tableBody');
-    el.innerHTML = '';
+    const container = document.getElementById('tableBody');
+    container.innerHTML = '';
     const rounds = bracketHistory.concat(
       (roundMatches.length || roundByes.length) ? [{ roundNum, matches: roundMatches, byes: roundByes }] : []
     );
     if(rounds.length === 0){
-      el.innerHTML = '<div class="table-empty">O chaveamento vai aparecendo aqui conforme as rodadas acontecem.</div>';
+      container.innerHTML = '<div class="table-empty">O chaveamento vai aparecendo aqui conforme as rodadas acontecem.</div>';
       return;
     }
+    const wrap = document.createElement('div');
+    wrap.className = 'bracket-columns';
     rounds.forEach(rd => {
-      const heading = document.createElement('div');
-      heading.className = 'bracket-round-heading';
-      heading.textContent = `Rodada ${rd.roundNum}`;
-      el.appendChild(heading);
+      const col = document.createElement('div');
+      col.className = 'bracket-col';
+      const title = document.createElement('div');
+      title.className = 'bracket-col-title';
+      title.textContent = `Rodada ${rd.roundNum}`;
+      col.appendChild(title);
       rd.matches.forEach(m => {
-        const row = document.createElement('div');
-        row.className = 'bracket-hist-row' + (m.winner ? ' decided' : '');
-        const aTxt = m.winner === m.a ? `🏆 ${TEAM_NAME[m.a]}` : TEAM_NAME[m.a];
-        const bTxt = m.winner === m.b ? `🏆 ${TEAM_NAME[m.b]}` : TEAM_NAME[m.b];
-        row.innerHTML = `<span>${aTxt}</span><span class="bh-score">${m.goalsA}x${m.goalsB}</span><span>${bTxt}</span>`;
-        el.appendChild(row);
+        const card = document.createElement('div');
+        card.className = 'bracket-card' + (m.winner ? ' decided' : '');
+        const aCls = m.winner ? (m.winner === m.a ? 'winner' : 'loser') : '';
+        const bCls = m.winner ? (m.winner === m.b ? 'winner' : 'loser') : '';
+        card.innerHTML = `
+          <div class="bracket-card-team ${aCls}">
+            <svg class="bracket-card-crest" viewBox="0 0 40 40"><use href="#${m.a}"></use></svg>
+            <span>${TEAM_NAME[m.a]}</span>
+            <span class="bracket-card-score">${m.goalsA}</span>
+          </div>
+          <div class="bracket-card-vs"></div>
+          <div class="bracket-card-team ${bCls}">
+            <svg class="bracket-card-crest" viewBox="0 0 40 40"><use href="#${m.b}"></use></svg>
+            <span>${TEAM_NAME[m.b]}</span>
+            <span class="bracket-card-score">${m.goalsB}</span>
+          </div>
+        `;
+        col.appendChild(card);
       });
       rd.byes.forEach(id => {
-        const row = document.createElement('div');
-        row.className = 'bracket-hist-row bye';
-        row.textContent = `🎟️ ${TEAM_NAME[id]} passou de bye`;
-        el.appendChild(row);
+        const card = document.createElement('div');
+        card.className = 'bracket-bye-card';
+        card.innerHTML = `🎟️ ${TEAM_NAME[id]}<br>de bye`;
+        col.appendChild(card);
       });
+      wrap.appendChild(col);
     });
+    container.appendChild(wrap);
+    wrap.scrollLeft = wrap.scrollWidth;
   }
 
   function renderSidePanel(){
