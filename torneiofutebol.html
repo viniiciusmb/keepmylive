@@ -103,8 +103,28 @@
   .match-row.decided{ background:rgba(255,215,106,0.08); }
   .match-team{ flex:1 1 0; min-width:0; display:flex; align-items:center; gap:5px; }
   .match-team.right{ flex-direction:row-reverse; text-align:right; }
-  .team-gift-icon{ width:20px; height:20px; flex:0 0 auto; border-radius:4px; object-fit:contain; background:rgba(255,255,255,0.1); }
-  .match-crest{ width:24px; height:24px; flex:0 0 auto; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
+  .team-gift-icon{ width:clamp(20px,4.8vw,30px); height:clamp(20px,4.8vw,30px); flex:0 0 auto; border-radius:5px; object-fit:contain; background:rgba(255,255,255,0.1); }
+  .match-crest{ width:clamp(26px,6.2vw,36px); height:clamp(26px,6.2vw,36px); flex:0 0 auto; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
+  .match-team-name.leading{ color:var(--gold); font-weight:800; text-shadow:0 0 8px rgba(255,215,106,0.6); }
+  .match-row.decided{ animation: rowWinFlash 0.7s ease; }
+  @keyframes rowWinFlash{ 0%{ background:rgba(255,215,106,0.4); } 100%{ background:rgba(255,215,106,0.08); } }
+  .match-team-name.winner{ animation: winnerPop 0.6s ease; display:inline-block; }
+  @keyframes winnerPop{ 0%{ transform:scale(1); } 45%{ transform:scale(1.22); text-shadow:0 0 14px var(--gold); } 100%{ transform:scale(1); } }
+  .winner-trophy{ margin:0 2px; }
+
+  .bracket-round-heading{
+    font-size:11px; font-weight:800; color:var(--gold); letter-spacing:0.5px;
+    margin:10px 0 4px; text-transform:uppercase;
+  }
+  .bracket-round-heading:first-child{ margin-top:0; }
+  .bracket-hist-row{
+    display:flex; align-items:center; justify-content:space-between; gap:6px;
+    padding:4px 6px; font-size:11px; border-radius:6px; margin-bottom:2px;
+    background:rgba(255,255,255,0.04);
+  }
+  .bracket-hist-row.decided{ background:rgba(255,215,106,0.06); animation:none; }
+  .bracket-hist-row.bye{ color:var(--text-dim); font-style:italic; justify-content:flex-start; }
+  .bh-score{ font-weight:800; color:var(--gold); flex:0 0 auto; }
   .match-team-name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
   .match-team-name.winner{ color:var(--gold); font-weight:800; }
   .match-team-name.loser{ opacity:0.5; text-decoration:line-through; }
@@ -191,7 +211,7 @@
   .table-row{ display:flex; align-items:center; gap:4px; padding:4px; font-size:11.5px; border-radius:6px; margin-bottom:2px; }
   .table-row:nth-child(odd){ background:rgba(255,255,255,0.04); }
   .tbl-rank{ width:18px; color:var(--text-dim); font-weight:700; flex:0 0 auto; }
-  .tbl-crest{ width:22px; height:22px; flex:0 0 auto; }
+  .tbl-crest{ width:26px; height:26px; flex:0 0 auto; }
   .tbl-name{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
   .tbl-stat{ width:20px; text-align:center; flex:0 0 auto; color:var(--text-dim); }
   .tbl-pts{ width:28px; text-align:center; flex:0 0 auto; font-weight:800; color:var(--gold); }
@@ -203,9 +223,9 @@
     background:#0c1410; border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:16px;
   }
   .gift-config-row{ display:flex; align-items:center; gap:6px; padding:5px 2px; border-bottom:1px solid rgba(255,255,255,0.06); }
-  .gcfg-crest{ width:22px; height:22px; flex:0 0 auto; }
+  .gcfg-crest{ width:26px; height:26px; flex:0 0 auto; }
   .gcfg-name{ flex:1 1 0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
-  .gcfg-icon{ width:22px; height:22px; flex:0 0 auto; border-radius:4px; object-fit:contain; background:rgba(255,255,255,0.1); }
+  .gcfg-icon{ width:26px; height:26px; flex:0 0 auto; border-radius:5px; object-fit:contain; background:rgba(255,255,255,0.1); }
   .gcfg-select{
     flex:0 0 auto; max-width:118px; background:rgba(255,255,255,0.08); color:var(--text);
     border:1px solid var(--panel-border); border-radius:6px; font-size:10px; padding:3px 4px;
@@ -796,10 +816,21 @@
 <div class="device-modal" id="deviceModal">
   <div class="device-modal-card">
     <h2>🏆 Copa do Brasil</h2>
-    <p>Você está assistindo no PC ou no celular?</p>
+    <p>Você está transmitindo do PC ou do celular?</p>
     <div class="device-modal-buttons">
       <button class="device-btn" id="choosePcBtn">🖥️ PC</button>
       <button class="device-btn" id="chooseMobileBtn">📱 Celular</button>
+    </div>
+  </div>
+</div>
+
+<div class="device-modal" id="modeModal" style="display:none;">
+  <div class="device-modal-card">
+    <h2>⚽ Formato do campeonato</h2>
+    <p>Como você quer jogar?</p>
+    <div class="device-modal-buttons">
+      <button class="device-btn" id="chooseCopaBtn">🏆 Copa do Brasil<br><span style="font-weight:400;font-size:10px;opacity:.7;">mata-mata</span></button>
+      <button class="device-btn" id="chooseLigaBtn">📊 Brasileirão<br><span style="font-weight:400;font-size:10px;opacity:.7;">pontos corridos</span></button>
     </div>
   </div>
 </div>
@@ -839,9 +870,9 @@
 </div>
 
 <div class="tabela-panel screen" data-screen="tabela">
-  <h3>📊 TABELA DO CAMPEONATO</h3>
-  <div class="sub">3 pontos por vitória, 1 por empate, 0 por derrota. Byes não contam como jogo.</div>
-  <div class="table-header-row">
+  <h3 id="sidePanelTitle">📊 TABELA DO CAMPEONATO</h3>
+  <div class="sub" id="sidePanelSub">3 pontos por vitória, 1 por empate, 0 por derrota. Byes não contam como jogo.</div>
+  <div class="table-header-row" id="tableHeaderRow">
     <span style="width:18px;"></span>
     <span style="width:22px;"></span>
     <span style="flex:1;">Time</span>
@@ -870,13 +901,16 @@
   </div>
 
   <div class="control-section" id="setupSection">
+    <h4 id="setupModeLabel">🏆 Modo Copa do Brasil (mata-mata)</h4>
     <h4>Times do torneio (máx. 19 — 1 por presente confirmado)</h4>
     <div class="ctrl-teams-grid" id="ctrlTeamsGrid"></div>
     <div class="ctrl-count" id="ctrlCount">0 selecionados</div>
 
-    <h4 style="margin-top:12px;">Chaveamento</h4>
-    <label class="ctrl-radio-row"><input type="radio" name="bracketMode" value="random" checked> Aleatório</label>
-    <label class="ctrl-radio-row"><input type="radio" name="bracketMode" value="manual"> Eu escolho os confrontos</label>
+    <div id="bracketModeSection">
+      <h4 style="margin-top:12px;">Chaveamento</h4>
+      <label class="ctrl-radio-row"><input type="radio" name="bracketMode" value="random" checked> Aleatório</label>
+      <label class="ctrl-radio-row"><input type="radio" name="bracketMode" value="manual"> Eu escolho os confrontos</label>
+    </div>
 
     <h4 style="margin-top:12px;">Duração de cada rodada</h4>
     <div class="ctrl-num-row">
@@ -936,14 +970,24 @@
   const gameFrame = document.getElementById('gameFrame');
 
   /* =========================================================
-     POPUP INICIAL — PC ou celular
+     POPUP INICIAL — PC/celular, depois formato do campeonato
      ========================================================= */
+  let gameMode = 'copa'; // 'copa' | 'brasileirao'
   function chooseDevice(mode){
     document.getElementById('deviceModal').style.display = 'none';
     gameFrame.classList.toggle('pc-mode', mode === 'pc');
+    document.getElementById('modeModal').style.display = 'flex';
   }
   document.getElementById('choosePcBtn').addEventListener('click', () => chooseDevice('pc'));
   document.getElementById('chooseMobileBtn').addEventListener('click', () => chooseDevice('mobile'));
+
+  function chooseGameMode(mode){
+    gameMode = mode;
+    document.getElementById('modeModal').style.display = 'none';
+    applyGameModeUI();
+  }
+  document.getElementById('chooseCopaBtn').addEventListener('click', () => chooseGameMode('copa'));
+  document.getElementById('chooseLigaBtn').addEventListener('click', () => chooseGameMode('brasileirao'));
 
   document.getElementById('configToggleBtn').addEventListener('click', () => {
     document.getElementById('configDrawer').classList.toggle('open');
@@ -1138,7 +1182,7 @@
     if(tState !== 'idle') return; // não mexe na tabela com o torneio já rolando
     leagueTable = {};
     Array.from(selectedTeamIds).forEach(id => ensureTableEntry(id));
-    renderTable();
+    renderSidePanel();
   }
   function renderTable(){
     const el = document.getElementById('tableBody');
@@ -1167,6 +1211,148 @@
     });
   }
   renderTable();
+
+  /* =========================================================
+     CHAVEAMENTO (histórico) — usado no modo Copa do Brasil
+     ========================================================= */
+  let bracketHistory = []; // [{roundNum, matches:[{a,b,goalsA,goalsB,winner}], byes:[...]}]
+  function renderBracketHistory(){
+    const el = document.getElementById('tableBody');
+    el.innerHTML = '';
+    const rounds = bracketHistory.concat(
+      (roundMatches.length || roundByes.length) ? [{ roundNum, matches: roundMatches, byes: roundByes }] : []
+    );
+    if(rounds.length === 0){
+      el.innerHTML = '<div class="table-empty">O chaveamento vai aparecendo aqui conforme as rodadas acontecem.</div>';
+      return;
+    }
+    rounds.forEach(rd => {
+      const heading = document.createElement('div');
+      heading.className = 'bracket-round-heading';
+      heading.textContent = `Rodada ${rd.roundNum}`;
+      el.appendChild(heading);
+      rd.matches.forEach(m => {
+        const row = document.createElement('div');
+        row.className = 'bracket-hist-row' + (m.winner ? ' decided' : '');
+        const aTxt = m.winner === m.a ? `🏆 ${TEAM_NAME[m.a]}` : TEAM_NAME[m.a];
+        const bTxt = m.winner === m.b ? `🏆 ${TEAM_NAME[m.b]}` : TEAM_NAME[m.b];
+        row.innerHTML = `<span>${aTxt}</span><span class="bh-score">${m.goalsA}x${m.goalsB}</span><span>${bTxt}</span>`;
+        el.appendChild(row);
+      });
+      rd.byes.forEach(id => {
+        const row = document.createElement('div');
+        row.className = 'bracket-hist-row bye';
+        row.textContent = `🎟️ ${TEAM_NAME[id]} passou de bye`;
+        el.appendChild(row);
+      });
+    });
+  }
+
+  function renderSidePanel(){
+    if(gameMode === 'brasileirao') renderTable();
+    else renderBracketHistory();
+  }
+
+  function applyGameModeUI(){
+    const isCopa = gameMode === 'copa';
+    document.getElementById('bracketModeSection').style.display = isCopa ? 'block' : 'none';
+    document.getElementById('setupModeLabel').textContent = isCopa
+      ? '🏆 Modo Copa do Brasil (mata-mata)'
+      : '📊 Modo Brasileirão (pontos corridos)';
+    document.getElementById('sidePanelTitle').textContent = isCopa ? '🗂️ CHAVEAMENTO' : '📊 TABELA DO CAMPEONATO';
+    document.getElementById('sidePanelSub').textContent = isCopa
+      ? 'Quem joga contra quem em cada rodada, e quem avança pra próxima.'
+      : '3 pontos por vitória, 1 por empate, 0 por derrota. Cada time enfrenta todos os outros 2 vezes.';
+    document.getElementById('tableHeaderRow').style.display = isCopa ? 'none' : 'flex';
+    renderSidePanel();
+  }
+
+  /* =========================================================
+     MODO BRASILEIRÃO — pontos corridos (turno e returno)
+     ========================================================= */
+  let leagueSchedule = []; // array de rodadas, cada rodada = array de [timeA, timeB]
+  let leagueRoundIndex = 0;
+
+  function generateRoundRobinSchedule(teamIds){
+    let arr = teamIds.slice();
+    if(arr.length % 2 !== 0) arr.push(null); // bye
+    const n = arr.length;
+    const half = n / 2;
+    const firstLeg = [];
+    for(let r = 0; r < n - 1; r++){
+      const roundPairs = [];
+      for(let i = 0; i < half; i++){
+        const a = arr[i], b = arr[n - 1 - i];
+        if(a !== null && b !== null) roundPairs.push([a, b]);
+      }
+      firstLeg.push(roundPairs);
+      const fixed = arr[0];
+      const rest = arr.slice(1);
+      rest.unshift(rest.pop());
+      arr = [fixed, ...rest];
+    }
+    const secondLeg = firstLeg.map(roundPairs => roundPairs.map(([a, b]) => [b, a]));
+    return firstLeg.concat(secondLeg);
+  }
+
+  function createBrasileirao(){
+    if(selectedTeamIds.size < 2) return;
+    const minutes = Math.max(1, parseInt(document.getElementById('ctrlRoundMinutes').value, 10) || 5);
+    roundSeconds = minutes * 60;
+    leagueTable = {};
+    Array.from(selectedTeamIds).forEach(id => ensureTableEntry(id));
+    leagueSchedule = generateRoundRobinSchedule(Array.from(selectedTeamIds));
+    leagueRoundIndex = 0;
+    championId = null;
+    prepareLeagueRound();
+  }
+
+  function prepareLeagueRound(){
+    roundNum = leagueRoundIndex + 1;
+    const pairs = leagueSchedule[leagueRoundIndex] || [];
+    roundMatches = pairs.map(([a, b]) => ({ a, b, goalsA: 0, goalsB: 0, winner: null }));
+    const playing = new Set();
+    pairs.forEach(([a, b]) => { playing.add(a); playing.add(b); });
+    roundByes = Array.from(selectedTeamIds).filter(id => !playing.has(id));
+    tState = 'ready';
+    renderAll();
+  }
+
+  function endLeagueRound(){
+    if(roundTimerInterval) clearInterval(roundTimerInterval);
+    roundMatches.forEach(m => {
+      ensureTableEntry(m.a);
+      ensureTableEntry(m.b);
+      leagueTable[m.a].played++;
+      leagueTable[m.b].played++;
+      if(m.goalsA > m.goalsB){
+        leagueTable[m.a].wins++; leagueTable[m.a].points += 3;
+        leagueTable[m.b].losses++;
+        m.winner = m.a;
+      } else if(m.goalsB > m.goalsA){
+        leagueTable[m.b].wins++; leagueTable[m.b].points += 3;
+        leagueTable[m.a].losses++;
+        m.winner = m.b;
+      } else {
+        leagueTable[m.a].draws++; leagueTable[m.a].points += 1;
+        leagueTable[m.b].draws++; leagueTable[m.b].points += 1;
+        m.winner = null; // empate de verdade — ninguém "avança", só soma ponto
+      }
+    });
+    leagueRoundIndex++;
+    if(leagueRoundIndex >= leagueSchedule.length){
+      const sorted = Object.entries(leagueTable)
+        .map(([id, s]) => ({ id, ...s }))
+        .sort((a, b) => b.points - a.points || b.wins - a.wins || TEAM_NAME[a.id].localeCompare(TEAM_NAME[b.id]));
+      championId = sorted[0] ? sorted[0].id : null;
+      tState = 'champion';
+      spawnParticles(pCanvas.width/2, pCanvas.height*0.15, 40,
+        ['#ffd76a','#4fd1ff','#ff6ec7','#6affa0','#ffffff'], { speed:7, gravity:0.2, life:70, size:6 });
+    } else {
+      tState = 'round-ended';
+    }
+    renderAll();
+  }
 
   /* =========================================================
      ESTADO DO TORNEIO
@@ -1313,7 +1499,7 @@
     if(roundTimeLeft <= 0) endRound();
   }
 
-  function endRound(){
+  function endCopaRound(){
     if(roundTimerInterval) clearInterval(roundTimerInterval);
     roundMatches.forEach(m => {
       ensureTableEntry(m.a);
@@ -1334,7 +1520,11 @@
         m.winner = Math.random() < 0.5 ? m.a : m.b; // empate = sorteio pra decidir quem avança
       }
     });
-    renderTable();
+    bracketHistory.push({
+      roundNum,
+      matches: roundMatches.map(m => ({ ...m })),
+      byes: roundByes.slice()
+    });
     advancingPool = roundMatches.map(m => m.winner).concat(roundByes);
     if(advancingPool.length <= 1){
       championId = advancingPool[0] || null;
@@ -1347,9 +1537,15 @@
     renderAll();
   }
 
+  function endRound(){
+    if(gameMode === 'brasileirao') endLeagueRound();
+    else endCopaRound();
+  }
+
   function nextRound(){
     if(tState !== 'round-ended') return;
-    prepareRound();
+    if(gameMode === 'brasileirao') prepareLeagueRound();
+    else prepareRound();
   }
 
   function resetTournament(){
@@ -1360,6 +1556,10 @@
     roundByes = [];
     advancingPool = [];
     championId = null;
+    bracketHistory = [];
+    leagueSchedule = [];
+    leagueRoundIndex = 0;
+    syncTableWithSelection();
     renderAll();
   }
 
@@ -1389,17 +1589,25 @@
     roundMatches.forEach(m => {
       const row = document.createElement('div');
       row.className = 'match-row' + (m.winner ? ' decided' : '');
-      const aName = m.winner ? (m.winner === m.a ? 'winner' : 'loser') : '';
-      const bName = m.winner ? (m.winner === m.b ? 'winner' : 'loser') : '';
+      let aName = '', bName = '', aTrophy = '', bTrophy = '';
+      if(m.winner){
+        aName = m.winner === m.a ? 'winner' : 'loser';
+        bName = m.winner === m.b ? 'winner' : 'loser';
+        aTrophy = m.winner === m.a ? '<span class="winner-trophy">🏆</span>' : '';
+        bTrophy = m.winner === m.b ? '<span class="winner-trophy">🏆</span>' : '';
+      } else if(m.goalsA !== m.goalsB){
+        aName = m.goalsA > m.goalsB ? 'leading' : '';
+        bName = m.goalsB > m.goalsA ? 'leading' : '';
+      }
       row.innerHTML = `
         <div class="match-team">
           ${crestBlock(m.a)}
-          <span class="match-team-name ${aName}">${TEAM_NAME[m.a]}</span>
+          <span class="match-team-name ${aName}">${aTrophy}${TEAM_NAME[m.a]}</span>
         </div>
         <div class="match-score">${m.goalsA} x ${m.goalsB}</div>
         <div class="match-team right">
           ${crestBlock(m.b)}
-          <span class="match-team-name ${bName}">${TEAM_NAME[m.b]}</span>
+          <span class="match-team-name ${bName}">${TEAM_NAME[m.b]}${bTrophy}</span>
         </div>
       `;
       el.appendChild(row);
@@ -1498,11 +1706,15 @@
     renderRoundLabel();
     renderControlSections();
     renderPairingBuilder();
+    renderSidePanel();
     updateTimerDisplay();
   }
   renderAll();
 
-  document.getElementById('ctrlCreateBtn').addEventListener('click', createTournament);
+  document.getElementById('ctrlCreateBtn').addEventListener('click', () => {
+    if(gameMode === 'brasileirao') createBrasileirao();
+    else createTournament();
+  });
   document.getElementById('ctrlStartRoundBtn').addEventListener('click', () => {
     if(bracketMode === 'manual' && tState === 'building') confirmManualRound();
     startRound();
