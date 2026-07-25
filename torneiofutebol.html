@@ -85,14 +85,14 @@
     overflow-y:auto; padding:6px;
   }
   .match-row{
-    display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05);
-    border-radius:8px; padding:7px 8px; margin-bottom:5px; font-size:clamp(10px,2.6vw,13px);
+    display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05);
+    border-radius:8px; padding:7px 10px; margin-bottom:6px; font-size:clamp(10px,2.6vw,13px);
   }
   .match-row.decided{ background:rgba(255,215,106,0.08); }
-  .match-team{ flex:1 1 0; min-width:0; display:flex; align-items:center; gap:5px; }
+  .match-team{ flex:1 1 0; min-width:0; display:flex; align-items:center; gap:6px; }
   .match-team.right{ flex-direction:row-reverse; text-align:right; }
-  .team-gift-icon{ width:clamp(20px,4.8vw,30px); height:clamp(20px,4.8vw,30px); flex:0 0 auto; border-radius:5px; object-fit:contain; background:rgba(255,255,255,0.1); }
-  .match-crest{ width:clamp(26px,6.2vw,36px); height:clamp(26px,6.2vw,36px); flex:0 0 auto; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
+  .team-gift-icon{ width:clamp(18px,4vw,26px); height:clamp(18px,4vw,26px); flex:0 0 auto; border-radius:5px; object-fit:contain; background:rgba(255,255,255,0.1); }
+  .match-crest{ width:clamp(22px,5vw,30px); height:clamp(22px,5vw,30px); flex:0 0 auto; filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5)); }
   .match-team-name.leading{ color:var(--gold); font-weight:800; text-shadow:0 0 8px rgba(255,215,106,0.6); }
   .match-row.decided{ animation: rowWinFlash 0.7s ease; }
   @keyframes rowWinFlash{ 0%{ background:rgba(255,215,106,0.4); } 100%{ background:rgba(255,215,106,0.08); } }
@@ -105,29 +105,29 @@
 
   /* ---------- árvore do chaveamento com linhas (modo aleatório) ---------- */
   .bracket-tree-wrap{ display:flex; overflow-x:auto; padding-bottom:8px; align-items:flex-start; }
-  .bracket-tree-round{ display:flex; flex-direction:column; flex:0 0 auto; width:126px; }
+  .bracket-tree-round{ display:flex; flex-direction:column; flex:0 0 auto; width:180px; }
   .bracket-tree-col{ display:flex; flex-direction:column; justify-content:space-around; position:relative; }
-  .bracket-tree-round.has-next .bracket-tree-col{ padding-right:16px; }
+  .bracket-tree-round.has-next .bracket-tree-col{ padding-right:22px; }
   .bracket-tree-match{
     position:relative; background:rgba(255,255,255,0.05); border-radius:6px;
-    padding:4px 5px; font-size:8.5px;
+    padding:5px 7px; font-size:10.5px;
   }
   .bracket-tree-match.decided{ background:rgba(255,215,106,0.12); }
   .bracket-tree-match.bye{ background:rgba(255,255,255,0.03); }
   .bracket-tree-match.empty{ background:transparent; }
-  .bracket-tree-team{ display:flex; align-items:center; gap:3px; padding:1.5px 0; min-width:0; }
+  .bracket-tree-team{ display:flex; align-items:center; gap:5px; padding:2.5px 0; min-width:0; }
   .bracket-tree-team span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .bracket-tree-team.winner{ color:var(--gold); font-weight:800; }
   .bracket-tree-team.loser{ opacity:0.5; text-decoration:line-through; }
-  .bracket-tree-crest{ width:14px; height:14px; flex:0 0 auto; }
+  .bracket-tree-crest{ width:18px; height:18px; flex:0 0 auto; }
   .bracket-tree-score{ margin-left:auto; font-weight:800; color:var(--text-dim); flex:0 0 auto; }
-  .bracket-tree-bye-label{ font-size:7.5px; color:var(--text-dim); font-style:italic; text-align:center; }
+  .bracket-tree-bye-label{ font-size:8.5px; color:var(--text-dim); font-style:italic; text-align:center; }
   .bracket-tree-round.has-next .bracket-tree-match:not(.empty)::after{
-    content:''; position:absolute; top:50%; right:-16px; width:16px; height:1px;
+    content:''; position:absolute; top:50%; right:-22px; width:22px; height:1px;
     background:rgba(255,255,255,0.35); z-index:1;
   }
   .bracket-tree-round.has-next .bracket-tree-match.pair-top:not(.empty)::before{
-    content:''; position:absolute; top:50%; right:-16px; width:1px; height:var(--conn-h, 40px);
+    content:''; position:absolute; top:50%; right:-22px; width:1px; height:var(--conn-h, 40px);
     background:rgba(255,255,255,0.35); z-index:1;
   }
   .bracket-champion-box{
@@ -227,7 +227,7 @@
 
   /* ---------- painel: tabela do campeonato ---------- */
   .tabela-panel{
-    width:560px; max-width:94vw; max-height:98vh; overflow-y:auto; flex-shrink:0;
+    width:640px; max-width:96vw; max-height:98vh; overflow-y:auto; flex-shrink:0;
     background:#0c1410; border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:16px;
   }
   .tabela-panel .sub{ font-size:10.5px; color:var(--text-dim); margin-bottom:10px; line-height:1.4; }
@@ -1248,7 +1248,7 @@
 
   function renderBracketTreeWithLines(container, rounds){
     const slotCount = rounds[0].slots.length;
-    const matchHeight = 40;
+    const matchHeight = 54;
     const totalHeight = Math.max(90, slotCount * (matchHeight + 10));
 
     const wrap = document.createElement('div');
