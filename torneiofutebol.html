@@ -2059,16 +2059,18 @@
     liveFeedList.appendChild(row);
     feedRows.push(row);
   }
-  let feedQueue = [];
+  let feedHistory = [];
+  let feedDirty = false;
   function logFeed(icon, text){
-    feedQueue.push(`${icon} ${text}`);
+    feedHistory.push(`${icon} ${text}`);
+    if(feedHistory.length > MAX_FEED_ROWS) feedHistory.shift();
+    feedDirty = true;
   }
   function flushFeed(){
-    if(feedQueue.length === 0) return;
-    const toShow = feedQueue.slice(-MAX_FEED_ROWS);
-    feedQueue = [];
-    feedRows.forEach((row, i) => { row.textContent = toShow[i] || ''; });
-    const lastIdx = toShow.length - 1;
+    if(!feedDirty) return;
+    feedDirty = false;
+    feedRows.forEach((row, i) => { row.textContent = feedHistory[i] || ''; });
+    const lastIdx = feedHistory.length - 1;
     if(feedRows[lastIdx]){
       feedRows[lastIdx].classList.remove('rowFresh');
       void feedRows[lastIdx].offsetWidth;
