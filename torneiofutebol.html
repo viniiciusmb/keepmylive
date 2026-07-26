@@ -52,6 +52,9 @@
       repeating-linear-gradient(180deg, var(--pitch-1) 0px, var(--pitch-1) 40px, var(--pitch-2) 40px, var(--pitch-2) 80px);
     box-shadow: 0 0 60px rgba(0,0,0,0.7);
   }
+  @media (min-width:1024px){
+    .game-frame{ width:min(100vw, calc(100vh * 10.5 / 16)); height:min(100vh, calc(100vw * 16 / 10.5)); }
+  }
 
   .main-view{
     display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; justify-content:center;
@@ -80,10 +83,23 @@
   .round-label{ margin-top:2px; font-size:clamp(9px,2.6vw,12px); color:var(--text-dim); }
 
   .bracket-area{
-    flex:1 1 auto; margin:0.4vh 2.5vw 2vh; min-height:0; position:relative; z-index:2;
+    flex:1 1 auto; margin:0.4vh 2.5vw 0.8vh; min-height:0; position:relative; z-index:2;
     background:var(--panel-bg); border:1px solid var(--panel-border); border-radius:12px;
     overflow-y:auto; padding:6px;
   }
+  .live-feed{
+    flex:0 0 auto; height:15%; margin:0 2.5vw 1.6vh; min-height:60px; position:relative; z-index:2;
+    background:rgba(0,0,0,0.3); border:1px solid var(--panel-border); border-radius:10px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .live-feed-title{
+    font-size:8px; font-weight:800; color:var(--gold); letter-spacing:0.5px;
+    padding:4px 8px 2px; flex:0 0 auto; text-transform:uppercase;
+  }
+  .live-feed-list{ flex:1 1 auto; overflow:hidden; padding:0 8px 4px; display:flex; flex-direction:column; justify-content:flex-end; gap:1px; }
+  .live-feed-row{ font-size:8.5px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.3; }
+  .live-feed-row.rowFresh{ animation: feedFlash 0.6s ease; color:var(--gold); font-weight:700; }
+  @keyframes feedFlash{ 0%{ background:rgba(255,215,106,0.3); } 100%{ background:transparent; } }
   .match-row{
     display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05);
     border-radius:8px; padding:7px 10px; margin-bottom:6px; font-size:clamp(10px,2.6vw,13px);
@@ -170,6 +186,41 @@
     box-shadow:0 6px 18px rgba(106,255,160,0.4); white-space:nowrap;
   }
   .follow-toast.show{ opacity:1; transform:translate(-50%,0); }
+
+  .goal-toast{
+    position:absolute; top:44%; left:50%; transform:translate(-50%,-50%) scale(0.5);
+    background:linear-gradient(135deg, var(--gold), #c99a2e); color:#1a1000;
+    font-weight:900; padding:10px 16px; border-radius:16px;
+    opacity:0; z-index:9; pointer-events:none;
+    box-shadow:0 10px 30px rgba(0,0,0,0.5);
+    display:flex; align-items:center; gap:8px;
+  }
+  .goal-toast.show{ animation: goalPop 2.4s ease forwards; }
+  @keyframes goalPop{
+    0%{ opacity:0; transform:translate(-50%,-50%) scale(0.5); }
+    15%{ opacity:1; transform:translate(-50%,-50%) scale(1.1); }
+    25%{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+    82%{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+    100%{ opacity:0; transform:translate(-50%,-60%) scale(0.92); }
+  }
+  .goal-toast-avatar{
+    width:38px; height:38px; border-radius:50%; overflow:hidden; flex:0 0 auto;
+    border:2px solid #1a1000; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.15);
+  }
+  .goal-toast-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .fallback-initial{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; }
+  .goal-toast-plus{ font-size:20px; font-weight:900; }
+  .goal-toast-crest{ width:34px; height:34px; flex:0 0 auto; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  .goal-toast-text{ font-size:13px; line-height:1.2; white-space:nowrap; }
+  .goal-toast-text span{ font-size:10px; font-weight:700; opacity:0.85; }
+
+  .match-row.scored{ animation: scorePulse 0.6s ease; }
+  @keyframes scorePulse{
+    0%{ background:rgba(255,215,106,0.5); transform:scale(1); }
+    40%{ transform:scale(1.02); }
+    100%{ background:rgba(255,255,255,0.05); transform:scale(1); }
+  }
 
   .frame-status-overlay{
     position:absolute; inset:0; background:rgba(2,10,5,0.6); z-index:5;
@@ -858,6 +909,7 @@
 <div class="game-frame screen active" id="gameFrame" data-screen="torneio">
   <canvas id="particles"></canvas>
   <div class="follow-toast" id="followToast"></div>
+  <div class="goal-toast" id="goalToast"></div>
 
   <div class="camera-slot" id="cameraSlot">
     <span>📷 Espaço da câmera — configure sua câmera aqui pelo TikTok Live Studio</span>
@@ -872,6 +924,11 @@
   </div>
 
   <div class="bracket-area" id="bracketArea"></div>
+
+  <div class="live-feed">
+    <div class="live-feed-title">📡 Interações ao vivo</div>
+    <div class="live-feed-list" id="liveFeedList"></div>
+  </div>
 
   <div class="frame-status-overlay" id="frameStatusOverlay">
     <div class="frame-status-card" id="frameStatusCard">
@@ -1222,7 +1279,7 @@
     const container = document.getElementById('tableBody');
     container.innerHTML = '';
     const rounds = bracketHistory.concat(
-      (roundMatches.length || roundByes.length) ? [{ roundNum, matches: roundMatches, byes: roundByes, slots: roundSlots }] : []
+      (roundMatches.length || roundByes.length) ? [{ roundNum, stageLabel: currentStageLabel, matches: roundMatches, byes: roundByes, slots: roundSlots }] : []
     );
     if(rounds.length === 0){
       container.innerHTML = '<div class="table-empty">O chaveamento vai aparecendo aqui conforme as rodadas acontecem.</div>';
@@ -1259,7 +1316,7 @@
 
       const title = document.createElement('div');
       title.className = 'bracket-col-title';
-      title.textContent = `Rodada ${rd.roundNum}`;
+      title.textContent = rd.stageLabel || `Rodada ${rd.roundNum}`;
       roundWrap.appendChild(title);
 
       const col = document.createElement('div');
@@ -1317,7 +1374,7 @@
       col.className = 'bracket-col';
       const title = document.createElement('div');
       title.className = 'bracket-col-title';
-      title.textContent = `Rodada ${rd.roundNum}`;
+      title.textContent = rd.stageLabel || `Rodada ${rd.roundNum}`;
       col.appendChild(title);
       rd.matches.forEach(m => {
         const card = document.createElement('div');
@@ -1567,8 +1624,18 @@
     prepareRound();
   }
 
+  function copaStageName(poolSize){
+    if(poolSize >= 16) return 'Oitavas de Final';
+    if(poolSize === 8) return 'Quartas de Final';
+    if(poolSize === 4) return 'Semifinal';
+    if(poolSize === 2) return 'Final';
+    return null; // tamanho fora do padrão — usa "Rodada N" como já era
+  }
+  let currentStageLabel = null;
+
   function prepareRound(){
     roundNum++;
+    currentStageLabel = gameMode === 'copa' ? copaStageName(advancingPool.length) : null;
     if(bracketMode === 'random'){
       const pool = advancingPool; // posições FIXAS (time ou null = bye)
       roundMatches = [];
@@ -1661,6 +1728,7 @@
     });
     bracketHistory.push({
       roundNum,
+      stageLabel: currentStageLabel,
       matches: roundMatches.map(m => ({ ...m })),
       byes: roundByes.slice(),
       slots: roundSlots.map(s => s.type === 'match' ? { type:'match', match:{ ...s.match } } : { ...s })
@@ -1750,6 +1818,7 @@
     bracketHistory = [];
     leagueSchedule = [];
     leagueRoundIndex = 0;
+    currentStageLabel = null;
     syncTableWithSelection();
     renderAll();
   }
@@ -1834,7 +1903,7 @@
     const label = document.getElementById('roundLabel');
     if(tState === 'idle') label.textContent = 'Aguardando início do torneio';
     else if(tState === 'champion') label.textContent = 'Torneio encerrado';
-    else label.textContent = `Rodada ${roundNum}`;
+    else label.textContent = currentStageLabel || `Rodada ${roundNum}`;
   }
 
   function renderControlSections(){
@@ -1861,7 +1930,7 @@
   function renderPairingBuilder(){
     if(tState === 'ready' && bracketMode === 'random'){
       document.getElementById('pairingSection').style.display = 'block';
-      document.getElementById('pairingTitle').textContent = `Rodada ${roundNum} — confrontos sorteados`;
+      document.getElementById('pairingTitle').textContent = (currentStageLabel || `Rodada ${roundNum}`) + ' — confrontos sorteados';
       document.getElementById('pairingGrid').style.display = 'none';
       const list = document.getElementById('manualPairsList');
       list.innerHTML = roundMatches.map(m => `<div class="manual-pair-row"><span>${TEAM_NAME[m.a]}</span><span>×</span><span>${TEAM_NAME[m.b]}</span></div>`).join('')
@@ -1874,7 +1943,7 @@
       return;
     }
     document.getElementById('pairingSection').style.display = 'block';
-    document.getElementById('pairingTitle').textContent = `Rodada ${roundNum} — monte os confrontos`;
+    document.getElementById('pairingTitle').textContent = (currentStageLabel || `Rodada ${roundNum}`) + ' — monte os confrontos';
     const grid = document.getElementById('pairingGrid');
     grid.style.display = 'grid';
     grid.innerHTML = '';
@@ -1979,6 +2048,36 @@
   requestAnimationFrame(particlesLoop);
 
   /* =========================================================
+     FEED DE INTERAÇÕES AO VIVO — em lote, pra nunca travar
+     ========================================================= */
+  const MAX_FEED_ROWS = 5;
+  const liveFeedList = document.getElementById('liveFeedList');
+  const feedRows = [];
+  for(let i = 0; i < MAX_FEED_ROWS; i++){
+    const row = document.createElement('div');
+    row.className = 'live-feed-row';
+    liveFeedList.appendChild(row);
+    feedRows.push(row);
+  }
+  let feedQueue = [];
+  function logFeed(icon, text){
+    feedQueue.push(`${icon} ${text}`);
+  }
+  function flushFeed(){
+    if(feedQueue.length === 0) return;
+    const toShow = feedQueue.slice(-MAX_FEED_ROWS);
+    feedQueue = [];
+    feedRows.forEach((row, i) => { row.textContent = toShow[i] || ''; });
+    const lastIdx = toShow.length - 1;
+    if(feedRows[lastIdx]){
+      feedRows[lastIdx].classList.remove('rowFresh');
+      void feedRows[lastIdx].offsetWidth;
+      feedRows[lastIdx].classList.add('rowFresh');
+    }
+  }
+  setInterval(flushFeed, 300);
+
+  /* =========================================================
      FOLLOW — celebração sutil
      ========================================================= */
   const followToast = document.getElementById('followToast');
@@ -2010,6 +2109,75 @@
        partida ativa na rodada atual.
      - FOLLOW: efeito visual só.
      ========================================================= */
+  /* =========================================================
+     AVATARES — foto real do usuário quando o evento trouxer
+     ========================================================= */
+  let userAvatars = {};
+  const avatarColors = {};
+  function colorForUser(user){
+    if(!avatarColors[user]){
+      let hash = 0;
+      for(let i = 0; i < user.length; i++) hash = user.charCodeAt(i) + ((hash << 5) - hash);
+      avatarColors[user] = `hsl(${Math.abs(hash) % 360}, 62%, 45%)`;
+    }
+    return avatarColors[user];
+  }
+  function rememberAvatar(evento){
+    const url = evento.avatar || evento.avatarUrl || evento.avatar_url ||
+                evento.profilePictureUrl || evento.userAvatar || evento.photo;
+    if(url && evento.user) userAvatars[evento.user] = url;
+  }
+  function renderAvatarInto(container, user){
+    container.innerHTML = '';
+    const url = userAvatars[user];
+    if(url){
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = user;
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => renderFallbackInitial(container, user);
+      container.appendChild(img);
+    } else {
+      renderFallbackInitial(container, user);
+    }
+  }
+  function renderFallbackInitial(container, user){
+    container.innerHTML = '';
+    const fb = document.createElement('div');
+    fb.className = 'fallback-initial';
+    fb.textContent = (user || '?').charAt(0).toUpperCase();
+    fb.style.background = colorForUser(user || '?');
+    container.appendChild(fb);
+  }
+
+  /* =========================================================
+     POPUP DE GOL — foto da pessoa + escudo do time + "Nx gols"
+     ========================================================= */
+  function showGoalToast(user, teamId, amount){
+    const el = document.getElementById('goalToast');
+    el.innerHTML = `
+      <div class="goal-toast-avatar" id="goalToastAvatar"></div>
+      <div class="goal-toast-plus">+</div>
+      <svg class="goal-toast-crest" viewBox="0 0 40 40"><use href="#${teamId}"></use></svg>
+      <div class="goal-toast-text">${amount} ${amount === 1 ? 'GOL' : 'GOLS'}<br><span>${TEAM_NAME[teamId]}</span></div>
+    `;
+    renderAvatarInto(document.getElementById('goalToastAvatar'), user);
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+  }
+
+  function pulseMatchScore(teamId){
+    const matchIdx = roundMatches.findIndex(m => !m.winner && (m.a === teamId || m.b === teamId));
+    if(matchIdx === -1) return;
+    const rows = document.querySelectorAll('#bracketArea .match-row');
+    const row = rows[matchIdx];
+    if(!row) return;
+    row.classList.remove('scored');
+    void row.offsetWidth;
+    row.classList.add('scored');
+  }
+
   function handleEvent(evento){
     if(!evento || !evento.type) return;
     const user = evento.user || 'alguém';
@@ -2017,6 +2185,7 @@
     switch(evento.type){
       case 'GIFT': {
         console.log('[Copa do Brasil] presente recebido:', evento);
+        rememberAvatar(evento);
         if(tState !== 'running') break;
         const teamId = teamForGift(evento.gift);
         if(!teamId){
@@ -2028,15 +2197,30 @@
         const { amount } = extractGiftValue(evento);
         if(match.a === teamId) match.goalsA += amount;
         else match.goalsB += amount;
+        logFeed('🎁', `${user} deu ${amount}x presente pro ${TEAM_NAME[teamId]}`);
+        showGoalToast(user, teamId, amount);
         renderBracketArea();
+        pulseMatchScore(teamId);
         break;
       }
       case 'FOLLOW': {
+        rememberAvatar(evento);
+        logFeed('⭐', `${user} seguiu a live`);
         celebrateFollow(user);
         break;
       }
+      case 'COMMENT': {
+        rememberAvatar(evento);
+        logFeed('💬', `${user}: ${(evento.message || '').slice(0, 40)}`);
+        break;
+      }
+      case 'LIKE': {
+        rememberAvatar(evento);
+        const count = evento.count || 1;
+        logFeed('👍', `${user} curtiu x${count}`);
+        break;
+      }
       default:
-        // COMMENT e LIKE não afetam esse jogo — só presentes marcam gol
         break;
     }
   }
