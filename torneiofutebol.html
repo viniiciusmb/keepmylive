@@ -1177,7 +1177,14 @@
     });
   }
   function teamForGift(giftName){
-    return TEAM_BY_GIFT[normalizeGiftName(giftName)] || null;
+    const norm = normalizeGiftName(giftName);
+    if(!norm) return null;
+    if(TEAM_BY_GIFT[norm]) return TEAM_BY_GIFT[norm];
+    // reforço: correspondência parcial, pega variações de nome que a lista exata não previu
+    for(const key in TEAM_BY_GIFT){
+      if(key && (norm.includes(key) || key.includes(norm))) return TEAM_BY_GIFT[key];
+    }
+    return null;
   }
 
   function assignGiftToTeam(teamId, newGift){
@@ -2188,14 +2195,21 @@
       case 'GIFT': {
         console.log('[Copa do Brasil] presente recebido:', evento);
         rememberAvatar(evento);
-        if(tState !== 'running') break;
+        if(tState !== 'running'){
+          console.warn('[Copa do Brasil] presente ignorado — nenhuma rodada em andamento agora (estado atual:', tState, ')');
+          break;
+        }
         const teamId = teamForGift(evento.gift);
         if(!teamId){
-          console.warn('[Copa do Brasil] presente não reconhecido:', JSON.stringify(evento.gift), '— nomes aceitos:', Object.keys(TEAM_BY_GIFT));
+          console.warn('[Copa do Brasil] presente não reconhecido:', JSON.stringify(evento.gift), '— presentes cadastrados:', Object.keys(giftOfTeam).map(t => giftOfTeam[t]));
           break;
         }
         const match = roundMatches.find(m => !m.winner && (m.a === teamId || m.b === teamId));
-        if(!match) break;
+        if(!match){
+          console.warn('[Copa do Brasil] presente reconhecido pro', TEAM_NAME[teamId], 'mas esse time não está numa partida ativa nessa rodada (bye, já decidiu, ou não foi selecionado)');
+          logFeed('⚠️', `${user} deu presente pro ${TEAM_NAME[teamId]}, mas não está em partida agora`);
+          break;
+        }
         const { amount } = extractGiftValue(evento);
         if(match.a === teamId) match.goalsA += amount;
         else match.goalsB += amount;
