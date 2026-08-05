@@ -1,0 +1,1709 @@
+<meta charset="utf-8">
+<title>Batalha Naval Pirata — Jogo de Live</title>
+<style>
+  :root{ --gold:#e8c05a; --gold2:#c9962f; --wood:#6b4423; --sea:#12314e; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#06090d;color:#eae3d2;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  body{display:flex;flex-wrap:wrap;align-items:flex-start;gap:18px;padding:18px;}
+
+  /* ==================== O QUE APARECE NA LIVE ==================== */
+  .game-frame{
+    position:relative;width:min(52vh,430px);aspect-ratio:9/16;
+    background:#04070b;overflow:hidden;border-radius:6px;
+    box-shadow:0 0 0 1px #241c12, 0 18px 60px rgba(0,0,0,.75);flex:0 0 auto;
+  }
+  .game-frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block;
+    image-rendering:pixelated;image-rendering:crisp-edges;}
+  .layer{position:absolute;inset:0;pointer-events:none}
+
+  /* barra de níveis de presente (topo) */
+  #tierBar{
+    position:absolute;top:1%;left:2%;right:2%;display:flex;gap:1.6%;
+    font-size:clamp(5.5px,1.62vh,10px);
+  }
+  #tierBar .t{
+    flex:1;background:rgba(6,10,16,.78);border:1px solid rgba(232,192,90,.28);
+    border-radius:7px;padding:4px 2px 5px;text-align:center;line-height:1.2;
+  }
+  #tierBar .t .cn{display:block;font-weight:900;color:var(--gold);font-size:1.22em}
+  #tierBar .t .nm{display:block;font-weight:800;letter-spacing:.02em}
+  #tierBar .t .hp{display:block;opacity:.66;font-size:.86em}
+  #tierBar .t.t4{border-color:rgba(160,90,220,.6);box-shadow:0 0 12px rgba(150,80,220,.22) inset}
+
+  #topRow{
+    position:absolute;top:10.5%;left:2.5%;right:2.5%;display:flex;
+    justify-content:space-between;font-size:clamp(6px,1.72vh,11px);
+  }
+  .chip{
+    background:rgba(6,10,16,.8);border:1px solid rgba(232,192,90,.26);
+    border-radius:999px;padding:3px 10px;font-weight:800;letter-spacing:.04em;
+    display:flex;align-items:center;gap:5px;
+  }
+
+  /* fila de espera */
+  #queueBox{
+    position:absolute;left:2.5%;bottom:2.2%;width:47%;
+    background:rgba(6,10,16,.78);border:1px solid rgba(232,192,90,.22);
+    border-radius:9px;padding:5px 7px;font-size:clamp(5.5px,1.55vh,10px);
+  }
+  /* ranking de medalhas */
+  #rankBox{
+    position:absolute;right:2.5%;bottom:2.2%;width:47%;
+    background:rgba(6,10,16,.78);border:1px solid rgba(232,192,90,.22);
+    border-radius:9px;padding:5px 7px;font-size:clamp(5.5px,1.55vh,10px);
+  }
+  #queueBox h4,#rankBox h4{
+    margin:0 0 3px;font-size:1em;letter-spacing:.07em;opacity:.72;font-weight:800;
+    display:flex;justify-content:space-between;
+  }
+  .li{display:flex;gap:4px;align-items:center;line-height:1.42}
+  .li i{font-style:normal;opacity:.55;width:1.15em;flex:0 0 auto}
+  .li b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+  .li u{text-decoration:none;font-weight:900;color:var(--gold);flex:0 0 auto}
+  .li .tg{font-size:.82em;padding:0 3px;border-radius:3px;font-weight:900;flex:0 0 auto}
+
+  /* feed de presentes */
+  #feed{
+    position:absolute;left:2.5%;bottom:17%;width:56%;display:flex;
+    flex-direction:column;gap:3px;font-size:clamp(5.5px,1.6vh,10px);
+  }
+  #feed .row{
+    display:flex;align-items:center;gap:5px;background:rgba(8,12,18,.7);
+    border-radius:999px;padding:2px 8px 2px 2px;opacity:0;
+    transform:translateX(-12px);transition:opacity .3s,transform .3s;
+  }
+  #feed .row.on{opacity:1;transform:none}
+  #feed .av{width:2em;height:2em;border-radius:50%;background:#2b241a;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden}
+  #feed .av img{width:100%;height:100%;object-fit:cover;display:block}
+  #feed .tx{min-width:0;line-height:1.15}
+  #feed .tx b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #feed .tx span{opacity:.7;font-size:.85em}
+  #feed .amt{margin-left:auto;font-weight:900;font-style:italic;color:var(--gold)}
+
+  #bigMsg{
+    position:absolute;top:15.5%;left:50%;transform:translateX(-50%);
+    font-size:clamp(9px,2.7vh,18px);font-weight:900;letter-spacing:.09em;
+    padding:5px 16px;border-radius:7px;white-space:nowrap;opacity:0;
+    transition:opacity .3s;text-transform:uppercase;text-align:center;
+  }
+  #bigMsg.show{opacity:1}
+
+  #endScreen{
+    position:absolute;inset:0;display:none;flex-direction:column;padding:6% 5%;
+    font-size:clamp(6.5px,1.85vh,12px);background:#05080c;
+    background-image:radial-gradient(ellipse at 50% 12%, rgba(232,192,90,.14), transparent 62%);
+  }
+  #endScreen.show{display:flex}
+  .game-frame.ended .layer{opacity:0;transition:opacity .4s}
+  #endScreen h2{margin:0 0 1.5%;text-align:center;font-size:2.4em;font-weight:900;
+    letter-spacing:.05em;color:var(--gold);text-shadow:0 0 24px rgba(232,192,90,.4)}
+  #endScreen .sub{text-align:center;opacity:.62;margin-bottom:5%}
+  #podium{display:flex;align-items:flex-end;gap:3%;justify-content:center;margin-bottom:5%}
+  #podium .p{flex:1;max-width:31%;text-align:center}
+  #podium .p .pos{font-size:2.1em;font-weight:900;opacity:.32;line-height:1}
+  #podium .p .bar{border-radius:8px 8px 0 0;display:flex;flex-direction:column;
+    align-items:center;padding-top:7%;gap:1px;min-height:60px}
+  #podium .p .nm{font-weight:800;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;padding:0 4px;max-width:100%;color:#120e08}
+  #podium .p .md{font-weight:900;font-size:1.45em;color:#120e08}
+  #endList{flex:1;overflow-y:auto;border-top:1px solid rgba(232,192,90,.18);padding-top:3%}
+  #endList .er{display:flex;gap:6px;padding:2.3% 0;align-items:center;
+    border-bottom:1px solid rgba(255,255,255,.055)}
+  #endList .er i{font-style:normal;opacity:.5;width:2.2em;flex:0 0 auto;font-weight:700}
+  #endList .er b{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #endList .er u{text-decoration:none;color:var(--gold);font-weight:900}
+
+  #connBadge{position:absolute;left:50%;bottom:.5%;transform:translateX(-50%);
+    font-size:clamp(5px,1.35vh,9px);opacity:.42;letter-spacing:.05em}
+
+  /* ==================== PAINEL DO STREAMER ==================== */
+  .control-panel{
+    flex:1 1 380px;min-width:330px;max-width:640px;background:#0d1015;
+    border:1px solid #1f2530;border-radius:12px;padding:16px;font-size:13px;
+  }
+  .control-panel h1{font-size:16px;margin:0 0 3px}
+  .control-panel .hint{font-size:11.5px;opacity:.55;margin:0 0 14px;line-height:1.5}
+  fieldset{border:1px solid #1f2530;border-radius:9px;padding:11px 12px 13px;margin:0 0 12px}
+  legend{font-size:11px;text-transform:uppercase;letter-spacing:.11em;opacity:.55;padding:0 6px;font-weight:700}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .grid.g3{grid-template-columns:1fr 1fr 1fr}
+  label{display:block;font-size:11px;opacity:.7;margin-bottom:3px}
+  input[type=text],input[type=number]{width:100%;background:#151a21;border:1px solid #252d38;
+    color:#eae3d2;border-radius:7px;padding:7px 9px;font:inherit;font-size:12.5px}
+  input:focus{outline:none;border-color:#3a4757}
+  .row2{display:flex;gap:8px;align-items:center;margin-top:9px;flex-wrap:wrap}
+  button{background:#232c38;border:0;border-radius:8px;color:#fff;font:inherit;
+    font-weight:700;font-size:12.5px;padding:9px 14px;cursor:pointer;transition:filter .15s}
+  button:hover{filter:brightness(1.25)}
+  button.primary{background:#1f7a4d}
+  button.danger{background:#a8392b}
+  button.warn{background:#8a6d1f}
+  .ck{display:flex;align-items:center;gap:7px;font-size:12px;opacity:.85;margin-top:8px}
+  .ck input{width:15px;height:15px;accent-color:#1f7a4d}
+  .ck label{margin:0}
+  .status{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700}
+  .status .dot{width:9px;height:9px;border-radius:50%;background:#a8392b;box-shadow:0 0 9px #a8392b}
+  .status.ok .dot{background:#1f9c5e;box-shadow:0 0 9px #1f9c5e}
+  .note{font-size:11px;opacity:.45;line-height:1.5;margin-top:8px}
+  #log{background:#080b0f;border:1px solid #1b212a;border-radius:7px;padding:8px;height:120px;
+    overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;
+    line-height:1.55;color:#8d9bab;white-space:pre-wrap}
+</style>
+
+<!-- =========== TUDO QUE VAI AO AR FICA DENTRO DE .game-frame =========== -->
+<div class="game-frame" id="gameFrame">
+  <canvas id="cv" width="1080" height="1920"></canvas>
+
+  <div class="layer">
+    <div id="tierBar">
+      <div class="t t1"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">10 vida</span></div>
+      <div class="t t2"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">100 vida</span></div>
+      <div class="t t3"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1.000 vida</span></div>
+      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10.000 vida</span></div>
+    </div>
+
+    <div id="topRow">
+      <div class="chip">⚓ <span id="fleetTxt">0/6 NAVIOS</span></div>
+      <div class="chip">⏱ <span id="matchTxt">--:--</span></div>
+    </div>
+
+    <div id="bigMsg"></div>
+    <div id="feed"></div>
+
+    <div id="queueBox">
+      <h4><span>FILA</span><span id="qCount">0</span></h4>
+      <div id="queueBody"></div>
+    </div>
+    <div id="rankBox">
+      <h4><span>🏅 MEDALHAS</span></h4>
+      <div id="rankBody"></div>
+    </div>
+
+    <div id="connBadge">desconectado</div>
+  </div>
+
+  <div id="endScreen">
+    <h2>ALMIRANTES</h2>
+    <div class="sub" id="endSub">quem juntou mais medalhas</div>
+    <div id="podium"></div>
+    <div id="endList"></div>
+  </div>
+</div>
+
+<!-- =========== PAINEL — NUNCA APARECE NA LIVE =========== -->
+<div class="control-panel">
+  <h1>Batalha Naval Pirata — Painel</h1>
+  <p class="hint">Capture <b>só a moldura à esquerda</b> no OBS / TikTok Live Studio.</p>
+
+  <fieldset>
+    <legend>Conexão</legend>
+    <div class="grid">
+      <div><label>Username</label><input type="text" id="inUser" placeholder="seu_usuario"></div>
+      <div><label>Key</label><input type="text" id="inKey" placeholder="sua_chave"></div>
+    </div>
+    <div class="row2">
+      <button id="btnConnect">Conectar</button>
+      <div class="status" id="connStatus"><span class="dot"></span><span>desconectado</span></div>
+    </div>
+    <p class="note">Também aceita pela URL: <code>?username=X&amp;key=Y</code></p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Regras</legend>
+    <div class="grid g3">
+      <div><label>Navios no mar</label><input type="number" id="inFleet" value="6" min="2" max="6" step="2"></div>
+      <div><label>Salvas p/ afundar</label><input type="number" id="inVolleys" value="18" min="4" max="60"></div>
+      <div><label>Intervalo salva (s)</label><input type="number" id="inRate" value="1.2" min="0.4" max="4" step="0.1"></div>
+    </div>
+    <div class="grid g3" style="margin-top:9px">
+      <div><label>Vida por moeda</label><input type="number" id="inHpPer" value="10" min="1" max="100"></div>
+      <div><label>Vitórias p/ aposentar</label><input type="number" id="inMaxWins" value="5" min="0" max="99"></div>
+      <div><label>Partida (min)</label><input type="number" id="inMatch" value="45" min="0" max="480"></div>
+    </div>
+    <div class="grid g3" style="margin-top:9px">
+      <div><label>Volume</label><input type="number" id="inVol" value="75" min="0" max="100"></div>
+    </div>
+    <p class="note"><b>Salvas p/ afundar</b> = quantos tiros um combate <i>de nível igual</i> dura.
+    18 × 1,2s ≈ 22s por batalha. Um nível acima mata em 2 salvas, dois níveis acima em 1.<br>
+    <b>Vitórias p/ aposentar</b>: depois de N vitórias seguidas o navio sai campeão e libera
+    a vaga. Sem isso, um navio forte fica pra sempre no mar e a fila nunca anda (0 = ilimitado).<br>
+    A fila entra por <b>quem mandou mais moedas</b>, não por ordem de chegada.</p>
+    <div class="ck"><input type="checkbox" id="ckFair" checked><label for="ckFair">Preferir adversário de nível parecido (recomendado)</label></div>
+    <div class="ck"><input type="checkbox" id="ckSink"><label for="ckSink">Afundado sai da fila (senão volta mandando presente)</label></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Partida</legend>
+    <div class="row2">
+      <button class="primary" id="btnStart">▶ Iniciar</button>
+      <button class="warn" id="btnPause">⏸ Pausar</button>
+      <button class="danger" id="btnEnd">⏹ Encerrar + Ranking</button>
+      <button id="btnReset">↺ Limpar</button>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Teste (sem live)</legend>
+    <div class="row2">
+      <button id="btnT1">1 moeda</button>
+      <button id="btnT2">10 moedas</button>
+      <button id="btnT3">100 moedas</button>
+      <button id="btnT4">1000 moedas</button>
+    </div>
+    <div class="row2">
+      <button id="btnFill">Encher o mar</button>
+      <button id="btnFlood">+12 na fila</button>
+      <button id="btnRepair">Reparar todos</button>
+    </div>
+    <p class="note">No console:<br>
+    <code>handleEvent({type:'GIFT',user:'teste',gift:'Rosa',amount:1,diamondCount:100})</code></p>
+  </fieldset>
+
+  <fieldset><legend>Console</legend><div id="log"></div></fieldset>
+</div>
+
+<script>
+"use strict";
+/* ============================================================================
+   BATALHA NAVAL PIRATA — jogo interativo de live (TikTok)
+   Arquivo único: sem build, sem dependências, sem assets externos.
+   Navios/capitães/mar/tiros desenhados por código em pixel art paramétrica.
+   ========================================================================== */
+
+const $ = id => document.getElementById(id);
+const clamp=(v,a,b)=>v<a?a:(v>b?b:v);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[(Math.random()*a.length)|0];
+const lerp=(a,b,t)=>a+(b-a)*t;
+const fmtN=n=>n>=1000?(n/1000).toFixed(n%1000?1:0).replace('.',',')+'k':String(Math.round(n));
+
+function logLine(t){
+  const el=$('log');
+  el.textContent += (el.textContent?'\n':'')+t;
+  const L=el.textContent.split('\n');
+  if(L.length>140) el.textContent=L.slice(-140).join('\n');
+  el.scrollTop=el.scrollHeight;
+}
+
+/* ============================================================================
+   1. NÍVEIS DE NAVIO
+   ========================================================================== */
+const TIERS = [
+  { i:0, coins:1,    name:'Jangada', short:'JANG', col:'#8b5a2b', medal:1    },
+  { i:1, coins:10,   name:'Barco',   short:'BARC', col:'#b8873a', medal:10   },
+  { i:2, coins:100,  name:'Galeão',  short:'GALE', col:'#e8c05a', medal:100  },
+  { i:3, coins:1000, name:'Supremo', short:'SUPR', col:'#a95ce0', medal:1000 }
+];
+function tierForCoins(c){
+  if(c>=1000) return 3;
+  if(c>=100)  return 2;
+  if(c>=10)   return 1;
+  return 0;
+}
+
+/* ============================================================================
+   2. FÁBRICA DE SPRITES — pixel art paramétrica
+   ========================================================================== */
+const C = {
+  woodD:'#3b2412', wood:'#5d3a1c', woodM:'#7a4c24', woodL:'#9c6634', woodH:'#bd8248',
+  goldD:'#8a6420', gold:'#c9962f', goldL:'#e8c05a',
+  sailD:'#b5a483', sail:'#ddd0b0', sailL:'#f0e7cf',
+  darkD:'#151119', dark:'#241d2b', darkL:'#372c42',
+  black:'#100d0c', iron:'#3a3a42', ironL:'#5c5c68',
+  bone:'#e9e4d6', purple:'#8b45d0', purpleL:'#c98cf5',
+  glass:'#ffd97a', red:'#b8322c'
+};
+
+/* especificação de cada nível: quanto maior, mais mastros, canhões e enfeites */
+const SHIP_SPEC = [
+  { w: 76, h: 62,  hw:24, deckY:44, depth:11, sheer:2.5, masts:[{x:0,  h:30, sails:[[6,15,13]] }],
+    cannons:1, ports:0, lanterns:0, castle:0, dark:false, glow:false, figure:false, bowsprit:9 },
+  { w:100, h: 86,  hw:33, deckY:62, depth:15, sheer:4,   masts:[{x:-3, h:44, sails:[[6,21,17],[26,17,12]] }],
+    cannons:2, ports:3, lanterns:1, castle:1, dark:false, glow:false, figure:false, bowsprit:13 },
+  { w:132, h:112,  hw:44, deckY:82, depth:20, sheer:6,
+    masts:[{x:-11,h:58, sails:[[6,25,20],[31,21,15]]}, {x:16, h:48, sails:[[8,20,16],[31,16,11]]}],
+    cannons:3, ports:5, lanterns:2, castle:2, dark:false, glow:false, figure:true, bowsprit:18 },
+  { w:168, h:142,  hw:56, deckY:104, depth:25, sheer:8,
+    masts:[{x:-19,h:74, sails:[[6,30,24],[35,26,18],[58,18,12]]},
+           {x:6,  h:66, sails:[[8,26,21],[34,22,15]]},
+           {x:30, h:52, sails:[[8,19,15],[28,15,11]]}],
+    cannons:5, ports:7, lanterns:3, castle:3, dark:true, glow:true, figure:true, bowsprit:24 }
+];
+
+const SPR_SCALE = 4;   // upscale do pixel art
+
+/* --- caveira pequenininha, usada em bandeiras e velas --- */
+function drawSkull(px,cx,cy,s,col,dcol){
+  if(s<=3){ px(cx-1,cy-1,3,3,col); px(cx-1,cy,1,1,dcol); px(cx+1,cy,1,1,dcol); return; }
+  px(cx-2,cy-2,5,4,col);            // crânio
+  px(cx-1,cy+2,3,1,col);            // maxilar
+  px(cx-2,cy-1,1,2,dcol);           // olho esq
+  px(cx+2,cy-1,1,2,dcol);           // olho dir
+  px(cx,cy+1,1,1,dcol);             // nariz
+}
+
+/* --- vela quadrada CENTRADA no mastro, enfunada, com faixas de rizo ---
+   (antes ela pendia só pra um lado do mastro e ficava com cara de mancha) --- */
+function drawSail(px,mx,topY,w,h,dark){
+  const main  = dark?'#4c4162':C.sail;      // escuras, mas ainda com leitura de vela
+  const shade = dark?'#332b45':C.sailD;
+  const lit   = dark?'#6b5c88':C.sailL;
+  const reef  = Math.max(4, Math.round(h/3));
+  for(let r=0;r<h;r++){
+    const t  = r/(h-1||1);
+    const wr = w*(0.88+0.22*t);                 // abre um pouco pra baixo
+    const belly = Math.sin(t*Math.PI)*w*0.09;   // barriga pro lado do vento
+    const x0 = mx - wr*0.5 + belly;
+    for(let i=0;i<wr;i++){
+      const u=i/wr;
+      px(x0+i, topY+r, 1,1, u<0.17?lit : (u>0.74?shade:main));
+    }
+    if(r>0 && r%reef===0) px(x0, topY+r, wr, 1, shade);      // faixa de rizo
+    if(r===h-1)           px(x0, topY+r, wr, 1, shade);      // ourela de baixo
+  }
+}
+
+/* --- casco: coluna por coluna, com quilha arredondada e proa erguida --- */
+function drawHull(px,spec,cx){
+  const {hw,deckY,depth,sheer} = spec;
+  for(let ix=-hw; ix<=hw; ix++){
+    const u = ix/hw;
+    const topY = deckY - sheer*u*u - (u>0.55? (u-0.55)*10 : 0);      // proa sobe mais
+    const bot  = deckY + depth*Math.sqrt(Math.max(0,1-u*u*0.90));
+    const x = cx+ix;
+    for(let y=Math.round(topY); y<=Math.round(bot); y++){
+      const d = (y-topY)/Math.max(1,bot-topY);
+      let col = C.wood;
+      if(d<0.13) col = C.woodH;                    // amurada iluminada
+      else if(((y|0)%4)===0) col = C.woodD;        // linhas de tábua
+      else if(d>0.74) col = C.woodD;               // sombra do bojo
+      else if(d>0.52) col = C.woodM;
+      else col = C.woodL;
+      if(Math.abs(ix)>hw-2) col = C.woodD;         // contorno
+      px(x,y,1,1,col);
+    }
+    // friso dourado logo abaixo da amurada
+    px(x, Math.round(topY)+2, 1, 1, ix%7===0?C.goldL:C.gold);
+  }
+}
+
+function makeShip(tier){
+  const spec = SHIP_SPEC[tier], S = SPR_SCALE;
+  const c = document.createElement('canvas');
+  c.width = spec.w*S; c.height = spec.h*S;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled=false;
+  g.scale(S,S);
+  const px=(x,y,w,h,col)=>{ g.fillStyle=col;
+    g.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h))); };
+
+  const cx = spec.w*0.5, deckY = spec.deckY;
+
+  /* halo roxo do navio lendário (por trás de tudo) */
+  if(spec.glow){
+    const gy = deckY - spec.h*0.30;
+    const gr = g.createRadialGradient(cx, gy, 4, cx, gy, spec.hw*1.3);
+    gr.addColorStop(0,   'rgba(168,96,236,.34)');
+    gr.addColorStop(0.55,'rgba(120,60,190,.16)');
+    gr.addColorStop(1,   'rgba(120,60,190,0)');
+    g.fillStyle=gr; g.fillRect(0,0,spec.w,spec.h);
+    for(let i=0;i<16;i++){                                   // fagulhas subindo
+      px(cx+rnd(-spec.hw*0.95,spec.hw*0.95), deckY-rnd(6,spec.h*0.72),
+         rnd(1,2.4), rnd(1,2.4),
+         Math.random()<0.5?'rgba(201,140,245,.7)':'rgba(168,96,236,.5)');
+    }
+  }
+
+  /* ---- mastros, vergas e velas ---- */
+  spec.masts.forEach((m,mi)=>{
+    const mx = cx + m.x;
+    const topY = deckY - m.h;
+    // velas primeiro (ficam atrás do mastro)
+    m.sails.forEach(([sy,sw,sh])=>{
+      const yardY = topY + sy;
+      drawSail(px, mx, yardY+2, sw, sh, spec.dark);
+      px(mx-sw*0.56, yardY, sw*1.12, 2, C.woodD);              // verga por cima da vela
+      px(mx-sw*0.56, yardY, sw*1.12, 1, C.woodL);
+      px(mx-sw*0.58, yardY, 2, 2, C.woodD);                    // pontas da verga
+      px(mx+sw*0.54, yardY, 2, 2, C.woodD);
+      if(spec.dark && sh>=15) drawSkull(px, mx, yardY+2+sh*0.5, 5, C.bone, '#1a1420');
+    });
+    // enxárcias
+    for(const dx of [-1,1]){
+      const n=4;
+      for(let i=1;i<=n;i++){
+        const fx = mx + dx*(spec.hw*0.30 + i*2.2);
+        for(let t=0;t<=1;t+=0.08){
+          px(lerp(mx,fx,t), lerp(topY+m.h*0.30, deckY-1, t), 1,1,'rgba(24,18,14,.55)');
+        }
+      }
+    }
+    // mastro
+    px(mx-1, topY, 2, m.h, C.woodM);
+    px(mx-1, topY, 1, m.h, C.woodL);
+    px(mx+1, topY, 1, m.h, C.woodD);
+    px(mx-2, topY+4, 4, 1, C.woodD);                            // cesto de gávea
+    // bandeira só no mastro principal
+    if(mi===0){
+      const fw=13, fh=9;
+      px(mx-1, topY-fh-2, 2, fh+3, C.woodD);                   // haste
+      for(let i=0;i<fw;i++){
+        const wav = Math.round(Math.sin(i*0.55)*1.3);          // pano ondulando
+        const cut = i>fw-4 ? (i-(fw-4))*1.6 : 0;               // recorte da ponta
+        px(mx+1+i, topY-fh-1+wav+cut*0.5, 1, fh-cut, C.black);
+      }
+      drawSkull(px, mx+5, topY-fh*0.5-1, 5, C.bone, C.black);
+    }
+  });
+
+  /* ---- casco ---- */
+  drawHull(px,spec,cx);
+
+  /* ---- castelo de popa (à esquerda, já que a proa aponta pra direita) ---- */
+  if(spec.castle){
+    const chH = 6+spec.castle*4, chW = spec.hw*0.46;
+    const bx = cx-spec.hw+1, by = deckY-chH;
+    for(let x=0;x<chW;x++){
+      const u = x/chW;
+      const top = by + (u<0.18 ? (0.18-u)*10 : 0);            // popa mais alta atrás
+      for(let y=Math.round(top); y<deckY+2; y++){
+        const d=(y-top)/Math.max(1,deckY+2-top);
+        let col = d<0.10?C.woodH : (((y|0)%4)===0?C.woodD : (u<0.28?C.woodL:C.woodM));
+        if(x<1) col=C.woodD;
+        px(bx+x,y,1,1,col);
+      }
+      px(bx+x, Math.round(top), 1, 1, x%5===0?C.goldL:C.gold);  // corrimão dourado
+    }
+    // janelas da cabine, acesas
+    for(let i=0;i<spec.castle;i++){
+      const wx = bx+3+i*4, wy = by+Math.max(3,chH*0.5);
+      px(wx-1,wy-1,4,5,C.woodD);
+      px(wx,wy,2,3, spec.glow?C.purpleL:C.glass);
+      px(wx,wy,2,1, C.goldL);
+    }
+  }
+
+  /* ---- portinholas e canhões (bordo voltado pra nós) ---- */
+  const portY = deckY + spec.depth*0.34;
+  for(let i=0;i<spec.ports;i++){
+    const t=(i+0.5)/spec.ports;
+    const x = cx-spec.hw*0.74 + t*spec.hw*1.48;
+    px(x-1.5, portY-1.5, 4, 4, C.woodD);
+    px(x-1,   portY-1,   3, 3, C.black);
+    px(x-1,   portY-1,   3, 1, C.goldD);
+  }
+  const canY = deckY - 1;
+  const canPos=[];
+  for(let i=0;i<spec.cannons;i++){
+    const t=(i+0.5)/spec.cannons;
+    const x = cx-spec.hw*0.62 + t*spec.hw*1.24;
+    px(x-2, canY-2, 6, 3, C.iron);          // tubo do canhão
+    px(x-2, canY-2, 6, 1, C.ironL);
+    px(x+4, canY-2, 2, 3, C.black);         // boca
+    canPos.push([x+5, canY-1]);
+  }
+  c._cannons = canPos;
+
+  /* ---- lanternas de popa ---- */
+  for(let i=0;i<spec.lanterns;i++){
+    const lx = cx-spec.hw+3+i*5, ly = deckY-spec.depth*0.2-6-i*2;
+    px(lx-1,ly,3,4,C.goldD); px(lx,ly+1,1,2, spec.glow?C.purpleL:C.glass);
+  }
+
+  /* ---- gurupés + figura de proa ---- */
+  const bx0 = cx+spec.hw-1, by0 = deckY-spec.sheer-2;
+  for(let i=0;i<spec.bowsprit;i++) px(bx0+i, by0-i*0.42, 2, 1.4, i%3===0?C.woodD:C.woodM);
+  if(spec.figure){
+    if(spec.glow) drawSkull(px, bx0+2, by0+2, 5, C.bone, C.purple);
+    else { px(bx0-1, by0+1, 3, 4, C.goldL); px(bx0, by0+2, 1, 2, C.goldD); }
+  }
+
+  c._spec = spec;
+  c._waterY = deckY + spec.depth*0.92;      // onde a linha d'água encosta
+  return c;
+}
+
+/* --- capitães: 4 níveis, mapa de caracteres (ficam pequenos no convés) --- */
+const CAP_PAL = [
+  { r:'#b8322c', c:'#5a4636', s:'#e8b98f', h:'#2a1d14', a:'#8a6a48', t:'#3a2b1e' },
+  { r:'#1f3f6b', c:'#22405f', s:'#e8b98f', h:'#241a12', a:'#c9962f', t:'#17120e' },
+  { r:'#7d1f24', c:'#8d2328', s:'#e8b98f', h:'#2b1c12', a:'#e8c05a', t:'#17120e' },
+  { r:'#2a1f3a', c:'#2f2340', s:'#e0cbb4', h:'#c9c2b4', a:'#c98cf5', t:'#120f18' }
+];
+const SPR_CAPTAIN = [
+  ["...ttttt...","..ttttttt..","...sssss...","...sesess..","...sssss...",
+   "....ccc....","..ccccccc..",".ccccccccc.",".ccccccccc.","..ccccccc..",
+   "..cc...cc..","..cc...cc..","..tt...tt..","..ttt.ttt.."],
+  ["..ttttttt..",".ttttttttt.","...aaaaa...","...sssss...","...sesess..",
+   "...sshss...","..ccccccc..",".ccccccccc.",".ccaaaaacc.",".ccccccccc.",
+   "..ccccccc..","..cc...cc..","..tt...tt..","..ttt.ttt.."],
+  [".a.ttttt.a.","..ttttttt..",".ttttttttt.","...aaaaa...","...sssss...",
+   "...sesess..","...sshss...","..rrrrrrr..",".rrraaarrr.",".rrrrrrrrr.",
+   ".rrraaarrr.","..rrrrrrr..","..rr...rr..","..tt...tt..","..ttt.ttt.."],
+  [".a.ttttt.a.","..ttttttt..",".ttttttttt.","...aaaaa...","...sssss...",
+   "...sesess..","...shhhs...","..ahhhhha..","..rrrrrrr..",".rrraaarrr.",
+   ".rrrrrrrrr.",".rrraaarrr.","..rrrrrrr..","..rr...rr..","..tt...tt..","..ttt.ttt.."]
+];
+function makeCaptain(tier){
+  const rows=SPR_CAPTAIN[tier], P=CAP_PAL[tier], S=SPR_SCALE;
+  const map={ t:P.t, c:P.c, r:P.r, s:P.s, h:P.h, a:P.a, e:'#141014' };
+  const w=rows.reduce((m,r)=>Math.max(m,r.length),0), h=rows.length;
+  const cv=document.createElement('canvas');
+  cv.width=w*S; cv.height=h*S;
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=false;
+  for(let y=0;y<h;y++) for(let x=0;x<rows[y].length;x++){
+    const ch=rows[y][x]; if(ch==='.') continue;
+    const col=map[ch]; if(!col) continue;
+    g.fillStyle=col; g.fillRect(x*S,y*S,S,S);
+  }
+  return cv;
+}
+
+const SPRITES = { ships:[], caps:[] };
+for(let t=0;t<4;t++){ SPRITES.ships.push(makeShip(t)); SPRITES.caps.push(makeCaptain(t)); }
+
+/* ============================================================================
+   3. ÁUDIO — sintetizado, nenhum arquivo externo
+   ========================================================================== */
+const Snd = {
+  ctx:null, master:null, vol:0.75, ready:false,
+  init(){ if(this.ctx) return;
+    try{ const AC=window.AudioContext||window.webkitAudioContext;
+      this.ctx=new AC(); this.master=this.ctx.createGain();
+      this.master.gain.value=this.vol; this.master.connect(this.ctx.destination);
+      this.ready=true;
+    }catch(e){ console.warn('áudio indisponível',e); } },
+  resume(){ if(this.ctx&&this.ctx.state==='suspended') this.ctx.resume(); },
+  setVol(v){ this.vol=v; if(this.master) this.master.gain.value=v; },
+  noise(d){ const n=(this.ctx.sampleRate*d)|0, b=this.ctx.createBuffer(1,n,this.ctx.sampleRate),
+    a=b.getChannelData(0); for(let i=0;i<n;i++) a[i]=Math.random()*2-1; return b; },
+  tone(f,t0,d,type,gain){ if(!this.ready) return;
+    const c=this.ctx,o=c.createOscillator(),g=c.createGain();
+    o.type=type||'triangle'; o.frequency.setValueAtTime(f,t0);
+    g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(gain||0.2,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+d);
+    o.connect(g); g.connect(this.master); o.start(t0); o.stop(t0+d+0.05); },
+
+  /* tiro de canhão: estouro grave + ruído */
+  cannon(power){
+    if(!this.ready) return;
+    const c=this.ctx,t0=c.currentTime, p=clamp(power||1,0.4,2.2);
+    const s=c.createBufferSource(); s.buffer=this.noise(0.4);
+    const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700*p;
+    const g=c.createGain();
+    g.gain.setValueAtTime(0.55*p,t0); g.gain.exponentialRampToValueAtTime(0.0008,t0+0.34);
+    s.connect(lp); lp.connect(g); g.connect(this.master); s.start(t0); s.stop(t0+0.4);
+    const o=c.createOscillator(),og=c.createGain(); o.type='sine';
+    o.frequency.setValueAtTime(120*p,t0); o.frequency.exponentialRampToValueAtTime(30,t0+0.22);
+    og.gain.setValueAtTime(0.5*p,t0); og.gain.exponentialRampToValueAtTime(0.0008,t0+0.26);
+    o.connect(og); og.connect(this.master); o.start(t0); o.stop(t0+0.3);
+  },
+  /* impacto de bala na madeira */
+  hit(){ if(!this.ready) return;
+    const c=this.ctx,t0=c.currentTime;
+    const s=c.createBufferSource(); s.buffer=this.noise(0.16);
+    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=1.1;
+    const g=c.createGain(); g.gain.setValueAtTime(0.32,t0);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+0.15);
+    s.connect(bp); bp.connect(g); g.connect(this.master); s.start(t0); s.stop(t0+0.18);
+  },
+  /* navio afundando */
+  sink(){ if(!this.ready) return;
+    const c=this.ctx,t0=c.currentTime;
+    const s=c.createBufferSource(); s.buffer=this.noise(1.5);
+    const lp=c.createBiquadFilter(); lp.type='lowpass';
+    lp.frequency.setValueAtTime(1500,t0); lp.frequency.exponentialRampToValueAtTime(180,t0+1.3);
+    const g=c.createGain(); g.gain.setValueAtTime(0.45,t0);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+1.4);
+    s.connect(lp); lp.connect(g); g.connect(this.master); s.start(t0); s.stop(t0+1.5);
+    this.tone(90,t0,0.9,'sine',0.3);
+  },
+  spawn(tier){ if(!this.ready) return;
+    const t0=this.ctx.currentTime, base=[392,494,587,784][tier];
+    [0,0.08,0.16].forEach((d,i)=>this.tone(base*(1+i*0.26),t0+d,0.26,'square',0.11));
+  },
+  repair(){ if(!this.ready) return;
+    const t0=this.ctx.currentTime;
+    [523,659,880].forEach((f,i)=>this.tone(f,t0+i*0.06,0.22,'triangle',0.11));
+  },
+  medal(){ if(!this.ready) return;
+    const t0=this.ctx.currentTime;
+    [784,988,1175,1568].forEach((f,i)=>this.tone(f,t0+i*0.07,0.3,'square',0.12));
+  },
+  fanfare(){ if(!this.ready) return;
+    const t0=this.ctx.currentTime;
+    [[392,0],[392,.15],[392,.3],[523,.48],[659,.72],[784,.96]]
+      .forEach(([f,d])=>this.tone(f,t0+d,0.44,'square',0.15));
+  }
+};
+
+/* ============================================================================
+   4. ESTADO
+   ========================================================================== */
+const CFG = { fleet:6, volleys:18, rate:1.2, hpPer:10, matchMin:45, fair:true, sinkOut:false, maxWins:5 };
+
+const G = {
+  running:false, paused:false, over:false,
+  matchLeft:0, t:0,
+  ships:new Map(),        // user -> navio no mar
+  queue:[],               // { user, coins, avatar }
+  fame:new Map(),         // user -> { user, medals, kills, bestTier, sunk }
+  balls:[], booms:[], splashes:[], floats:[],
+  shake:0
+};
+
+const BANDS = [0.88, 0.52, 0.20];   // profundidade de cada raia (longe -> perto)
+
+function readCfg(){
+  CFG.fleet   = clamp(+$('inFleet').value||6, 2, 6);
+  CFG.volleys = clamp(+$('inVolleys').value||18, 4, 60);
+  CFG.rate    = clamp(+$('inRate').value||1.2, 0.4, 4);
+  CFG.hpPer   = clamp(+$('inHpPer').value||10, 1, 100);
+  CFG.matchMin= clamp(+$('inMatch').value||0, 0, 480);
+  CFG.maxWins = clamp(+$('inMaxWins').value||0, 0, 99);
+  CFG.fair    = $('ckFair').checked;
+  CFG.sinkOut = $('ckSink').checked;
+}
+
+/* ============================================================================
+   5. EVENTOS DO BACKEND
+   ========================================================================== */
+function extractGiftValue(ev){
+  const amount = Number(ev.amount ?? ev.repeatCount ?? ev.comboCount ?? 1) || 1;
+  const coins  = Number(ev.diamondCount ?? ev.diamond_count ?? ev.coinCount ?? ev.price ?? ev.diamonds ?? 1) || 1;
+  let value = Number(ev.value);
+  if(!value || isNaN(value)) value = coins*amount;
+  return { amount, coins, value };
+}
+function extractAvatar(ev){
+  const keys=['avatar','avatarUrl','avatar_url','profilePictureUrl','userAvatar','photo','pic','profilePicture'];
+  for(const k of keys){ const v=ev[k]; if(typeof v==='string'&&/^https?:\/\//.test(v)) return v; }
+  return null;
+}
+
+function handleEvent(ev){
+  if(!ev||!ev.type) return;
+  if(ev.type==='GIFT') onGift(ev);
+  /* COMMENT/LIKE/FOLLOW não afetam a batalha — só presente entra no mar */
+}
+window.handleEvent = handleEvent;
+
+function onGift(ev){
+  const user=(ev.user||'').trim();
+  if(!user) return;
+  const giftName = ev.gift || ev.giftName || 'presente';
+  const { value, amount } = extractGiftValue(ev);
+  const coins = Math.max(1, Math.round(value));      // total de moedas do presente
+  const avatar = extractAvatar(ev);
+
+  pushFeed(user, giftName, amount, avatar, coins);
+
+  if(!G.running || G.over){
+    console.warn('presente fora de partida, ignorado:', user, coins);
+    return;
+  }
+
+  const ship = G.ships.get(user);
+  if(ship && !ship.sunk){ reinforce(ship, coins, avatar); return; }
+
+  // já está na fila? acumula as moedas dele
+  const q = G.queue.find(x=>x.user===user);
+  if(q){ q.coins += coins; if(avatar) q.avatar=avatar; renderQueue(); return; }
+
+  if(activeCount() < CFG.fleet && spawnShip(user, coins, avatar)) return;
+  G.queue.push({ user, coins, avatar });
+  renderQueue();
+  logLine('fila: '+user+' ('+coins+' moedas) — '+G.queue.length+' esperando');
+}
+
+/* ============================================================================
+   6. NAVIOS
+   ========================================================================== */
+/* navio afundando ou se aposentando já não ocupa vaga: a próxima pessoa
+   da fila pode zarpar enquanto ele ainda sai de cena */
+function activeCount(){
+  let n=0; for(const s of G.ships.values()) if(!s.sunk && !s.retiring) n++;
+  return n;
+}
+
+function fame(user){
+  let f=G.fame.get(user);
+  if(!f){ f={ user, medals:0, kills:0, bestTier:0, sunk:0 }; G.fame.set(user,f); }
+  return f;
+}
+
+/* escolhe a raia e o lado menos ocupados */
+function freeSlot(){
+  const occ = BANDS.map(()=>({'-1':null,'1':null}));
+  for(const s of G.ships.values()){
+    /* quem está afundando ou saindo de cena NÃO segura a vaga — se contasse,
+       activeCount() veria espaço, freeSlot() não daria vaga, e admitFromQueue
+       ficaria devolvendo a mesma pessoa pra fila pra sempre */
+    if(s.sunk || s.retiring) continue;
+    if(s.band!=null && occ[s.band]) occ[s.band][String(s.side)] = s;
+  }
+  // 1) raia que já tem exatamente 1 navio -> entra pra brigar com ele
+  for(let b=0;b<BANDS.length;b++){
+    const L=occ[b]['-1'], R=occ[b]['1'];
+    if(L&&!R) return {band:b, side:1};
+    if(R&&!L) return {band:b, side:-1};
+  }
+  // 2) raia vazia
+  for(let b=0;b<BANDS.length;b++) if(!occ[b]['-1']&&!occ[b]['1']) return {band:b, side:pick([-1,1])};
+  return null;
+}
+
+function spawnShip(user, coins, avatar){
+  const slot = freeSlot();
+  if(!slot) return null;          // quem chama decide o que fazer (fila)
+  const tier = tierForCoins(coins);
+  const maxHp = coins*CFG.hpPer;
+  const f = fame(user);
+  f.bestTier = Math.max(f.bestTier, tier);
+  const s = {
+    user, avatar, coins, tier,
+    hp: maxHp, maxHp,
+    band: slot.band, side: slot.side,
+    x: slot.side*SPAWN_X,            // entra por fora da tela
+    targetX: slot.side*engageX(slot.band),
+    facing: -slot.side,              // aponta pra dentro
+    opponent:null, engaged:false, volleyT:rnd(0,0.6),
+    sunk:false, sinkT:0, retiring:false, wins:0, retireAt:0,
+    bob: Math.random()*Math.PI*2,
+    flash:0, healFlash:0, upFlash:0,
+    medals: f.medals, kills: f.kills,
+    born: G.t
+  };
+  G.ships.set(user, s);
+  Snd.spawn(tier);
+  bigMsg((tier===3?'⚡ ':'')+'NAVIO DE '+user.toUpperCase()+' — '+TIERS[tier].name.toUpperCase(),
+         TIERS[tier].col);
+  logLine('⚓ '+user+' entrou com '+TIERS[tier].name+' ('+coins+' moedas, '+maxHp+' vida)');
+  return s;
+}
+
+/* presente de quem já está no mar: upgrade de nível ou reparo */
+function reinforce(s, coins, avatar){
+  if(avatar) s.avatar=avatar;
+  const before = s.tier;
+  s.coins += coins;
+  const nt = tierForCoins(s.coins);
+  if(nt > before){
+    s.tier = nt;
+    s.maxHp = s.coins*CFG.hpPer;
+    s.hp = s.maxHp;                      // upgrade repara tudo
+    s.upFlash = 1;
+    fame(s.user).bestTier = Math.max(fame(s.user).bestTier, nt);
+    Snd.spawn(nt);
+    bigMsg('⬆ '+s.user.toUpperCase()+' VIROU '+TIERS[nt].name.toUpperCase()+'!', TIERS[nt].col);
+    logLine('⬆ '+s.user+' upgrade -> '+TIERS[nt].name+' ('+s.coins+' moedas)');
+  }else{
+    const heal = coins*CFG.hpPer;
+    const was = s.hp;
+    s.maxHp = Math.max(s.maxHp, s.coins*CFG.hpPer);
+    s.hp = Math.min(s.maxHp, s.hp + heal);
+    s.healFlash = 1;
+    Snd.repair();
+    floatTxt(s, '+'+fmtN(s.hp-was), '#6ee7a8');
+    logLine('🔧 '+s.user+' reparou +'+fmtN(s.hp-was)+' vida');
+  }
+}
+
+function volleyDamage(s){ return (s.maxHp / CFG.volleys); }
+
+function ballsPerVolley(s){ return [1,2,3,5][s.tier]; }
+
+function sinkShip(s, killer){
+  if(s.sunk) return;
+  s.sunk = true; s.sinkT = 0; s.opponent = null; s.engaged=false;
+  Snd.sink();
+  G.shake = Math.min(1, G.shake+0.6);
+  fame(s.user).sunk++;
+  // explosões em cadeia no casco
+  for(let i=0;i<7;i++){
+    setTimeout(()=>{ if(!G.running&&!G.over) return;
+      boomAt(shipX(s)+rnd(-40,40)*shipScale(s), shipDeckY(s)+rnd(-20,20)*shipScale(s), rnd(0.7,1.5)*shipScale(s));
+    }, i*130);
+  }
+  if(killer && !killer.sunk){
+    const won = TIERS[s.tier].medal;
+    const f = fame(killer.user);
+    f.medals += won; f.kills++;
+    killer.medals = f.medals; killer.kills = f.kills;
+    killer.hp = Math.min(killer.maxHp, killer.hp + killer.maxHp*0.10);  // sopro de vitória
+    killer.wins++;
+    Snd.medal();
+    floatTxt(killer, '+'+won+' 🏅', '#e8c05a');
+    bigMsg('🏅 '+killer.user.toUpperCase()+' AFUNDOU '+s.user.toUpperCase()+'  +'+won,
+           TIERS[killer.tier].col);
+    logLine('💥 '+killer.user+' afundou '+s.user+' (+'+won+' medalhas, total '+f.medals+')');
+    if(CFG.maxWins>0 && killer.wins>=CFG.maxWins) killer.retireAt = G.t + 1.4;
+  }else{
+    logLine('💥 '+s.user+' afundou');
+  }
+  renderRank();
+}
+
+const shipScale = s => proj(BANDS[s.band]).s;
+const shipX     = s => CX + s.x*HALFW*proj(BANDS[s.band]).s;
+/* o sprite é posicionado pela LINHA D'ÁGUA: a linha _waterY dele encosta no mar */
+function shipDeckY(s){
+  const spr=SPRITES.ships[s.tier], spec=SHIP_SPEC[s.tier];
+  const sc=shipScale(s)*SHIP_DRAW;
+  return proj(BANDS[s.band]).y - (spr._waterY - spec.deckY)*sc + Math.sin(s.bob)*3*sc;
+}
+
+/* ============================================================================
+   7. EMPARELHAMENTO E COMBATE
+   ========================================================================== */
+/* Reconstrói TODO o mapa de duelos a cada chamada.
+   Antes eu remanejava raias na mão e dois pares acabavam caindo na mesma raia,
+   empilhando navios em cima uns dos outros. Agora: monto a lista de pares,
+   só então distribuo as raias, garantindo uma raia por duelo e um lado por navio. */
+function rematch(){
+  const alive = [...G.ships.values()].filter(s=>!s.sunk && !s.retiring);
+  const pairs = [], used = new Set();
+
+  // 1) duelos em andamento continuam de pé
+  for(const s of alive){
+    if(used.has(s.user)) continue;
+    const o = s.opponent ? G.ships.get(s.opponent) : null;
+    if(o && !o.sunk && o.opponent === s.user){
+      pairs.push({a:s, b:o, existing:true});
+      used.add(s.user); used.add(o.user);
+    }
+  }
+
+  // 2) quem ficou sozinho procura adversário — de nível parecido, se pedido
+  const idle = alive.filter(s=>!used.has(s.user));
+  idle.forEach(s=>{ s.opponent=null; s.engaged=false; });
+  while(idle.length>=2){
+    const a = idle.shift();
+    let bi=0, bc=Infinity;
+    for(let i=0;i<idle.length;i++){
+      const cost = (CFG.fair ? Math.abs(a.tier-idle[i].tier)*10 : 0)
+                 + Math.abs(a.band-idle[i].band);
+      if(cost<bc){ bc=cost; bi=i; }
+    }
+    const b = idle.splice(bi,1)[0];
+    pairs.push({a, b, existing:false});
+  }
+  const lone = idle;                       // no máximo 1 navio sem par
+
+  // 3) distribuir raias: duelo em andamento fica onde está, o resto pega raia livre
+  const taken = new Set();
+  for(const p of pairs){
+    p.band = (p.existing && !taken.has(p.a.band)) ? p.a.band : -1;
+    if(p.band>=0) taken.add(p.band);
+  }
+  for(const p of pairs){
+    if(p.band>=0) continue;
+    for(let b=0;b<BANDS.length;b++) if(!taken.has(b)){ p.band=b; taken.add(b); break; }
+    if(p.band<0) p.band = 0;
+  }
+
+  // 4) aplicar
+  for(const {a,b,existing,band} of pairs){
+    a.band=band; b.band=band;
+    if(a.side===b.side || !a.side || !b.side){ a.side=-1; b.side=1; }
+    a.targetX=a.side*engageX(band); b.targetX=b.side*engageX(band);
+    a.facing=-a.side;          b.facing=-b.side;
+    if(!existing){
+      a.opponent=b.user; b.opponent=a.user;
+      a.engaged=false;   b.engaged=false;
+      a.volleyT=rnd(0.2,0.9); b.volleyT=rnd(0.8,1.5);   // não disparam juntos
+      logLine('⚔ '+a.user+' ('+TIERS[a.tier].name+') x '+b.user+' ('+TIERS[b.tier].name+')');
+    }
+  }
+
+  // 5) navio sem par patrulha numa raia que ninguém está usando
+  for(const s of lone){
+    s.opponent=null; s.engaged=false;
+    if(taken.has(s.band)){
+      for(let b=0;b<BANDS.length;b++) if(!taken.has(b)){ s.band=b; taken.add(b); break; }
+    } else taken.add(s.band);
+  }
+}
+
+function fireVolley(s, target){
+  const n = ballsPerVolley(s);
+  const dmgTotal = volleyDamage(s) * rnd(0.88,1.12);
+  const spr = SPRITES.ships[s.tier];
+  const sc = shipScale(s)*SHIP_DRAW;
+  const spec = SHIP_SPEC[s.tier];
+  const sx = shipX(s), sy = shipDeckY(s);
+  const tx = shipX(target), ty = shipDeckY(target) + 8*shipScale(target)*SHIP_DRAW;
+
+  Snd.cannon(0.5 + s.tier*0.45);
+  G.shake = Math.min(1, G.shake + 0.06 + s.tier*0.05);
+
+  for(let i=0;i<n;i++){
+    const cp = spr._cannons[i % spr._cannons.length] || [spec.w*0.5, spec.deckY];
+    // posição da boca do canhão no mundo (espelhada conforme a proa)
+    const ox = (cp[0]-spec.w*0.5) * sc * (s.facing>0?1:-1);
+    const oy = (cp[1]-spec.deckY) * sc;
+    const bx = sx+ox, by = sy+oy;
+    G.balls.push({
+      x0:bx, y0:by,
+      x1:tx+rnd(-26,26)*shipScale(target)*SHIP_DRAW,
+      y1:ty+rnd(-10,10)*shipScale(target)*SHIP_DRAW,
+      t:-i*0.075, dur:rnd(0.52,0.66),
+      dmg:dmgTotal/n, target:target.user, from:s.user,
+      r:Math.max(2.2, 3.4*sc), arc:rnd(48,84)*sc
+    });
+    // fogo na boca do canhão
+    G.booms.push({x:bx+8*sc*(s.facing>0?1:-1), y:by, t:0, s:0.42*sc, muzzle:true});
+  }
+}
+
+function updateCombat(dt){
+  for(const s of G.ships.values()){
+    if(s.sunk) continue;
+    // navega até a posição de combate
+    const dx = s.targetX - s.x;
+    const spd = 0.16 + 0.03*(3-s.tier);            // navio grande é mais lento
+    if(Math.abs(dx) > 0.006){
+      s.x += Math.sign(dx)*Math.min(Math.abs(dx), spd*dt);
+      s.engaged = false;
+    } else if(s.opponent){
+      s.engaged = true;
+    }
+    // sem adversário: patrulha devagar
+    if(!s.opponent){
+      s.patrol = (s.patrol||0) + dt*0.5;
+      s.targetX = s.side*(engageX(s.band)+0.12 + Math.sin(s.patrol)*0.07);
+    }
+
+    const opp = s.opponent ? G.ships.get(s.opponent) : null;
+    if(!opp || opp.sunk){
+      if(s.opponent){ s.opponent=null; s.engaged=false; }
+      continue;
+    }
+    if(!s.engaged || !opp.engaged) continue;
+
+    s.volleyT -= dt;
+    if(s.volleyT<=0){ s.volleyT = CFG.rate*rnd(0.9,1.1); fireVolley(s,opp); }
+  }
+}
+
+function updateBalls(dt){
+  for(let i=G.balls.length-1;i>=0;i--){
+    const b=G.balls[i];
+    b.t += dt;
+    if(b.t < 0) continue;
+    if(b.t >= b.dur){
+      const tgt = G.ships.get(b.target);
+      boomAt(b.x1, b.y1, 1.0*(b.r/3.4));
+      if(tgt && !tgt.sunk){
+        tgt.hp -= b.dmg; tgt.flash = 1;
+        Snd.hit();
+        if(tgt.hp<=0){ tgt.hp=0; sinkShip(tgt, G.ships.get(b.from)); }
+      }else{
+        G.splashes.push({x:b.x1,y:b.y1,t:0,s:b.r/3.4});
+      }
+      G.balls.splice(i,1);
+      continue;
+    }
+    // fumacinha na esteira
+    if(Math.random()<0.5){
+      const p=ballPos(b);
+      G.booms.push({x:p.x,y:p.y,t:0.12,s:0.20*(b.r/3.4),smoke:true});
+    }
+  }
+}
+function ballPos(b){
+  const t=clamp(b.t/b.dur,0,1);
+  return { x: lerp(b.x0,b.x1,t),
+           y: lerp(b.y0,b.y1,t) - Math.sin(t*Math.PI)*b.arc };
+}
+
+function boomAt(x,y,s){ G.booms.push({x,y,t:0,s:s||1}); }
+function floatTxt(s,txt,col){ G.floats.push({ship:s.user,txt,col,t:0}); }
+
+function updateFX(dt){
+  G.shake = Math.max(0, G.shake - dt*2.1);
+  for(let i=G.booms.length-1;i>=0;i--){ G.booms[i].t+=dt; if(G.booms[i].t>0.62) G.booms.splice(i,1); }
+  for(let i=G.splashes.length-1;i>=0;i--){ G.splashes[i].t+=dt; if(G.splashes[i].t>0.7) G.splashes.splice(i,1); }
+  for(let i=G.floats.length-1;i>=0;i--){ G.floats[i].t+=dt; if(G.floats[i].t>1.6) G.floats.splice(i,1); }
+
+  for(const s of G.ships.values()){
+    s.bob += dt*(1.6 - s.tier*0.18);
+    s.flash = Math.max(0, s.flash - dt*3.5);
+    s.healFlash = Math.max(0, s.healFlash - dt*1.5);
+    s.upFlash = Math.max(0, s.upFlash - dt*0.8);
+    if(s.sunk){
+      s.sinkT += dt;
+      if(s.sinkT > 3.4){
+        G.ships.delete(s.user);
+        if(CFG.sinkOut) G.queue = G.queue.filter(q=>q.user!==s.user);
+        admitFromQueue();
+      }
+    } else if(!s.retiring && s.retireAt && G.t >= s.retireAt){
+      retireShip(s);
+    } else if(s.retiring && Math.abs(s.x) > 2.2){
+      G.ships.delete(s.user);
+      admitFromQueue();
+    }
+  }
+}
+
+/* A fila entra por MOEDAS, não por ordem de chegada. Numa live movimentada ela
+   passa de centenas de pessoas; por ordem de chegada quem mandou 1000 moedas
+   esperaria horas atrás de quem mandou 1. */
+function admitFromQueue(){
+  if(G.queue.length>1) G.queue.sort((a,b)=> b.coins-a.coins);
+  while(activeCount() < CFG.fleet && G.queue.length){
+    const q = G.queue.shift();
+    if(!spawnShip(q.user, q.coins, q.avatar)){
+      G.queue.unshift(q);   // não havia vaga de verdade: devolve e para
+      break;                // (sem o break isso vira laço infinito)
+    }
+  }
+  if(G.queue.length > 200) G.queue.length = 200;   // não cresce sem limite
+  renderQueue();
+}
+
+/* campeão se aposenta e libera a vaga */
+function retireShip(s){
+  if(s.sunk || s.retiring) return;
+  s.retiring = true; s.opponent = null; s.engaged = false;
+  s.targetX = s.side*2.4;                      // sai de cena navegando
+  Snd.medal();
+  bigMsg('👑 '+s.user.toUpperCase()+' SAI CAMPEÃO — '+fmtN(s.medals)+' 🏅', C.goldL);
+  logLine('👑 '+s.user+' aposentou com '+s.wins+' vitórias seguidas ('+fmtN(s.medals)+' medalhas)');
+  admitFromQueue();
+}
+
+/* ============================================================================
+   8. PROJEÇÃO E MAR
+   ========================================================================== */
+const CVW=1080, CVH=1920;
+const HORIZON=430, SEA_BOT=1720, CX=CVW/2;
+const ZFAR=4.5, HALFW=1000, TMAX=1.15, FLAT=0.5, SHIP_DRAW=3.3;
+const ENGAGE_X=0.62, SPAWN_X=1.5;   // separação de combate e ponto de entrada
+/* perto da câmera o navio ocupa muito mais pixels: encosta os dois lados
+   para o duelo caber no quadro em qualquer raia */
+function engageX(band){ return ENGAGE_X*(0.55+0.45*BANDS[band]); }
+
+function proj(d){                    // d=0 perto (baixo) .. 1 longe (horizonte)
+  const z=1+d*(ZFAR-1), zMax=1+TMAX*(ZFAR-1);
+  const kP=(1-1/z)/(1-1/zMax), kL=d/TMAX;
+  const k=kL*FLAT+kP*(1-FLAT);
+  return { y: SEA_BOT-(SEA_BOT-HORIZON)*k, s:1/z };
+}
+
+/* céu + lua + ilhas, desenhado uma vez */
+const skyCv=document.createElement('canvas');
+(function buildSky(){
+  skyCv.width=CVW; skyCv.height=HORIZON+8;
+  const g=skyCv.getContext('2d');
+  const sky=g.createLinearGradient(0,0,0,HORIZON);
+  sky.addColorStop(0,'#070a14'); sky.addColorStop(0.5,'#111a2e');
+  sky.addColorStop(0.82,'#2a3350'); sky.addColorStop(1,'#5a5266');
+  g.fillStyle=sky; g.fillRect(0,0,CVW,HORIZON+8);
+  // estrelas
+  for(let i=0;i<260;i++){
+    const y=Math.random()*HORIZON*0.72;
+    g.fillStyle='rgba(255,255,255,'+(0.15+Math.random()*0.6)+')';
+    g.fillRect(Math.random()*CVW, y, Math.random()<0.15?2:1, Math.random()<0.15?2:1);
+  }
+  // lua
+  const mx=168,my=316,mr=46;
+  const mg=g.createRadialGradient(mx,my,mr*0.4,mx,my,mr*3.2);
+  mg.addColorStop(0,'rgba(255,240,200,.30)'); mg.addColorStop(1,'rgba(255,240,200,0)');
+  g.fillStyle=mg; g.beginPath(); g.arc(mx,my,mr*3.2,0,7); g.fill();
+  g.fillStyle='#f3e7c6'; g.beginPath(); g.arc(mx,my,mr,0,7); g.fill();
+  g.fillStyle='rgba(206,190,155,.55)';
+  [[10,-14,11],[-18,8,8],[16,20,7],[-6,-24,5]].forEach(([a,b,r])=>{
+    g.beginPath(); g.arc(mx+a,my+b,r,0,7); g.fill(); });
+  // nuvens compridas
+  g.fillStyle='rgba(20,26,44,.55)';
+  for(let i=0;i<9;i++){
+    const y=90+Math.random()*230, w=rnd(180,460), h=rnd(9,20);
+    g.fillRect(Math.random()*CVW-w*0.3, y, w, h);
+  }
+  // ilhas na linha do horizonte
+  g.fillStyle='#0d1520';
+  for(const [ix,iw,ih] of [[90,300,44],[560,240,30],[900,300,52]]){
+    g.beginPath(); g.moveTo(ix,HORIZON+4);
+    g.quadraticCurveTo(ix+iw*0.5, HORIZON+4-ih, ix+iw, HORIZON+4);
+    g.closePath(); g.fill();
+  }
+  // brilho da lua no mar
+  const gl=g.createLinearGradient(0,HORIZON-16,0,HORIZON+8);
+  gl.addColorStop(0,'rgba(243,231,198,0)'); gl.addColorStop(1,'rgba(243,231,198,.22)');
+  g.fillStyle=gl; g.fillRect(0,HORIZON-16,CVW,24);
+})();
+
+const cv=$('cv'), ctx=cv.getContext('2d');
+ctx.imageSmoothingEnabled=false;
+
+function drawSea(){
+  const grad=ctx.createLinearGradient(0,HORIZON,0,CVH);
+  grad.addColorStop(0,'#2b3f5c'); grad.addColorStop(0.16,'#1b3350');
+  grad.addColorStop(0.55,'#12283f'); grad.addColorStop(1,'#0a1a2c');
+  ctx.fillStyle=grad; ctx.fillRect(0,HORIZON,CVW,CVH-HORIZON);
+
+  // rastro de luar
+  const mg=ctx.createLinearGradient(0,HORIZON,0,CVH);
+  mg.addColorStop(0,'rgba(243,231,198,.16)'); mg.addColorStop(1,'rgba(243,231,198,0)');
+  ctx.fillStyle=mg;
+  ctx.beginPath(); ctx.moveTo(120,HORIZON); ctx.lineTo(230,HORIZON);
+  ctx.lineTo(560,CVH); ctx.lineTo(-260,CVH); ctx.closePath(); ctx.fill();
+
+  // ondas: linhas tracejadas que descem, mais espaçadas conforme chegam perto
+  const T=G.t;
+  for(let i=0;i<58;i++){
+    const d = 1 - i/58;
+    const pr = proj(d*TMAX);
+    if(pr.y<HORIZON) continue;
+    const amp = 16*pr.s, seg = 46*pr.s+8;
+    const off = (T*(26+70*pr.s)) % (seg*2);
+    ctx.strokeStyle='rgba(150,200,235,'+(0.05+0.13*pr.s).toFixed(3)+')';
+    ctx.lineWidth=Math.max(1,3.2*pr.s);
+    ctx.beginPath();
+    for(let x=-seg*2;x<CVW+seg*2;x+=seg*2){
+      const xx=x+off+Math.sin((x*0.01)+T*0.7+i)*amp;
+      ctx.moveTo(xx,pr.y); ctx.lineTo(xx+seg,pr.y);
+    }
+    ctx.stroke();
+  }
+}
+
+/* ============================================================================
+   9. RENDER DOS NAVIOS
+   ========================================================================== */
+function drawShip(s){
+  const spr = SPRITES.ships[s.tier], spec = SHIP_SPEC[s.tier];
+  const pr = proj(BANDS[s.band]);
+  const sc = pr.s*SHIP_DRAW;
+  const w = spec.w*sc, h = spec.h*sc;
+  const x = shipX(s);
+  const bobY = Math.sin(s.bob)*3*sc;
+  const roll = Math.sin(s.bob*0.8)*0.028 + (s.sunk? s.sinkT*0.38 : 0);
+  const yBase = pr.y + bobY + (s.sunk? Math.pow(s.sinkT,1.7)*38*sc : 0);
+
+  ctx.save();
+  if(s.sunk) ctx.globalAlpha = clamp(1 - (s.sinkT-2.2)/1.2, 0, 1);
+
+  // esteira / espuma na linha d'água
+  const foamW = w*0.52;
+  ctx.fillStyle='rgba(200,230,245,.16)';
+  ctx.beginPath(); ctx.ellipse(x, yBase-2*sc, foamW, Math.max(3,9*sc), 0,0,7); ctx.fill();
+  ctx.fillStyle='rgba(230,245,255,.24)';
+  ctx.beginPath(); ctx.ellipse(x - s.facing*foamW*0.55, yBase-2*sc, foamW*0.34, Math.max(2,5*sc),0,0,7); ctx.fill();
+
+  ctx.translate(x, yBase);
+  ctx.rotate(roll);
+  ctx.scale(s.facing>0?1:-1, 1);
+
+  // aura de upgrade
+  if(s.upFlash>0){
+    ctx.save(); ctx.globalCompositeOperation='lighter';
+    ctx.globalAlpha = s.upFlash*0.5;
+    const g=ctx.createRadialGradient(0,-h*0.4,0,0,-h*0.4,w*0.8);
+    g.addColorStop(0,'rgba(232,192,90,.8)'); g.addColorStop(1,'rgba(232,192,90,0)');
+    ctx.fillStyle=g; ctx.fillRect(-w,-h*1.1,w*2,h*1.4); ctx.restore();
+  }
+
+  // ancorado pela linha d'água do sprite
+  ctx.drawImage(spr, -w*0.5, -spr._waterY*sc, w, h);
+  ctx.restore();
+
+  // capitão no convés (fora do flip, pra não espelhar o rosto)
+  if(!s.sunk && sc>0.42){
+    const cap = SPRITES.caps[s.tier];
+    const ch = SPR_CAPTAIN[s.tier].length*sc*1.25, cw = cap.width/cap.height*ch;
+    ctx.save();
+    ctx.drawImage(cap, x - cw*0.5 - s.facing*w*0.06, shipDeckY(s) - ch + 3*sc, cw, ch);
+    ctx.restore();
+  }
+
+  // clarão de dano
+  if(s.flash>0){
+    ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=s.flash*0.5;
+    ctx.fillStyle='rgba(255,110,60,1)';
+    ctx.fillRect(x-w*0.5, yBase-h, w, h); ctx.restore();
+  }
+  // brilho de reparo
+  if(s.healFlash>0){
+    ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.globalAlpha=s.healFlash*0.4;
+    const g=ctx.createLinearGradient(0,yBase-h,0,yBase);
+    g.addColorStop(0,'rgba(110,231,168,0)'); g.addColorStop(1,'rgba(110,231,168,.9)');
+    ctx.fillStyle=g; ctx.fillRect(x-w*0.5, yBase-h, w, h); ctx.restore();
+  }
+  // fumaça de navio ferido
+  if(!s.sunk && s.hp/s.maxHp < 0.35 && Math.random()<0.30){
+    G.booms.push({x:x+rnd(-w*0.3,w*0.3), y:yBase-h*0.55, t:0.1, s:0.30*sc, smoke:true});
+  }
+}
+
+/* placa: [NÍVEL] Navio de X ........ 🏅medalhas  +  barra de vida
+   Os dois navios de uma raia ficam em alturas diferentes (pelo lado), então
+   as placas nunca se sobrepõem por mais perto que os navios cheguem. */
+function drawShipLabel(s){
+  if(s.sunk) return;
+  const spr=SPRITES.ships[s.tier], spec=SHIP_SPEC[s.tier];
+  const pr=proj(BANDS[s.band]), sc=pr.s*SHIP_DRAW, x=shipX(s);
+  const shipTop = pr.y + Math.sin(s.bob)*3*sc - spr._waterY*sc;
+
+  const fs   = Math.max(20, 27*pr.s);
+  const barH = Math.max(13, fs*0.64);
+  const bw   = Math.max(252, spec.w*sc);
+  const rowH = fs*1.3;
+  const blockH = rowH + barH + 3;
+  const lift = s.side>0 ? blockH+9 : 0;
+  const bx = x-bw*0.5, by = shipTop - blockH - 12*sc - lift;
+  const pad = 7;
+
+  ctx.fillStyle='rgba(6,10,16,.85)';
+  roundRect(ctx,bx,by,bw,rowH,5); ctx.fill();
+  ctx.strokeStyle=TIERS[s.tier].col+'66'; ctx.lineWidth=1.5;
+  roundRect(ctx,bx,by,bw,rowH,5); ctx.stroke();
+
+  // etiqueta do nível
+  ctx.font='900 '+(fs*0.64).toFixed(0)+'px -apple-system,sans-serif';
+  const tw = ctx.measureText(TIERS[s.tier].short).width+9;
+  ctx.fillStyle=TIERS[s.tier].col;
+  roundRect(ctx,bx+pad,by+rowH*0.21,tw,rowH*0.58,3); ctx.fill();
+  ctx.fillStyle='#0b0d12'; ctx.textAlign='center';
+  ctx.fillText(TIERS[s.tier].short, bx+pad+tw/2, by+rowH*0.70);
+
+  // medalhas à direita
+  ctx.font='900 '+fs.toFixed(0)+'px -apple-system,sans-serif';
+  const md='🏅'+fmtN(s.medals), mw=ctx.measureText(md).width;
+  ctx.fillStyle=C.goldL; ctx.textAlign='right';
+  ctx.fillText(md, bx+bw-pad, by+rowH*0.74);
+
+  /* Nome no espaço que sobra. Se não couber "Navio de fulano", cai pra só o
+     usuário — é o dado que importa, e antes era justamente ele que era cortado. */
+  const avail = bw - pad*3 - tw - mw - 4;
+  ctx.font='800 '+fs.toFixed(0)+'px -apple-system,Segoe UI,sans-serif';
+  ctx.textAlign='left';
+  let nm='Navio de '+s.user;
+  if(ctx.measureText(nm).width>avail) nm=s.user;
+  while(ctx.measureText(nm).width>avail && nm.length>4) nm=nm.slice(0,-2)+'…';
+  ctx.fillStyle='#f2ead8';
+  ctx.fillText(nm, bx+pad*2+tw, by+rowH*0.74);
+
+  // barra de vida
+  const pct=clamp(s.hp/s.maxHp,0,1), y2=by+rowH+3;
+  ctx.fillStyle='rgba(4,8,12,.9)';
+  roundRect(ctx,bx,y2,bw,barH,3); ctx.fill();
+  ctx.fillStyle = pct>0.55?'#3fbf6a':pct>0.25?'#e0a828':'#d0402f';
+  roundRect(ctx,bx+2,y2+2,Math.max(0,(bw-4)*pct),barH-4,2); ctx.fill();
+  ctx.fillStyle='rgba(255,255,255,.24)';
+  roundRect(ctx,bx+2,y2+2,Math.max(0,(bw-4)*pct),(barH-4)*0.42,2); ctx.fill();
+  ctx.font='800 '+(barH*0.76).toFixed(0)+'px -apple-system,sans-serif';
+  ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,.95)';
+  ctx.fillText(fmtN(s.hp)+' / '+fmtN(s.maxHp), x, y2+barH*0.77);
+}
+
+function roundRect(g,x,y,w,h,r){
+  w=Math.max(w,r*2);
+  g.beginPath();
+  g.moveTo(x+r,y); g.lineTo(x+w-r,y); g.quadraticCurveTo(x+w,y,x+w,y+r);
+  g.lineTo(x+w,y+h-r); g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  g.lineTo(x+r,y+h); g.quadraticCurveTo(x,y+h,x,y+h-r);
+  g.lineTo(x,y+r); g.quadraticCurveTo(x,y,x+r,y); g.closePath();
+}
+
+function drawBalls(){
+  for(const b of G.balls){
+    if(b.t<0) continue;
+    const p=ballPos(b);
+    ctx.fillStyle='#15120f';
+    ctx.beginPath(); ctx.arc(p.x,p.y,b.r,0,7); ctx.fill();
+    ctx.fillStyle='rgba(120,120,130,.85)';
+    ctx.beginPath(); ctx.arc(p.x-b.r*0.3,p.y-b.r*0.3,b.r*0.42,0,7); ctx.fill();
+  }
+}
+
+/* explosão em 6 fases, como a régua de efeitos da referência */
+function drawBooms(){
+  for(const b of G.booms){
+    const t=clamp(b.t/0.62,0,1);
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    if(b.smoke){
+      ctx.globalAlpha=(1-t)*0.4;
+      ctx.fillStyle='rgba(190,190,200,1)';
+      const r=(14+t*26)*b.s;
+      ctx.beginPath(); ctx.arc(b.x,b.y-t*18*b.s,r,0,7); ctx.fill();
+      ctx.restore(); continue;
+    }
+    const r=(18+t*70)*b.s;
+    ctx.globalAlpha=1-t;
+    const g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,r);
+    g.addColorStop(0,'rgba(255,248,214,.98)');
+    g.addColorStop(0.28,'rgba(255,196,72,.9)');
+    g.addColorStop(0.6,'rgba(226,96,26,.55)');
+    g.addColorStop(1,'rgba(120,40,10,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,r,0,7); ctx.fill();
+    // fagulhas
+    if(!b.muzzle && t<0.75){
+      ctx.globalAlpha=(1-t)*0.9;
+      ctx.fillStyle='#ffdf8a';
+      for(let i=0;i<8;i++){
+        const a=i/8*Math.PI*2 + b.s*3;
+        const rr=r*(0.7+t*1.5);
+        ctx.fillRect(b.x+Math.cos(a)*rr-2, b.y+Math.sin(a)*rr-2, 4.5, 4.5);
+      }
+    }
+    ctx.restore();
+    // baforada de fumaça cinza por cima (source-over)
+    if(!b.muzzle){
+      ctx.save(); ctx.globalAlpha=(1-t)*0.30;
+      ctx.fillStyle='#8b8b95';
+      for(let i=0;i<4;i++){
+        const a=i/4*Math.PI*2+1;
+        ctx.beginPath();
+        ctx.arc(b.x+Math.cos(a)*r*0.5, b.y+Math.sin(a)*r*0.4-t*14*b.s, r*0.42*(0.6+t),0,7);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+}
+
+function drawSplashes(){
+  for(const s of G.splashes){
+    const t=clamp(s.t/0.7,0,1);
+    ctx.save(); ctx.globalAlpha=(1-t)*0.7;
+    ctx.fillStyle='rgba(206,235,250,1)';
+    for(let i=0;i<7;i++){
+      const a=(i/7)*Math.PI - Math.PI;
+      const rr=(10+t*46)*s.s;
+      ctx.fillRect(s.x+Math.cos(a)*rr-2, s.y+Math.sin(a)*rr*0.55-t*20*s.s, 4,4);
+    }
+    ctx.restore();
+  }
+}
+
+function drawFloats(){
+  for(const f of G.floats){
+    const s=G.ships.get(f.ship); if(!s) continue;
+    const pr=proj(BANDS[s.band]), sc=pr.s*SHIP_DRAW;
+    const h=SHIP_SPEC[s.tier].h*sc;
+    const a=1-f.t/1.6;
+    const fs=Math.max(24, 34*pr.s);
+    ctx.save(); ctx.globalAlpha=a;
+    ctx.font='900 '+fs.toFixed(0)+'px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.strokeStyle='rgba(0,0,0,.75)'; ctx.lineWidth=fs*0.18;
+    ctx.strokeText(f.txt, shipX(s), pr.y-h-60-f.t*54);
+    ctx.fillStyle=f.col;
+    ctx.fillText(f.txt, shipX(s), pr.y-h-60-f.t*54);
+    ctx.restore();
+  }
+}
+
+function render(){
+  ctx.save();
+  if(G.shake>0){ const m=G.shake*16; ctx.translate(rnd(-m,m),rnd(-m,m)); }
+
+  ctx.drawImage(skyCv,0,0);
+  drawSea();
+
+  // navios: raia mais longe primeiro
+  const list=[...G.ships.values()].sort((a,b)=> BANDS[b.band]-BANDS[a.band]);
+  for(const s of list) drawShip(s);
+  drawBalls();
+  drawBooms();
+  drawSplashes();
+  for(const s of list) drawShipLabel(s);
+  drawFloats();
+
+  ctx.restore();
+
+  // vinheta
+  const vg=ctx.createRadialGradient(CX,CVH*0.5,CVH*0.3,CX,CVH*0.5,CVH*0.8);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.55)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,CVW,CVH);
+}
+
+/* ============================================================================
+   10. HUD
+   ========================================================================== */
+const FEED_MAX=4;
+let feedQueue=[], feedItems=[];
+function pushFeed(user,gift,amount,avatar,coins){
+  feedQueue.push({user,gift,amount,avatar,coins});
+  if(feedQueue.length>30) feedQueue=feedQueue.slice(-30);
+}
+const feedRows=[];
+(function(){
+  const wrap=$('feed');
+  for(let i=0;i<FEED_MAX;i++){
+    const r=document.createElement('div');
+    r.className='row';
+    r.innerHTML='<div class="av"></div><div class="tx"><b></b><span></span></div><div class="amt"></div>';
+    wrap.appendChild(r);
+    feedRows.push({el:r,av:r.querySelector('.av'),nm:r.querySelector('b'),
+                   sub:r.querySelector('span'),amt:r.querySelector('.amt')});
+  }
+})();
+setInterval(()=>{
+  if(!feedQueue.length) return;
+  const batch=[], byUser=new Map();
+  for(const it of feedQueue.splice(0)){
+    const p=byUser.get(it.user);
+    if(p){ p.coins+=it.coins; p.amount+=it.amount; if(it.avatar)p.avatar=it.avatar; }
+    else { const c=Object.assign({},it); byUser.set(it.user,c); batch.push(c); }
+  }
+  batch.reverse();
+  const fresh=new Set(batch.map(b=>b.user));
+  feedItems=batch.concat(feedItems.filter(it=>!fresh.has(it.user))).slice(0,FEED_MAX);
+  for(let i=0;i<FEED_MAX;i++){
+    const r=feedRows[i], it=feedItems[i];
+    if(!it){ r.el.classList.remove('on'); continue; }
+    r.nm.textContent=it.user;
+    r.sub.textContent=it.coins+' moeda'+(it.coins>1?'s':'');
+    r.amt.textContent='x'+it.amount;
+    r.av.innerHTML='';
+    if(it.avatar){
+      const img=document.createElement('img'); img.src=it.avatar;
+      img.onerror=()=>{ r.av.textContent=(it.user[0]||'?').toUpperCase(); };
+      r.av.appendChild(img);
+    } else r.av.textContent=(it.user[0]||'?').toUpperCase();
+    r.el.classList.add('on');
+  }
+},320);
+
+function renderQueue(){
+  $('qCount').textContent=G.queue.length;
+  const b=$('queueBody');
+  if(!G.queue.length){ b.innerHTML='<div class="li" style="opacity:.45"><b>mande um presente</b></div>'; return; }
+  b.innerHTML = G.queue.slice(0,4).map((q,i)=>{
+    const t=TIERS[tierForCoins(q.coins)];
+    return '<div class="li"><i>'+(i+1)+'</i><b>'+esc(q.user)+'</b>'+
+           '<span class="tg" style="color:'+t.col+'">'+t.short+'</span></div>';
+  }).join('') + (G.queue.length>4 ? '<div class="li" style="opacity:.5"><i></i><b>+'+(G.queue.length-4)+' esperando</b></div>' : '');
+}
+
+function renderRank(){
+  const top=[...G.fame.values()].filter(f=>f.medals>0)
+    .sort((a,b)=>b.medals-a.medals||b.kills-a.kills).slice(0,4);
+  const b=$('rankBody');
+  if(!top.length){ b.innerHTML='<div class="li" style="opacity:.45"><b>sem medalhas ainda</b></div>'; return; }
+  b.innerHTML=top.map((f,i)=>
+    '<div class="li"><i>'+(i+1)+'</i><b>'+esc(f.user)+'</b><u>'+fmtN(f.medals)+'</u></div>').join('');
+}
+
+let msgTimer=null;
+function bigMsg(txt,col){
+  const el=$('bigMsg');
+  el.textContent=txt;
+  el.style.background='rgba(6,10,16,.86)';
+  el.style.color=col||'#f2ead8';
+  el.style.boxShadow='0 0 26px '+(col||'#f2ead8')+'55';
+  el.style.border='1px solid '+(col||'#f2ead8')+'66';
+  el.classList.add('show');
+  clearTimeout(msgTimer);
+  msgTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function fmtTime(s){ s=Math.max(0,Math.floor(s));
+  return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+
+let hudAcc=0;
+function updateHUD(dt){
+  hudAcc+=dt; if(hudAcc<0.25) return; hudAcc=0;
+  $('fleetTxt').textContent=G.ships.size+'/'+CFG.fleet+' NAVIOS';
+  $('matchTxt').textContent=G.matchLeft>0?fmtTime(G.matchLeft):(G.running?'LIVRE':'--:--');
+}
+
+let endScrollTimer=null;
+function autoScrollEnd(){
+  clearInterval(endScrollTimer);
+  const el=$('endList'); el.scrollTop=0;
+  let dir=1,hold=60;
+  endScrollTimer=setInterval(()=>{
+    const max=el.scrollHeight-el.clientHeight;
+    if(max<4) return;
+    if(hold>0){hold--;return;}
+    el.scrollTop+=dir*0.7;
+    if(el.scrollTop>=max-1){dir=-1;hold=60;} else if(el.scrollTop<=0){dir=1;hold=60;}
+  },30);
+}
+
+function buildEndScreen(){
+  const all=[...G.fame.values()].filter(f=>f.medals>0)
+    .sort((a,b)=>b.medals-a.medals||b.kills-a.kills||a.user.localeCompare(b.user));
+  const pod=$('podium'); pod.innerHTML='';
+  const H=['70%','100%','52%'];
+  const COL=['linear-gradient(180deg,#dfe4ea,#8f97a2)',
+             'linear-gradient(180deg,#ffdc74,#c9962f)',
+             'linear-gradient(180deg,#dc9a5e,#8f5c2c)'];
+  [1,0,2].forEach((idx,slot)=>{
+    const f=all[idx];
+    const d=document.createElement('div'); d.className='p';
+    d.innerHTML='<div class="pos">'+(idx+1)+'</div>'+
+      '<div class="bar" style="height:'+H[slot]+';background:'+COL[slot]+'">'+
+      '<div class="nm">'+(f?esc(f.user):'—')+'</div>'+
+      '<div class="md">'+(f?fmtN(f.medals):'')+'</div></div>';
+    pod.appendChild(d);
+  });
+  const L=$('endList'); L.innerHTML='';
+  if(!all.length) L.innerHTML='<div class="er" style="opacity:.5;justify-content:center">nenhuma medalha conquistada</div>';
+  else all.forEach((f,i)=>{
+    const d=document.createElement('div'); d.className='er';
+    d.innerHTML='<i>'+(i+1)+'º</i><b>'+esc(f.user)+'</b>'+
+      '<span style="opacity:.5;font-size:.9em">'+f.kills+' afund.</span>'+
+      '<u>🏅'+fmtN(f.medals)+'</u>';
+    L.appendChild(d);
+  });
+  $('endSub').textContent=all.length+' capitão(ões) com medalha · '+
+    [...G.fame.values()].reduce((a,f)=>a+f.kills,0)+' navios afundados';
+  $('endScreen').classList.add('show');
+  $('gameFrame').classList.add('ended');
+  autoScrollEnd();
+}
+
+/* ============================================================================
+   11. PARTIDA
+   ========================================================================== */
+function startMatch(){
+  Snd.init(); Snd.resume(); readCfg();
+  G.running=true; G.paused=false; G.over=false;
+  G.matchLeft = CFG.matchMin>0?CFG.matchMin*60:0;
+  $('endScreen').classList.remove('show');
+  $('gameFrame').classList.remove('ended');
+  clearInterval(endScrollTimer);
+  $('btnPause').textContent='⏸ Pausar';
+  bigMsg('⚓ AO MAR!','#e8c05a');
+  logLine('▶ partida iniciada — '+CFG.fleet+' navios, '+CFG.volleys+' salvas p/ afundar');
+}
+function endMatch(){
+  G.running=false; G.over=true;
+  Snd.fanfare();
+  $('bigMsg').classList.remove('show');
+  buildEndScreen();
+  logLine('⏹ partida encerrada');
+}
+function resetMatch(){
+  G.running=false; G.paused=false; G.over=false;
+  G.ships.clear(); G.queue.length=0; G.fame.clear();
+  G.balls.length=0; G.booms.length=0; G.splashes.length=0; G.floats.length=0;
+  G.shake=0;
+  clearInterval(endScrollTimer);
+  $('endScreen').classList.remove('show');
+  $('gameFrame').classList.remove('ended');
+  $('bigMsg').classList.remove('show');
+  feedItems=[]; feedQueue=[];
+  feedRows.forEach(r=>r.el.classList.remove('on'));
+  renderQueue(); renderRank();
+  logLine('↺ limpo');
+}
+
+let matchAcc=0;
+function updateMatch(dt){
+  if(!G.running||G.paused) return;
+  if(G.matchLeft>0){
+    G.matchLeft-=dt;
+    if(G.matchLeft<=0){ G.matchLeft=0; endMatch(); return; }
+  }
+  matchAcc+=dt;
+  if(matchAcc>0.5){ matchAcc=0; rematch(); admitFromQueue(); }
+}
+
+/* ============================================================================
+   12. LOOP — um erro aqui nunca pode matar o requestAnimationFrame
+   ========================================================================== */
+let lastT=performance.now();
+function loop(now){
+  try{
+    let dt=(now-lastT)/1000; lastT=now;
+    if(dt>0.1) dt=0.1;
+    if(!G.paused) G.t+=dt;
+    updateMatch(dt);
+    if(!G.paused){ updateCombat(dt); updateBalls(dt); }
+    updateFX(dt);
+    render();
+    updateHUD(dt);
+  }catch(err){ console.error('erro no loop, recuperando:',err); }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ============================================================================
+   13. WEBSOCKET
+   ========================================================================== */
+const params=new URLSearchParams(location.search);
+let USERNAME=params.get('username')||'', KEY=params.get('key')||'';
+$('inUser').value=USERNAME; $('inKey').value=KEY;
+let ws=null, wantConnect=false, reconnectTimer=null;
+
+function setConn(ok,txt){
+  const el=$('connStatus');
+  el.classList.toggle('ok',!!ok);
+  el.lastElementChild.textContent=txt;
+  $('connBadge').textContent=txt;
+}
+function connect(){
+  if(!USERNAME||!KEY){ setConn(false,'faltam username/key'); return; }
+  wantConnect=true; clearTimeout(reconnectTimer);
+  try{ if(ws) ws.close(); }catch(e){}
+  const url='wss://api.interactivelivegames.com:8443?username='+
+    encodeURIComponent(USERNAME)+'&key='+encodeURIComponent(KEY);
+  setConn(false,'conectando…');
+  try{
+    ws=new WebSocket(url);
+    ws.onopen=()=>{ setConn(true,'conectado'); logLine('✓ conectado como '+USERNAME); };
+    ws.onmessage=(m)=>{ try{ handleEvent(JSON.parse(m.data)); }
+                        catch(e){ console.error('evento inválido',e,m.data); } };
+    ws.onclose=()=>{ setConn(false,'desconectado');
+                     if(wantConnect) reconnectTimer=setTimeout(connect,5000); };
+    ws.onerror=(e)=>console.error('erro no WebSocket',e);
+  }catch(e){
+    console.error('não foi possível conectar',e);
+    if(wantConnect) reconnectTimer=setTimeout(connect,5000);
+  }
+}
+
+/* ============================================================================
+   14. PAINEL
+   ========================================================================== */
+$('btnConnect').onclick=()=>{ USERNAME=$('inUser').value.trim(); KEY=$('inKey').value.trim();
+  Snd.init(); Snd.resume(); connect(); };
+$('btnStart').onclick=()=>{ Snd.init(); Snd.resume(); startMatch(); };
+$('btnPause').onclick=()=>{ if(!G.running) return;
+  G.paused=!G.paused; $('btnPause').textContent=G.paused?'▶ Retomar':'⏸ Pausar';
+  logLine(G.paused?'⏸ pausado':'▶ retomado'); };
+$('btnEnd').onclick=()=>{ if(G.running||G.ships.size) endMatch(); };
+$('btnReset').onclick=()=>resetMatch();
+
+['inFleet','inVolleys','inRate','inHpPer','inMatch','inMaxWins','ckFair','ckSink']
+  .forEach(id=>$(id).addEventListener('change',readCfg));
+$('inVol').addEventListener('change',()=>Snd.setVol(clamp((+$('inVol').value||0)/100,0,1)));
+
+const FAKE=['capitao_lu','joaozin','pedr0','mari.s','biel','th41s','lu4na','gab_','rafa77','duda',
+            'kaio','yasmin','vitin','nanda','igor','sofi','murilo','helo','davi','clara'];
+const testGift=(coins)=>handleEvent({type:'GIFT',user:pick(FAKE),gift:'Presente',amount:1,diamondCount:coins});
+$('btnT1').onclick=()=>testGift(1);
+$('btnT2').onclick=()=>testGift(10);
+$('btnT3').onclick=()=>testGift(100);
+$('btnT4').onclick=()=>testGift(1000);
+$('btnFill').onclick=()=>{
+  const c=[1,10,100,1000];
+  FAKE.slice(0,6).forEach((u,i)=>setTimeout(()=>
+    handleEvent({type:'GIFT',user:u,gift:'Presente',amount:1,diamondCount:c[i%4]}), i*250));
+};
+$('btnFlood').onclick=()=>{
+  FAKE.slice(6,18).forEach((u,i)=>setTimeout(()=>
+    handleEvent({type:'GIFT',user:u,gift:'Presente',amount:1,diamondCount:pick([1,10,100])}), i*120));
+};
+$('btnRepair').onclick=()=>{
+  for(const u of [...G.ships.keys()])
+    handleEvent({type:'GIFT',user:u,gift:'Presente',amount:1,diamondCount:10});
+};
+
+document.addEventListener('pointerdown',()=>{ Snd.init(); Snd.resume(); });
+
+readCfg(); Snd.setVol(0.75); renderQueue(); renderRank();
+if(USERNAME&&KEY) connect(); else setConn(false,'desconectado');
+logLine('pronto. configure e clique em Iniciar.');
+</script>
