@@ -23,9 +23,15 @@
   #tierBar .t .cn{display:block;font-weight:900;color:var(--gold);font-size:1.22em}
   #tierBar .t .nm{display:block;font-weight:800}
   #tierBar .t .hp{display:block;opacity:.66;font-size:.86em}
+  #tierBar .t .dm{display:block;font-size:.86em;font-weight:800;color:#ff9a6a}
+  #repairHint{position:absolute;top:6.4%;left:2%;right:2%;text-align:center;
+    font-size:clamp(5.5px,1.5vh,9.5px);letter-spacing:.02em;color:#8fe6b6;
+    background:rgba(4,10,16,.72);border:1px solid rgba(110,231,168,.30);
+    border-radius:999px;padding:2px 8px}
+  #repairHint b{color:#b6f5d2}
   #tierBar .t.t4{border-color:rgba(170,100,230,.62);box-shadow:0 0 12px rgba(150,80,220,.24) inset}
 
-  #topRow{position:absolute;top:8.2%;left:2.5%;right:2.5%;display:flex;
+  #topRow{position:absolute;top:10.6%;left:2.5%;right:2.5%;display:flex;
     justify-content:space-between;font-size:clamp(6px,1.72vh,11px);}
   .chip{background:rgba(4,10,16,.82);border:1px solid rgba(232,192,90,.26);
     border-radius:999px;padding:3px 10px;font-weight:800;letter-spacing:.04em;
@@ -57,7 +63,7 @@
   .li u{text-decoration:none;font-weight:900;color:var(--gold);flex:0 0 auto}
   .li .tg{font-size:.82em;padding:0 3px;border-radius:3px;font-weight:900;flex:0 0 auto}
 
-  #bigMsg{position:absolute;top:13%;left:50%;transform:translateX(-50%);
+  #bigMsg{position:absolute;bottom:19.5%;left:50%;transform:translateX(-50%);
     font-size:clamp(9px,2.7vh,18px);font-weight:900;letter-spacing:.09em;
     padding:5px 16px;border-radius:7px;white-space:nowrap;opacity:0;
     transition:opacity .3s;text-transform:uppercase;text-align:center;}
@@ -123,11 +129,12 @@
   <canvas id="cv" width="1080" height="1920"></canvas>
   <div class="layer">
     <div id="tierBar">
-      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">10 vida</span></div>
-      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">100 vida</span></div>
-      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1.000 vida</span></div>
-      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10.000 vida</span></div>
+      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">10 vida</span><span class="dm" id="dm0">·</span></div>
+      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">100 vida</span><span class="dm" id="dm1">·</span></div>
+      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1.000 vida</span><span class="dm" id="dm2">·</span></div>
+      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10.000 vida</span><span class="dm" id="dm3">·</span></div>
     </div>
+    <div id="repairHint">🔧 <b>1 moeda = +10 de vida</b> — mande presente pro seu navio pra consertar</div>
     <div id="topRow">
       <div class="chip">⚓ <span id="fleetTxt">0/6 NAVIOS</span></div>
       <div class="chip">⏱ <span id="matchTxt">--:--</span></div>
@@ -175,7 +182,8 @@
       <div><label>Partida (min)</label><input type="number" id="inMatch" value="45" min="0" max="480"></div>
     </div>
     <div class="grid g3" style="margin-top:9px">
-      <div><label>Volume</label><input type="number" id="inVol" value="75" min="0" max="100"></div>
+      <div><label>Volume geral</label><input type="number" id="inVol" value="75" min="0" max="100"></div>
+      <div><label>Volume música</label><input type="number" id="inVolMus" value="45" min="0" max="100"></div>
     </div>
     <p class="note"><b>Salvas p/ afundar</b> = quantos tiros um combate <i>de nível igual</i> dura.<br>
     <b>Pausa p/ reparo</b>: depois de cada batalha o navio navega esse tempo antes do próximo
@@ -191,6 +199,7 @@
       <button class="warn" id="btnPause">⏸ Pausar</button>
       <button class="danger" id="btnEnd">⏹ Encerrar + Ranking</button>
       <button id="btnReset">↺ Limpar</button>
+      <button id="btnMusic">🎵 Música: desligada</button>
     </div>
   </fieldset>
 
@@ -244,7 +253,7 @@ const W=1080, H=1920;
 /* Três arenas de duelo, empilhadas. O eixo de cada combate fica QUASE HORIZONTAL,
    então os dois navios ficam lado a lado e o comprimento deles corre na vertical.
    É o único arranjo em que 3 duelos cabem num quadro 9:16 sem se sobrepor. */
-const ARENAS=[{x:380,y:470},{x:700,y:890},{x:420,y:1310}];
+const ARENAS=[{x:380,y:540},{x:700,y:965},{x:420,y:1390}];
 const STATION_R=190;                 // distância de cada navio ao centro da arena
 const AXIS_TILT=25*Math.PI/180;      // inclinação máxima do eixo do duelo
 
@@ -255,10 +264,10 @@ const ISLANDS=[
 ];
 
 const TIERS=[
-  {i:0,name:'Jangada',short:'JANG',col:'#a4703c',medal:1},
-  {i:1,name:'Barco',  short:'BARC',col:'#c99247',medal:10},
-  {i:2,name:'Galeão', short:'GALE',col:'#e8c05a',medal:100},
-  {i:3,name:'Supremo',short:'SUPR',col:'#b06ce8',medal:1000}
+  {i:0,name:'Jangada',short:'JANG',col:'#a4703c',medal:1,   coinsBase:1},
+  {i:1,name:'Barco',  short:'BARC',col:'#c99247',medal:10,  coinsBase:10},
+  {i:2,name:'Galeão', short:'GALE',col:'#e8c05a',medal:100, coinsBase:100},
+  {i:3,name:'Supremo',short:'SUPR',col:'#b06ce8',medal:1000,coinsBase:1000}
 ];
 const tierForCoins=c=> c>=1000?3 : c>=100?2 : c>=10?1 : 0;
 
@@ -318,10 +327,16 @@ function makeShipTop(tier){
       const d=Math.abs(x)/hw;
       let col;
       if(d>0.97)      col=C.hullD;                        // contorno
-      else if(d>0.86) col=C.hull;                         // amurada
-      else if(d>0.79) col=C.gold;                         // friso dourado corrido
+      else if(d>0.90) col=(x<0)?'#2b1a0c':C.hull;         // amurada (sombra a bombordo)
+      else if(d>0.84) col=C.hullM;
+      else if(d>0.77) col=(y%9===0)?C.goldL:C.gold;       // friso dourado com brilhos
       else{
-        col=(Math.floor((x+40)/3)%2)?C.deckA:C.deckL;     // tábuas no sentido do comprimento
+        // tábuas no sentido do comprimento + volume (centro claro, bordas escuras)
+        const plank=Math.floor((x+40)/3)%2;
+        col = plank?C.deckA:C.deckL;
+        if(d>0.62)      col = plank?'#6f4c26':'#83592d';   // sombra junto à amurada
+        else if(d<0.20) col = plank?'#b6813f':'#cb9a52';   // luz no meio do convés
+        if(Math.floor((x+40)/3)%6===0) col='#5e401f';      // junta entre tábuas
       }
       px(x,y,1,1,col);
     }
@@ -333,9 +348,13 @@ function makeShipTop(tier){
   /* ---- castelo de popa ---- */
   if(S.cabin){
     const cy=S.len*0.80, ch=S.len*0.15, cw=hullHalf(0.86,S.beam)*1.28;
-    px(-cw/2,cy,cw,ch,C.hull);
+    for(let k=0;k<ch;k++){                       // telhado abaulado
+      const t=k/ch, shr=cw*(0.06*Math.sin(t*Math.PI));
+      px(-cw/2+shr,cy+k,cw-shr*2,1, t<0.18?'#9c6634' : (t>0.72?'#452a13':C.hull));
+    }
     px(-cw/2,cy,cw,1.5,C.goldL);
     px(-cw/2,cy+ch-1.5,cw,1.5,C.hullD);
+    px(-cw/2,cy+ch*0.5,cw,1,'rgba(0,0,0,.25)');
     for(let i=0;i<S.cabin;i++){
       const wx=-cw/2+cw*(i+0.5)/S.cabin-1.4;
       px(wx,cy+ch*0.42,2.8,2.4, S.glow?C.purpleL:C.glass);
@@ -348,6 +367,45 @@ function makeShipTop(tier){
     px(-S.beam*0.08,hy+0.8,S.beam*0.16,S.beam*0.09,'#2a1a0d');
   }
   g.fillStyle=C.gold; g.beginPath(); g.arc(0,S.len*0.26,S.beam*0.055,0,TAU); g.fill();
+  g.fillStyle='#3a2411'; g.beginPath(); g.arc(0,S.len*0.26,S.beam*0.025,0,TAU); g.fill();
+
+  /* corrimão claro logo por dentro da amurada — dá espessura ao casco */
+  for(let y=2;y<S.len-2;y++){
+    const hw=hullHalf(y/S.len,S.beam);
+    if(hw<2) continue;
+    px( hw*0.74,y,1,1,'rgba(232,192,90,.30)');
+    px(-hw*0.74,y,1,1,'rgba(0,0,0,.22)');
+  }
+
+  /* barris e caixas no convés */
+  const props=[[0.42,-0.30],[0.46,0.32],[0.62,-0.34],[0.70,0.30],[0.55,0.0]];
+  props.slice(0,1+tier*1.4).forEach(([ty,tx],i)=>{
+    const hw=hullHalf(ty,S.beam), bx2=tx*hw*1.15, by2=ty*S.len;
+    if(Math.abs(bx2)>hw*0.72) return;
+    const r=S.beam*0.055;
+    if(i%2){                                     // caixa
+      px(bx2-r,by2-r,r*2,r*2,'#6b4a24');
+      px(bx2-r,by2-r,r*2,1,'#8a6234');
+      px(bx2-r,by2+r-1,r*2,1,'#3a2411');
+    }else{                                       // barril
+      g.fillStyle='#6b4a24'; g.beginPath(); g.arc(bx2,by2,r,0,TAU); g.fill();
+      g.fillStyle='#8a6234'; g.beginPath(); g.arc(bx2,by2,r*0.66,0,TAU); g.fill();
+      g.fillStyle='#3a2411'; g.beginPath(); g.arc(bx2,by2,r*0.26,0,TAU); g.fill();
+    }
+  });
+
+  /* pilha de balas de canhão junto aos canhões (só nos navios maiores) */
+  if(tier>=2){
+    for(const sgn of [-1,1]){
+      const ty=0.44, hw=hullHalf(ty,S.beam);
+      for(let k=0;k<3;k++){
+        g.fillStyle='#1d1a18';
+        g.beginPath(); g.arc(sgn*hw*0.5,ty*S.len+k*2.6,1.5,0,TAU); g.fill();
+        g.fillStyle='#3d3a36';
+        g.beginPath(); g.arc(sgn*hw*0.5-0.5,ty*S.len+k*2.6-0.5,0.7,0,TAU); g.fill();
+      }
+    }
+  }
 
   /* ---- canhões dos dois bordos ---- */
   const guns=[];
@@ -502,24 +560,44 @@ const Snd={
     g.gain.setValueAtTime(0.0001,t0); g.gain.linearRampToValueAtTime(gain||0.2,t0+0.012);
     g.gain.exponentialRampToValueAtTime(0.0001,t0+d);
     o.connect(g);g.connect(this.master);o.start(t0);o.stop(t0+d+0.05); },
+  /* tiro em 3 camadas: estalo seco + corpo grave + cauda de eco */
   cannon(p){ if(!this.ready)return;
     const c=this.ctx,t0=c.currentTime; p=clamp(p||1,0.4,2.2);
-    const s=c.createBufferSource(); s.buffer=this.noise(0.4);
-    const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=700*p;
+    const crack=c.createBufferSource(); crack.buffer=this.noise(0.09);
+    const hp=c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1700;
+    const cg=c.createGain(); cg.gain.setValueAtTime(0.34*p,t0);
+    cg.gain.exponentialRampToValueAtTime(0.0008,t0+0.07);
+    crack.connect(hp);hp.connect(cg);cg.connect(this.master);crack.start(t0);crack.stop(t0+0.1);
+
+    const body=c.createBufferSource(); body.buffer=this.noise(0.5);
+    const lp=c.createBiquadFilter(); lp.type='lowpass';
+    lp.frequency.setValueAtTime(900*p,t0); lp.frequency.exponentialRampToValueAtTime(180,t0+0.4);
     const g=c.createGain(); g.gain.setValueAtTime(0.5*p,t0);
-    g.gain.exponentialRampToValueAtTime(0.0008,t0+0.34);
-    s.connect(lp);lp.connect(g);g.connect(this.master);s.start(t0);s.stop(t0+0.4);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+0.42);
+    body.connect(lp);lp.connect(g);g.connect(this.master);body.start(t0);body.stop(t0+0.5);
+
     const o=c.createOscillator(),og=c.createGain(); o.type='sine';
-    o.frequency.setValueAtTime(115*p,t0); o.frequency.exponentialRampToValueAtTime(28,t0+0.22);
-    og.gain.setValueAtTime(0.45*p,t0); og.gain.exponentialRampToValueAtTime(0.0008,t0+0.26);
-    o.connect(og);og.connect(this.master);o.start(t0);o.stop(t0+0.3); },
+    o.frequency.setValueAtTime(125*p,t0); o.frequency.exponentialRampToValueAtTime(26,t0+0.26);
+    og.gain.setValueAtTime(0.5*p,t0); og.gain.exponentialRampToValueAtTime(0.0008,t0+0.3);
+    o.connect(og);og.connect(this.master);o.start(t0);o.stop(t0+0.34);
+
+    const tail=c.createBufferSource(); tail.buffer=this.noise(0.7);
+    const tf=c.createBiquadFilter(); tf.type='lowpass'; tf.frequency.value=400;
+    const tg=c.createGain(); tg.gain.setValueAtTime(0.0001,t0+0.09);
+    tg.gain.linearRampToValueAtTime(0.11*p,t0+0.14);
+    tg.gain.exponentialRampToValueAtTime(0.0008,t0+0.7);
+    tail.connect(tf);tf.connect(tg);tg.connect(this.master);tail.start(t0+0.09);tail.stop(t0+0.8); },
   hit(){ if(!this.ready)return;
     const c=this.ctx,t0=c.currentTime;
-    const s=c.createBufferSource(); s.buffer=this.noise(0.16);
-    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=520; bp.Q.value=1.1;
-    const g=c.createGain(); g.gain.setValueAtTime(0.3,t0);
-    g.gain.exponentialRampToValueAtTime(0.0008,t0+0.15);
-    s.connect(bp);bp.connect(g);g.connect(this.master);s.start(t0);s.stop(t0+0.18); },
+    const s=c.createBufferSource(); s.buffer=this.noise(0.22);
+    const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=460; bp.Q.value=0.9;
+    const g=c.createGain(); g.gain.setValueAtTime(0.34,t0);
+    g.gain.exponentialRampToValueAtTime(0.0008,t0+0.2);
+    s.connect(bp);bp.connect(g);g.connect(this.master);s.start(t0);s.stop(t0+0.24);
+    const o=c.createOscillator(),og=c.createGain(); o.type='sine';   // baque no casco
+    o.frequency.setValueAtTime(90,t0); o.frequency.exponentialRampToValueAtTime(40,t0+0.12);
+    og.gain.setValueAtTime(0.24,t0); og.gain.exponentialRampToValueAtTime(0.0008,t0+0.16);
+    o.connect(og);og.connect(this.master);o.start(t0);o.stop(t0+0.2); },
   splash(){ if(!this.ready)return;
     const c=this.ctx,t0=c.currentTime;
     const s=c.createBufferSource(); s.buffer=this.noise(0.3);
@@ -557,6 +635,91 @@ const Snd={
 };
 
 /* ============================================================================
+   4b. MUSICA DE BATALHA — shanty pirata em ré menor, sintetizada e em loop.
+   Sequenciador com agendamento antecipado: o navegador só garante timing
+   preciso se as notas forem marcadas com antecedência no relógio do áudio.
+   ========================================================================== */
+const Music = {
+  on:false, timer:null, step:0, next:0, vol:0.5,
+  BPM:112,
+  // ré menor — 16 passos por compasso de 4 tempos (semicolcheias)
+  mel:[  0,null,  3,  5,  7,null,  7,null,  8,  7,  5,  3,  2,null,  0,null,
+         0,null,  3,  5,  7,null, 10,null, 12, 10,  8,  7,  5,null,  3,null,
+         7,null,  7,  8, 10,null, 10,null, 12, 10,  8,  7,  5,  3,  2,null,
+         0,null,  0,  2,  3,null,  5,null,  7,  5,  3,  2,  0,null,null,null],
+  bass:[ 0,null,null,null,  0,null,null,null,  5,null,null,null,  5,null,null,null,
+         3,null,null,null,  3,null,null,null,  7,null,null,null,  7,null,null,null,
+         5,null,null,null,  5,null,null,null,  3,null,null,null,  3,null,null,null,
+         0,null,null,null,  0,null,null,null,  7,null,null,null,  7,null,null,null],
+  hz(semi){ return 146.83*Math.pow(2,semi/12); },   // D3 = raiz
+
+  start(){
+    if(this.on||!Snd.ready) return;
+    this.on=true; this.step=0; this.next=Snd.ctx.currentTime+0.08;
+    this.timer=setInterval(()=>this.tickScheduler(),25);
+    $('btnMusic').textContent='🎵 Música: ligada';
+  },
+  stop(){
+    this.on=false; clearInterval(this.timer); this.timer=null;
+    $('btnMusic').textContent='🎵 Música: desligada';
+  },
+  toggle(){ Snd.init(); Snd.resume(); this.on?this.stop():this.start(); },
+  setVol(v){ this.vol=v; },
+
+  tickScheduler(){
+    if(!this.on||!Snd.ready) return;
+    const spb=60/this.BPM/4;                    // duração de uma semicolcheia
+    while(this.next < Snd.ctx.currentTime+0.12){
+      this.playStep(this.step%64, this.next, spb);
+      this.next += spb; this.step++;
+    }
+  },
+  playStep(i,t,spb){
+    const c=Snd.ctx, out=Snd.master, V=this.vol;
+    // melodia (dobrada uma oitava acima, com cara de rabeca/concertina)
+    const m=this.mel[i];
+    if(m!==null&&m!==undefined){
+      [1,2].forEach((mult,k)=>{
+        const o=c.createOscillator(), g=c.createGain();
+        o.type=k?'triangle':'sawtooth';
+        o.frequency.setValueAtTime(this.hz(m+12)*mult,t);
+        const lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+        g.gain.setValueAtTime(0.0001,t);
+        g.gain.linearRampToValueAtTime((k?0.05:0.075)*V,t+0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+spb*3.1);
+        o.connect(lp); lp.connect(g); g.connect(out);
+        o.start(t); o.stop(t+spb*3.3);
+      });
+    }
+    // baixo
+    const bs=this.bass[i];
+    if(bs!==null&&bs!==undefined){
+      const o=c.createOscillator(), g=c.createGain();
+      o.type='triangle'; o.frequency.setValueAtTime(this.hz(bs-12),t);
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.linearRampToValueAtTime(0.16*V,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+spb*3.6);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t+spb*3.8);
+    }
+    // tambor: bumbo nos tempos, caixa no 2 e no 4
+    if(i%4===0){
+      const o=c.createOscillator(), g=c.createGain();
+      o.type='sine';
+      o.frequency.setValueAtTime(110,t); o.frequency.exponentialRampToValueAtTime(42,t+0.10);
+      g.gain.setValueAtTime(0.22*V,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.16);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t+0.2);
+    }
+    if(i%8===4){
+      const src=c.createBufferSource(); src.buffer=Snd.noise(0.14);
+      const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1900;
+      const g=c.createGain();
+      g.gain.setValueAtTime(0.10*V,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
+      src.connect(bp); bp.connect(g); g.connect(out); src.start(t); src.stop(t+0.16);
+    }
+  }
+};
+
+/* ============================================================================
    5. ESTADO
    ========================================================================== */
 const CFG={fleet:6,volleys:18,rate:1.4,hpPer:10,repair:22,matchMin:45,fair:true};
@@ -564,7 +727,7 @@ const G={
   running:false,paused:false,over:false,matchLeft:0,t:0,
   ships:new Map(), queue:[], fame:new Map(),
   balls:[], booms:[], splashes:[], wakes:[], floats:[], debris:[],
-  fauna:[], nextFauna:3, shake:0
+  fauna:[], nextFauna:3, shake:0, topMedalUser:null
 };
 
 function readCfg(){
@@ -575,6 +738,13 @@ function readCfg(){
   CFG.repair  = clamp(+$('inRepair').value||0,0,120);
   CFG.matchMin= clamp(+$('inMatch').value||0,0,480);
   CFG.fair    = $('ckFair').checked;
+  /* dano por salva = vida / salvas — mostrado na barra de niveis */
+  for(let t=0;t<4;t++){
+    const dmg=(TIERS[t].coinsBase*CFG.hpPer)/CFG.volleys;
+    $('dm'+t).textContent = (dmg<10?dmg.toFixed(1).replace('.',','):Math.round(dmg))+' dano';
+  }
+  $('repairHint').innerHTML='🔧 <b>1 moeda = +'+CFG.hpPer+' de vida</b>'+
+    ' — mande presente pro seu navio pra consertar';
 }
 
 /* ============================================================================
@@ -642,7 +812,7 @@ function spawnShip(user,coins,avatar){
     maxSpd:SPD[tier],turnRate:TURN[tier],accel:ACC[tier],
     tx:x,ty:y,thdg:null,axis:0,
     arena:null,station:0,opponent:null,engaged:false,volleyT:rnd(0.4,1.4),
-    readyAt:0,                       // pausa de reparo antes do próximo duelo
+    readyAt:0, pairedAt:0,           // pausa de reparo / quando o par foi formado
     patrolA:rnd(0,TAU),
     sunk:false,sinkT:0,
     flash:0,healFlash:0,upFlash:0,
@@ -719,6 +889,17 @@ function rematch(){
       pairs.push({a:s,b:o,existing:true}); used.add(s.user); used.add(o.user);
     }
   }
+  /* Se uma dupla foi formada ha muito tempo e nunca chegou a se enfrentar,
+     desfaz o par: garante que nunca exista duelo eternamente parado. */
+  for(let i=pairs.length-1;i>=0;i--){
+    const p=pairs[i];
+    if(p.existing && p.a.pairedAt && G.t-p.a.pairedAt>60 && !p.a.engaged && !p.b.engaged){
+      p.a.opponent=null; p.b.opponent=null; p.a.arena=null; p.b.arena=null;
+      used.delete(p.a.user); used.delete(p.b.user);
+      pairs.splice(i,1);
+      logLine('⟲ duelo travado desfeito: '+p.a.user+' x '+p.b.user);
+    }
+  }
   const rest=alive.filter(s=>!used.has(s.user));
   rest.forEach(s=>{ s.opponent=null; s.engaged=false; });
   // só entra em novo duelo quem já cumpriu a pausa de reparo
@@ -750,7 +931,8 @@ function rematch(){
       a.station=0; b.station=1;
       a.opponent=b.user; b.opponent=a.user;
       a.engaged=false; b.engaged=false;
-      a.volleyT=rnd(0.3,1.0); b.volleyT=rnd(1.0,1.8);
+        a.volleyT=rnd(0.3,1.0); b.volleyT=rnd(1.0,1.8);
+      a.pairedAt=G.t; b.pairedAt=G.t;
       // eixo do duelo quase horizontal, com inclinação sorteada
       const ax=(Math.random()<0.5?0:Math.PI)+rnd(-AXIS_TILT,AXIS_TILT);
       a.axis=ax; b.axis=ax;
@@ -842,10 +1024,11 @@ function steer(s,dt){
   }
 }
 
+const FIRE_RANGE = STATION_R*2 + 90;      // alcance dos canhoes
 function inPosition(s){
-  if(!s.opponent||s.arena==null) return false;
-  const st=stationOf(s);
-  return Math.hypot(s.x-st.x,s.y-st.y)<44 && Math.abs(angDiff(s.hdg,st.hdg))<0.32;
+  const o = s.opponent ? G.ships.get(s.opponent) : null;
+  if(!o || o.sunk) return false;
+  return Math.hypot(s.x-o.x, s.y-o.y) < FIRE_RANGE;
 }
 
 /* ============================================================================
@@ -1109,18 +1292,24 @@ function labelFree(x,y,w,h){
 function drawShipLabel(s){
   if(s.sunk) return;
   const S=SHIP[s.tier];
-  const fs=25, barH=17, pad=7, rowH=fs*1.3;
-  const bw=Math.max(258,S.beam*SHIP_SCALE*2.1);
+  const fs=27, barH=23, pad=8, rowH=fs*1.3;   // maior: a vida estava ilegivel na live
+  const bw=Math.max(310,S.beam*SHIP_SCALE*2.2);
   const cooling=G.t<s.readyAt;
-  const blockH=rowH+barH+3+(cooling?15:0);
+  const leader = G.topMedalUser===s.user && s.medals>0;
+  const blockH=rowH+barH+3+(cooling?17:0)+(leader?24:0);
 
   let bx=clamp(s.x-bw*0.5,6,W-bw-6);
   let by=s.y-S.len*SHIP_SCALE*0.5-16-blockH;
   for(let a=0;a<4 && !labelFree(bx,by,bw,blockH);a++) by-=blockH+7;
-  by=Math.max(by,208);   // não sobe atrás da barra de níveis
+  by=Math.max(by,262);   // não sobe atrás do HUD do topo
   labelRects.push([bx,by,bw,blockH]);
 
-  ctx.fillStyle='rgba(4,10,16,.86)';
+  /* bandeira pirata em cima de quem tem mais medalhas */
+  if(leader){
+    drawPirateFlag(bx+bw/2, by+12, 1.15);
+    by+=24;
+  }
+  ctx.fillStyle='rgba(4,10,16,.88)';
   roundRect(ctx,bx,by,bw,rowH,5); ctx.fill();
   ctx.strokeStyle=TIERS[s.tier].col+'77'; ctx.lineWidth=1.5;
   roundRect(ctx,bx,by,bw,rowH,5); ctx.stroke();
@@ -1154,14 +1343,48 @@ function drawShipLabel(s){
   roundRect(ctx,bx+2,y2+2,Math.max(0,(bw-4)*pct),barH-4,2); ctx.fill();
   ctx.fillStyle='rgba(255,255,255,.24)';
   roundRect(ctx,bx+2,y2+2,Math.max(0,(bw-4)*pct),(barH-4)*0.42,2); ctx.fill();
-  ctx.font='800 13px -apple-system,sans-serif';
-  ctx.textAlign='center'; ctx.fillStyle='rgba(255,255,255,.95)';
-  ctx.fillText(fmtN(s.hp)+' / '+fmtN(s.maxHp),bx+bw/2,y2+barH*0.78);
+  ctx.font='900 19px -apple-system,sans-serif';
+  ctx.textAlign='center';
+  ctx.strokeStyle='rgba(0,0,0,.55)'; ctx.lineWidth=3.5;
+  ctx.strokeText(fmtN(s.hp)+' / '+fmtN(s.maxHp),bx+bw/2,y2+barH*0.76);
+  ctx.fillStyle='#ffffff';
+  ctx.fillText(fmtN(s.hp)+' / '+fmtN(s.maxHp),bx+bw/2,y2+barH*0.76);
 
   if(cooling){
-    ctx.font='900 13px -apple-system,sans-serif'; ctx.fillStyle='#8fd8ff';
-    ctx.fillText('🔧 reparando — '+Math.ceil(s.readyAt-G.t)+'s',bx+bw/2,y2+barH+13);
+    ctx.font='900 16px -apple-system,sans-serif'; ctx.fillStyle='#8fd8ff';
+    ctx.fillText('🔧 reparando — '+Math.ceil(s.readyAt-G.t)+'s',bx+bw/2,y2+barH+15);
   }
+}
+
+/* bandeira negra com caveira, marca de quem lidera as medalhas */
+function drawPirateFlag(cx,cy,sc){
+  const w=46*sc,h=26*sc;
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.fillStyle='#3a2411';                       // mastro
+  ctx.fillRect(-w/2-3,-h/2-3,3,h+9);
+  ctx.beginPath();                               // pano ondulando
+  ctx.moveTo(-w/2,-h/2);
+  for(let i=0;i<=8;i++){
+    const t=i/8;
+    ctx.lineTo(-w/2+t*w, -h/2+Math.sin(G.t*3.4+t*4.2)*2.6*sc);
+  }
+  for(let i=8;i>=0;i--){
+    const t=i/8;
+    ctx.lineTo(-w/2+t*w, h/2+Math.sin(G.t*3.4+t*4.2+0.5)*2.6*sc);
+  }
+  ctx.closePath();
+  ctx.fillStyle='#100d0c'; ctx.fill();
+  ctx.strokeStyle='rgba(232,192,90,.65)'; ctx.lineWidth=1.4; ctx.stroke();
+  // caveira
+  ctx.fillStyle='#ece7d9';
+  ctx.beginPath(); ctx.arc(0,-1.5*sc,6*sc,0,TAU); ctx.fill();
+  ctx.fillRect(-4*sc,3*sc,8*sc,3.4*sc);
+  ctx.fillStyle='#100d0c';
+  ctx.beginPath(); ctx.arc(-2.4*sc,-2*sc,1.9*sc,0,TAU); ctx.fill();
+  ctx.beginPath(); ctx.arc( 2.4*sc,-2*sc,1.9*sc,0,TAU); ctx.fill();
+  ctx.fillRect(-0.7*sc,0.4*sc,1.4*sc,2*sc);
+  ctx.restore();
 }
 
 function roundRect(g,x,y,w,h,r){
@@ -1419,8 +1642,10 @@ function renderQueue(){
   }).join('')+(G.queue.length>4?'<div class="li" style="opacity:.5"><i></i><b>+'+(G.queue.length-4)+' esperando</b></div>':'');
 }
 function renderRank(){
-  const top=[...G.fame.values()].filter(f=>f.medals>0)
-    .sort((a,b)=>b.medals-a.medals||b.kills-a.kills).slice(0,4);
+  const ordered=[...G.fame.values()].filter(f=>f.medals>0)
+    .sort((a,b)=>b.medals-a.medals||b.kills-a.kills);
+  G.topMedalUser = ordered.length? ordered[0].user : null;
+  const top=ordered.slice(0,4);
   const b=$('rankBody');
   if(!top.length){ b.innerHTML='<div class="li" style="opacity:.45"><b>sem medalhas ainda</b></div>'; return; }
   b.innerHTML=top.map((f,i)=>'<div class="li"><i>'+(i+1)+'</i><b>'+esc(f.user)+'</b><u>'+fmtN(f.medals)+'</u></div>').join('');
@@ -1502,15 +1727,17 @@ function startMatch(){
   clearInterval(endScrollTimer);
   $('btnPause').textContent='⏸ Pausar';
   bigMsg('⚓ AO MAR!','#e8c05a');
+  Music.setVol(clamp((+$('inVolMus').value||45)/100,0,1));
+  Music.start();
   logLine('▶ partida iniciada — '+CFG.fleet+' navios, pausa de reparo '+CFG.repair+'s');
 }
 function endMatch(){
-  G.running=false; G.over=true; Snd.fanfare();
+  G.running=false; G.over=true; Music.stop(); Snd.fanfare();
   $('bigMsg').classList.remove('show');
   buildEndScreen(); logLine('⏹ partida encerrada');
 }
 function resetMatch(){
-  G.running=false; G.paused=false; G.over=false;
+  G.running=false; G.paused=false; G.over=false; Music.stop();
   G.ships.clear(); G.queue.length=0; G.fame.clear();
   G.balls.length=0; G.booms.length=0; G.splashes.length=0;
   G.wakes.length=0; G.floats.length=0; G.debris.length=0; G.fauna.length=0;
@@ -1598,6 +1825,7 @@ $('btnConnect').onclick=()=>{ USERNAME=$('inUser').value.trim(); KEY=$('inKey').
 $('btnStart').onclick=()=>{ Snd.init(); Snd.resume(); startMatch(); };
 $('btnPause').onclick=()=>{ if(!G.running) return;
   G.paused=!G.paused; $('btnPause').textContent=G.paused?'▶ Retomar':'⏸ Pausar';
+  if(G.paused) Music.stop(); else Music.start();
   logLine(G.paused?'⏸ pausado':'▶ retomado'); };
 $('btnEnd').onclick=()=>{ if(G.running||G.ships.size) endMatch(); };
 $('btnReset').onclick=()=>resetMatch();
@@ -1605,6 +1833,8 @@ $('btnReset').onclick=()=>resetMatch();
 ['inFleet','inVolleys','inRate','inHpPer','inRepair','inMatch','ckFair']
   .forEach(id=>$(id).addEventListener('change',readCfg));
 $('inVol').addEventListener('change',()=>Snd.setVol(clamp((+$('inVol').value||0)/100,0,1)));
+$('inVolMus').addEventListener('change',()=>Music.setVol(clamp((+$('inVolMus').value||0)/100,0,1)));
+$('btnMusic').onclick=()=>Music.toggle();
 
 const FAKE=['capitao_lu','joaozin','pedr0','mari.s','biel','th41s','lu4na','gab_','rafa77','duda',
             'kaio','yasmin','vitin','nanda','igor','sofi','murilo','helo','davi','clara'];
