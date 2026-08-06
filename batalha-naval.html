@@ -134,7 +134,7 @@
       <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1.000 vida</span><span class="dm" id="dm2">·</span></div>
       <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10.000 vida</span><span class="dm" id="dm3">·</span></div>
     </div>
-    <div id="repairHint">🔧 <b>1 moeda = +10 de vida</b> — mande presente pro seu navio pra consertar</div>
+    <div id="repairHint">🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +10 de vida</div>
     <div id="topRow">
       <div class="chip">⚓ <span id="fleetTxt">0/6 NAVIOS</span></div>
       <div class="chip">⏱ <span id="matchTxt">--:--</span></div>
@@ -255,6 +255,9 @@ const W=1080, H=1920;
    É o único arranjo em que 3 duelos cabem num quadro 9:16 sem se sobrepor. */
 const ARENAS=[{x:380,y:540},{x:700,y:965},{x:420,y:1390}];
 const STATION_R=190;                 // distância de cada navio ao centro da arena
+/* pontos de patrulha separados, um por navio ocioso */
+const PATROL=[{x:250,y:700,r:150},{x:830,y:760,r:150},{x:250,y:1180,r:150},
+              {x:830,y:1180,r:150},{x:540,y:930,r:170},{x:540,y:1480,r:150}];
 const AXIS_TILT=25*Math.PI/180;      // inclinação máxima do eixo do duelo
 
 /* ilhas: posições resolvidas para nunca invadir uma arena */
@@ -743,8 +746,7 @@ function readCfg(){
     const dmg=(TIERS[t].coinsBase*CFG.hpPer)/CFG.volleys;
     $('dm'+t).textContent = (dmg<10?dmg.toFixed(1).replace('.',','):Math.round(dmg))+' dano';
   }
-  $('repairHint').innerHTML='🔧 <b>1 moeda = +'+CFG.hpPer+' de vida</b>'+
-    ' — mande presente pro seu navio pra consertar';
+  $('repairHint').innerHTML='🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +'+CFG.hpPer+' de vida';
 }
 
 /* ============================================================================
@@ -813,11 +815,13 @@ function spawnShip(user,coins,avatar){
     tx:x,ty:y,thdg:null,axis:0,
     arena:null,station:0,opponent:null,engaged:false,volleyT:rnd(0.4,1.4),
     readyAt:0, pairedAt:0,           // pausa de reparo / quando o par foi formado
-    patrolA:rnd(0,TAU),
+    patrolA:rnd(0,TAU), patrolSlot:0,
     sunk:false,sinkT:0,
     flash:0,healFlash:0,upFlash:0,
     medals:f.medals,kills:f.kills,wins:0,wakeT:0
   };
+  const usados=new Set([...G.ships.values()].filter(o=>!o.sunk).map(o=>o.patrolSlot));
+  for(let i=0;i<PATROL.length;i++) if(!usados.has(i)){ s.patrolSlot=i; break; }
   G.ships.set(user,s);
   Snd.spawn(tier);
   bigMsg((tier===3?'⚡ ':'⚓ ')+user.toUpperCase()+' — '+TIERS[tier].name.toUpperCase(),TIERS[tier].col);
@@ -853,7 +857,7 @@ const ballsPerVolley=s=>[1,2,3,5][s.tier];
 function sinkShip(s,killer){
   if(s.sunk) return;
   s.sunk=true; s.sinkT=0; s.opponent=null; s.engaged=false; s.arena=null;
-  Snd.sink(); G.shake=Math.min(1,G.shake+0.6);
+  Snd.sink(); G.shake=Math.min(0.85,G.shake+0.45);
   fame(s.user).sunk++;
   for(let i=0;i<9;i++)
     G.debris.push({x:s.x+rnd(-30,30),y:s.y+rnd(-40,40),vx:rnd(-46,46),vy:rnd(-46,46),
@@ -956,11 +960,12 @@ function steer(s,dt){
     const st=stationOf(s);
     s.tx=st.x; s.ty=st.y; s.thdg=st.hdg;
   }else{
-    // sem duelo: patrulha em círculo lento
+    /* Sem duelo: patrulha. Cada navio tem um PONTO PRÓPRIO — antes todos que
+       estavam sem arena circulavam a mesma arena 1 e acabavam empilhados. */
     s.patrolA += dt*0.28;
-    const A=ARENAS[s.arena!=null?s.arena:1];
-    s.tx=clamp(A.x+Math.cos(s.patrolA)*300,120,W-120);
-    s.ty=clamp(A.y+Math.sin(s.patrolA)*210,320,H-430);
+    const P = PATROL[s.patrolSlot % PATROL.length];
+    s.tx=clamp(P.x+Math.cos(s.patrolA)*P.r,120,W-120);
+    s.ty=clamp(P.y+Math.sin(s.patrolA)*P.r*0.7,320,H-430);
     s.thdg=null;
   }
 
@@ -1009,6 +1014,22 @@ function steer(s,dt){
     }
   }
 
+  /* Separação entre navios: não existia colisão entre eles, então dois barcos
+     passavam um por cima do outro. Empurrão suave (não é teleporte: o ajuste
+     por quadro é pequeno e só age quando os cascos já estão encostando). */
+  const myHalf=SHIP[s.tier].beam*SHIP_SCALE*0.5;
+  for(const o of G.ships.values()){
+    if(o===s||o.sunk) continue;
+    let ox=s.x-o.x, oy=s.y-o.y;
+    let d=Math.hypot(ox,oy);
+    if(d<0.01){ ox=Math.cos(s.hdg+1.57); oy=Math.sin(s.hdg+1.57); d=1; }  // exatamente juntos
+    const minD=myHalf+SHIP[o.tier].beam*SHIP_SCALE*0.5+10;
+    if(d<minD){
+      const push=Math.min((minD-d)*0.5, 90*dt);
+      s.x+=ox/d*push; s.y+=oy/d*push;
+    }
+  }
+
   // esteira
   s.wakeT-=dt;
   if(s.spd>14 && s.wakeT<=0){
@@ -1044,7 +1065,7 @@ function fireVolley(s,target){
   const n=Math.min(ballsPerVolley(s),guns.length);
   const dmg=volleyDamage(s)*rnd(0.88,1.12)/n;
   Snd.cannon(0.5+s.tier*0.45);
-  G.shake=Math.min(1,G.shake+0.05+s.tier*0.045);
+  G.shake=Math.min(0.5,G.shake+0.03+s.tier*0.022);   // teto baixo: senão a tela vibra sem parar
 
   const cos=Math.cos(s.hdg+Math.PI/2), sin=Math.sin(s.hdg+Math.PI/2);
   for(let i=0;i<n;i++){
@@ -1296,7 +1317,7 @@ function drawShipLabel(s){
   const bw=Math.max(310,S.beam*SHIP_SCALE*2.2);
   const cooling=G.t<s.readyAt;
   const leader = G.topMedalUser===s.user && s.medals>0;
-  const blockH=rowH+barH+3+(cooling?17:0)+(leader?24:0);
+  const blockH=rowH+barH+3+(cooling?17:0)+(leader?50:0);
 
   let bx=clamp(s.x-bw*0.5,6,W-bw-6);
   let by=s.y-S.len*SHIP_SCALE*0.5-16-blockH;
@@ -1306,8 +1327,8 @@ function drawShipLabel(s){
 
   /* bandeira pirata em cima de quem tem mais medalhas */
   if(leader){
-    drawPirateFlag(bx+bw/2, by+12, 1.15);
-    by+=24;
+    drawPirateFlag(bx+bw/2, by+24, 2.3);
+    by+=50;
   }
   ctx.fillStyle='rgba(4,10,16,.88)';
   roundRect(ctx,bx,by,bw,rowH,5); ctx.fill();
@@ -1560,7 +1581,7 @@ function drawFloats(){
 
 function render(){
   ctx.save();
-  if(G.shake>0){ const m=G.shake*14; ctx.translate(rnd(-m,m),rnd(-m,m)); }
+  if(G.shake>0){ const m=G.shake*8; ctx.translate(rnd(-m,m),rnd(-m,m)); }
 
   ctx.drawImage(seaCv,0,0);
   drawWaves();
