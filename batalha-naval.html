@@ -134,8 +134,16 @@
     padding:6px 8px;line-height:1.2}
   .live-stats .st b{display:block;font-size:16px;color:#e8c05a;font-weight:900}
   .live-stats .st span{font-size:10.5px;opacity:.55;text-transform:uppercase;letter-spacing:.06em}
+  .box-title{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+    opacity:.55;font-weight:800;margin:2px 0 5px}
+  /* presentes numa caixa propria, com altura fixa: assim uma enxurrada de
+     comentarios nunca empurra os presentes pra fora da vista */
+  #giftBox{height:34%;min-height:130px;overflow-y:auto;background:#0d0a06;
+    border:1px solid #3a2f16;border-radius:8px;padding:7px;margin-bottom:10px}
   #chatBox{flex:1;overflow-y:auto;background:#080b0f;border:1px solid #1b212a;
-    border-radius:8px;padding:7px;min-height:220px}
+    border-radius:8px;padding:7px;min-height:150px}
+  #giftBox .cm{border-bottom-color:rgba(232,192,90,.10)}
+  #giftBox .cm .coin{color:#ffd97a;font-weight:900;flex:0 0 auto;margin-left:auto}
   .cm{display:flex;gap:6px;padding:3px 0;font-size:12px;line-height:1.35;
     border-bottom:1px solid rgba(255,255,255,.04)}
   .cm .ic{flex:0 0 auto;width:1.2em;text-align:center}
@@ -254,6 +262,9 @@
     <div class="st"><b id="stCoins">0</b><span>moedas recebidas</span></div>
     <div class="st"><b id="stComments">0</b><span>comentários</span></div>
   </div>
+  <div class="box-title">🎁 Últimos presentes</div>
+  <div id="giftBox"></div>
+  <div class="box-title">💬 Chat</div>
   <div id="chatBox"></div>
 </div>
 
@@ -812,9 +823,13 @@ function handleEvent(ev){
     case 'JOIN':    chatPush('join',ev.user,'entrou na live'); break;
     case 'LIKE':    LIVE.likes+=Number(ev.count)||1;
                     chatPush('like',ev.user,'mandou '+(ev.count||1)+' curtida'+((ev.count||1)>1?'s':'')); break;
-    case 'ROOM_USER': case 'VIEWERS':
-      LIVE.viewers=Number(ev.viewerCount ?? ev.count ?? ev.viewers);
+    case 'ROOM_USER': case 'VIEWERS': {
+      /* viewerCount = espectadores AGORA. O backend antes mandava o acumulado
+         (totalUser) por engano — 9,7k com 470 assistindo. */
+      const n=Number(ev.viewerCount ?? ev.count ?? ev.viewers);
+      if(Number.isFinite(n)&&n>=0) LIVE.viewers=n;
       break;
+    }
   }
   updateLiveStats();
 }
@@ -822,28 +837,44 @@ window.handleEvent=handleEvent;
 
 /* ---------- chat da live (painel do streamer) ---------- */
 const LIVE={viewers:null,gifts:0,coins:0,comments:0,likes:0};
-let chatQueue=[];
-const CHAT_MAX=140;
+/* Duas filas separadas: presente vai pra caixa de presentes, o resto pro chat.
+   Antes tudo caia junto e os presentes sumiam no meio dos comentários. */
+let chatQueue=[], giftQueue=[];
+const CHAT_MAX=140, GIFT_MAX=60;
 function chatPush(kind,user,txt,extra){
-  chatQueue.push({kind,user:user||'anônimo',txt:txt||'',extra});
-  if(chatQueue.length>60) chatQueue=chatQueue.slice(-60);
+  const item={kind,user:user||'anônimo',txt:txt||'',extra};
+  if(kind==='gift'){ giftQueue.push(item); if(giftQueue.length>40) giftQueue=giftQueue.slice(-40); }
+  else            { chatQueue.push(item); if(chatQueue.length>60) chatQueue=chatQueue.slice(-60); }
 }
 const CHAT_ICON={comment:'💬',gift:'🎁',follow:'💚',join:'👋',like:'❤️'};
-setInterval(()=>{
-  if(!chatQueue.length) return;
-  const box=$('chatBox');
-  const perto = box.scrollHeight-box.scrollTop-box.clientHeight < 60;  // só rola se já estava embaixo
+/* despeja uma fila numa caixa, sem quebrar a rolagem de quem subiu pra ler */
+function flushBox(fila, boxId, teto, monta){
+  if(!fila.length) return;
+  const box=$(boxId);
+  const perto = box.scrollHeight-box.scrollTop-box.clientHeight < 60;
   const frag=document.createDocumentFragment();
-  for(const c of chatQueue.splice(0)){
+  for(const c of fila.splice(0)) frag.appendChild(monta(c));
+  box.appendChild(frag);
+  while(box.childElementCount>teto) box.removeChild(box.firstChild);
+  if(perto) box.scrollTop=box.scrollHeight;
+}
+setInterval(()=>{
+  flushBox(giftQueue,'giftBox',GIFT_MAX,c=>{
+    const d=document.createElement('div');
+    d.className='cm gift';
+    d.innerHTML='<span class="ic">🎁</span><span class="who">'+esc(c.user)+'</span>'+
+      '<span class="txt">'+esc(c.extra&&c.extra.gift||'presente')+
+      (c.extra&&c.extra.amount>1?' ×'+c.extra.amount:'')+'</span>'+
+      '<span class="coin">'+fmtN(c.extra&&c.extra.coins||0)+' 🪙</span>';
+    return d;
+  });
+  flushBox(chatQueue,'chatBox',CHAT_MAX,c=>{
     const d=document.createElement('div');
     d.className='cm '+c.kind;
     d.innerHTML='<span class="ic">'+(CHAT_ICON[c.kind]||'•')+'</span>'+
       '<span class="who">'+esc(c.user)+'</span><span class="txt">'+esc(c.txt)+'</span>';
-    frag.appendChild(d);
-  }
-  box.appendChild(frag);
-  while(box.childElementCount>CHAT_MAX) box.removeChild(box.firstChild);
-  if(perto) box.scrollTop=box.scrollHeight;
+    return d;
+  });
 },300);
 function updateLiveStats(){
   $('stViewers').textContent = LIVE.viewers!=null ? fmtN(LIVE.viewers) : '—';
@@ -860,7 +891,7 @@ function onGift(ev){
   const avatar=extractAvatar(ev);
   pushFeed(user,giftName,amount,avatar,coins);
   LIVE.gifts++; LIVE.coins+=coins;
-  chatPush('gift',user,'mandou '+giftName+' ×'+amount+'  ('+coins+' moedas)');
+  chatPush('gift',user,'',{gift:giftName,amount,coins});
   if(!G.running||G.over){ console.warn('presente fora de partida:',user,coins); return; }
 
   const ship=G.ships.get(user);
