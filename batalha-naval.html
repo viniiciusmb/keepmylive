@@ -175,10 +175,10 @@
   <canvas id="cv" width="1080" height="1920"></canvas>
   <div class="layer">
     <div id="tierBar">
-      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">10 vida <b class="dm" id="dm0">·</b></span></div>
-      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">100 vida <b class="dm" id="dm1">·</b></span></div>
-      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1k vida <b class="dm" id="dm2">·</b></span></div>
-      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10k vida <b class="dm" id="dm3">·</b></span></div>
+      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">20 vida <b class="dm" id="dm0">·</b></span></div>
+      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">60 vida <b class="dm" id="dm1">·</b></span></div>
+      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">180 vida <b class="dm" id="dm2">·</b></span></div>
+      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">540 vida <b class="dm" id="dm3">·</b></span></div>
     </div>
     <div id="repairHint">🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +10 de vida</div>
     <div id="topRow">
@@ -324,11 +324,17 @@ const ISLANDS=[
   {x:69,y:1565,r:110},{x:927,y:1580,r:96}
 ];
 
+/* coinsBase = custo em moedas pra alcançar o nível (não muda, é a economia).
+   power = força de combate do nível (vida e dano) — separada do coinsBase pra
+   evitar que o salto de 10x por nível vire 100x de vantagem num duelo entre
+   níveis vizinhos (10x mais dano E 10x mais vida ao mesmo tempo). Com power
+   crescendo 3x por nível, um nível acima continua ganhando quase sempre, mas
+   sem afundar o adversário num tiro só. */
 const TIERS=[
-  {i:0,name:'Jangada',short:'JANG',col:'#a4703c',medal:1,   coinsBase:1},
-  {i:1,name:'Barco',  short:'BARC',col:'#c99247',medal:10,  coinsBase:10},
-  {i:2,name:'Galeão', short:'GALE',col:'#e8c05a',medal:100, coinsBase:100},
-  {i:3,name:'Supremo',short:'SUPR',col:'#b06ce8',medal:1000,coinsBase:1000}
+  {i:0,name:'Jangada',short:'JANG',col:'#a4703c',medal:1,   coinsBase:1,   power:1},
+  {i:1,name:'Barco',  short:'BARC',col:'#c99247',medal:10,  coinsBase:10,  power:3},
+  {i:2,name:'Galeão', short:'GALE',col:'#e8c05a',medal:100, coinsBase:100, power:9},
+  {i:3,name:'Supremo',short:'SUPR',col:'#b06ce8',medal:1000,coinsBase:1000,power:27}
 ];
 const tierForCoins=c=> c>=1000?3 : c>=100?2 : c>=10?1 : 0;
 
@@ -801,7 +807,7 @@ function readCfg(){
   CFG.fair    = $('ckFair').checked;
   /* dano por salva = vida / salvas — mostrado na barra de niveis */
   for(let t=0;t<4;t++){
-    const dmg=(TIERS[t].coinsBase*CFG.hpPer)/CFG.volleys;
+    const dmg=(TIERS[t].power*CFG.hpPer)/CFG.volleys;
     $('dm'+t).textContent = '· '+(dmg<10?dmg.toFixed(1).replace('.',','):Math.round(dmg))+' dano';
   }
   $('repairHint').innerHTML='🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +'+CFG.hpPer+' de vida';
@@ -989,12 +995,18 @@ function reinforce(s,coins,avatar){
    Antes era maxHp/salvas, e como cada reparo aumenta o maxHp, um galeão
    muito reparado chegava a 278 de dano (hit kill em jangada e barco)
    enquanto a barra do topo prometia 56. Agora o número bate com o HUD. */
-const volleyDamage=s=>(TIERS[s.tier].coinsBase*CFG.hpPer)/CFG.volleys;
+const volleyDamage=s=>(TIERS[s.tier].power*CFG.hpPer)/CFG.volleys;
 
-/* Vida = moedas x vida_por_moeda, mas com teto de 2x a base do nível: sem isso
-   um galeão de 999 moedas ficava com 9.990 de vida e a batalha durava minutos. */
-const maxHpFor=(coins,tier)=>Math.min(TIERS[tier].coinsBase*CFG.hpPer*2, coins*CFG.hpPer);
+/* Vida = moedas x vida_por_moeda, mas com teto de 2x a força do nível: sem isso
+   um galeão de 999 moedas ficava com 9.990 de vida e a batalha durava minutos.
+   Usa "power" (curva suave, 3x por nível) em vez de "coinsBase" (10x por nível)
+   pra não deixar os níveis altos viciosamente tanques nem os baixos de papel. */
+const maxHpFor=(coins,tier)=>Math.min(TIERS[tier].power*CFG.hpPer*2, coins*CFG.hpPer);
 const ballsPerVolley=s=>[1,2,3,5][s.tier];
+/* Teto de dano por salva: nenhum tiro tira mais que 30% da vida MÁXIMA do
+   alvo, então mesmo um Supremo contra uma Jangada precisa de uns 4 tiros pra
+   afundar — sem isso, a diferença de nível ainda permitia matar num tiro só. */
+const MAX_DMG_FRAC=0.3;
 
 function sinkShip(s,killer){
   if(s.sunk) return;
@@ -1235,7 +1247,8 @@ function fireVolley(s,target){
   const guns=spr._guns.filter(g=>g.side===side);
   if(!guns.length) return;
   const n=Math.min(ballsPerVolley(s),guns.length);
-  const dmg=volleyDamage(s)*rnd(0.88,1.12)/n;
+  const volleyTotal=Math.min(volleyDamage(s)*rnd(0.88,1.12), target.maxHp*MAX_DMG_FRAC);
+  const dmg=volleyTotal/n;
   Snd.cannon(0.5+s.tier*0.45);
   G.shake=Math.min(0.5,G.shake+0.03+s.tier*0.022);   // teto baixo: senão a tela vibra sem parar
 
@@ -2051,7 +2064,20 @@ $('btnChat').onclick=()=>{
   }, i*140);
 };
 
-document.addEventListener('pointerdown',()=>{ Snd.init(); Snd.resume(); });
+/* Destrava o áudio em qualquer toque — "pointerdown" sozinho falha em vários
+   navegadores/WebViews de celular que não emulam Pointer Events direito. */
+['pointerdown','touchend','click'].forEach(ev=>
+  document.addEventListener(ev,()=>{ Snd.init(); Snd.resume(); },{passive:true}));
+
+/* No celular o navegador suspende o AudioContext sozinho quando a tela apaga
+   ou o app perde foco (pra trocar pro TikTok Live Studio/OBS, por exemplo) —
+   e sem isso o som ficava mudo pro resto da live até alguém tocar de novo
+   NESSA aba, o que não acontece numa transmissão rodando sem supervisão. */
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible'){ Snd.resume(); if(Music.on) Snd.resume(); }
+});
+window.addEventListener('focus',()=>Snd.resume());
+window.addEventListener('pageshow',()=>Snd.resume());
 
 readCfg(); Snd.setVol(0.75); renderQueue(); renderRank(); updateLiveStats();
 if(USERNAME&&KEY) connect(); else setConn(false,'desconectado');
