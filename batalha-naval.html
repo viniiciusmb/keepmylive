@@ -22,16 +22,16 @@
     border-radius:7px;padding:4px 2px 5px;text-align:center;line-height:1.2;}
   #tierBar .t .cn{display:block;font-weight:900;color:var(--gold);font-size:1.22em}
   #tierBar .t .nm{display:block;font-weight:800}
-  #tierBar .t .hp{display:block;opacity:.66;font-size:.86em}
-  #tierBar .t .dm{display:block;font-size:.86em;font-weight:800;color:#ff9a6a}
-  #repairHint{position:absolute;top:6.4%;left:2%;right:2%;text-align:center;
+  #tierBar .t .hp{display:block;opacity:.66;font-size:.82em;white-space:nowrap}
+  #tierBar .t .dm{font-weight:800;color:#ff9a6a}
+  #repairHint{position:absolute;top:8.4%;left:2%;right:2%;text-align:center;
     font-size:clamp(5.5px,1.5vh,9.5px);letter-spacing:.02em;color:#8fe6b6;
     background:rgba(4,10,16,.72);border:1px solid rgba(110,231,168,.30);
     border-radius:999px;padding:2px 8px}
   #repairHint b{color:#b6f5d2}
   #tierBar .t.t4{border-color:rgba(170,100,230,.62);box-shadow:0 0 12px rgba(150,80,220,.24) inset}
 
-  #topRow{position:absolute;top:10.6%;left:2.5%;right:2.5%;display:flex;
+  #topRow{position:absolute;top:12.2%;left:2.5%;right:2.5%;display:flex;
     justify-content:space-between;font-size:clamp(6px,1.72vh,11px);}
   .chip{background:rgba(4,10,16,.82);border:1px solid rgba(232,192,90,.26);
     border-radius:999px;padding:3px 10px;font-weight:800;letter-spacing:.04em;
@@ -120,6 +120,31 @@
   .status .dot{width:9px;height:9px;border-radius:50%;background:#a8392b;box-shadow:0 0 9px #a8392b}
   .status.ok .dot{background:#1f9c5e;box-shadow:0 0 9px #1f9c5e}
   .note{font-size:11px;opacity:.45;line-height:1.5;margin-top:8px}
+  /* ==================== CHAT DA LIVE (só o streamer vê) ==================== */
+  .chat-panel{flex:1 1 300px;min-width:270px;max-width:400px;background:#0d1015;
+    border:1px solid #1f2530;border-radius:12px;padding:14px;font-size:13px;
+    display:flex;flex-direction:column;max-height:calc(100vh - 36px)}
+  .chat-panel h1{font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:7px}
+  .chat-panel h1 .dot{width:8px;height:8px;border-radius:50%;background:#a8392b;flex:0 0 auto}
+  .chat-panel h1.on .dot{background:#e0342f;box-shadow:0 0 8px #e0342f;
+    animation:pulseLive 1.4s infinite}
+  @keyframes pulseLive{0%,100%{opacity:1}50%{opacity:.35}}
+  .live-stats{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}
+  .live-stats .st{background:#151a21;border:1px solid #232b36;border-radius:8px;
+    padding:6px 8px;line-height:1.2}
+  .live-stats .st b{display:block;font-size:16px;color:#e8c05a;font-weight:900}
+  .live-stats .st span{font-size:10.5px;opacity:.55;text-transform:uppercase;letter-spacing:.06em}
+  #chatBox{flex:1;overflow-y:auto;background:#080b0f;border:1px solid #1b212a;
+    border-radius:8px;padding:7px;min-height:220px}
+  .cm{display:flex;gap:6px;padding:3px 0;font-size:12px;line-height:1.35;
+    border-bottom:1px solid rgba(255,255,255,.04)}
+  .cm .ic{flex:0 0 auto;width:1.2em;text-align:center}
+  .cm .who{font-weight:800;color:#9fc4e8;flex:0 0 auto;max-width:44%;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cm .txt{flex:1;min-width:0;word-break:break-word;opacity:.9}
+  .cm.gift .who{color:#e8c05a} .cm.gift .txt{color:#ffd97a;font-weight:700}
+  .cm.follow .txt{color:#6ee7a8} .cm.join .txt{color:#8fd8ff;opacity:.7}
+  .cm.like .txt{color:#ff9ec4;opacity:.75}
   #log{background:#080b0f;border:1px solid #1b212a;border-radius:7px;padding:8px;height:120px;
     overflow-y:auto;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;
     line-height:1.55;color:#8d9bab;white-space:pre-wrap}
@@ -129,10 +154,10 @@
   <canvas id="cv" width="1080" height="1920"></canvas>
   <div class="layer">
     <div id="tierBar">
-      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">10 vida</span><span class="dm" id="dm0">·</span></div>
-      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">100 vida</span><span class="dm" id="dm1">·</span></div>
-      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1.000 vida</span><span class="dm" id="dm2">·</span></div>
-      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10.000 vida</span><span class="dm" id="dm3">·</span></div>
+      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">10 vida <b class="dm" id="dm0">·</b></span></div>
+      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">100 vida <b class="dm" id="dm1">·</b></span></div>
+      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">1k vida <b class="dm" id="dm2">·</b></span></div>
+      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">10k vida <b class="dm" id="dm3">·</b></span></div>
     </div>
     <div id="repairHint">🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +10 de vida</div>
     <div id="topRow">
@@ -212,12 +237,24 @@
     <div class="row2">
       <button id="btnFill">Encher o mar</button><button id="btnFlood">+12 na fila</button>
       <button id="btnRepair">Reparar todos</button><button id="btnFauna">Baleia / gaivotas</button>
+      <button id="btnChat">Simular chat</button>
     </div>
     <p class="note">No console:<br>
     <code>handleEvent({type:'GIFT',user:'teste',gift:'Rosa',amount:1,diamondCount:100})</code></p>
   </fieldset>
 
   <fieldset><legend>Console</legend><div id="log"></div></fieldset>
+</div>
+
+<div class="chat-panel">
+  <h1 id="chatTitle"><span class="dot"></span>Chat da live</h1>
+  <div class="live-stats">
+    <div class="st"><b id="stViewers">—</b><span>ao vivo agora</span></div>
+    <div class="st"><b id="stGifts">0</b><span>presentes</span></div>
+    <div class="st"><b id="stCoins">0</b><span>moedas recebidas</span></div>
+    <div class="st"><b id="stComments">0</b><span>comentários</span></div>
+  </div>
+  <div id="chatBox"></div>
 </div>
 
 <script>
@@ -744,7 +781,7 @@ function readCfg(){
   /* dano por salva = vida / salvas — mostrado na barra de niveis */
   for(let t=0;t<4;t++){
     const dmg=(TIERS[t].coinsBase*CFG.hpPer)/CFG.volleys;
-    $('dm'+t).textContent = (dmg<10?dmg.toFixed(1).replace('.',','):Math.round(dmg))+' dano';
+    $('dm'+t).textContent = '· '+(dmg<10?dmg.toFixed(1).replace('.',','):Math.round(dmg))+' dano';
   }
   $('repairHint').innerHTML='🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +'+CFG.hpPer+' de vida';
 }
@@ -764,8 +801,56 @@ function extractAvatar(ev){
   for(const k of keys){const v=ev[k]; if(typeof v==='string'&&/^https?:\/\//.test(v)) return v;}
   return null;
 }
-function handleEvent(ev){ if(ev&&ev.type==='GIFT') onGift(ev); }
+/* O jogo só reage a GIFT, mas o resto dos eventos alimenta o chat lateral
+   (que fica fora da moldura, então nunca aparece na live). */
+function handleEvent(ev){
+  if(!ev||!ev.type) return;
+  switch(ev.type){
+    case 'GIFT':    onGift(ev); break;
+    case 'COMMENT': LIVE.comments++; chatPush('comment',ev.user,ev.message||''); break;
+    case 'FOLLOW':  chatPush('follow',ev.user,'começou a seguir'); break;
+    case 'JOIN':    chatPush('join',ev.user,'entrou na live'); break;
+    case 'LIKE':    LIVE.likes+=Number(ev.count)||1;
+                    chatPush('like',ev.user,'mandou '+(ev.count||1)+' curtida'+((ev.count||1)>1?'s':'')); break;
+    case 'ROOM_USER': case 'VIEWERS':
+      LIVE.viewers=Number(ev.viewerCount ?? ev.count ?? ev.viewers);
+      break;
+  }
+  updateLiveStats();
+}
 window.handleEvent=handleEvent;
+
+/* ---------- chat da live (painel do streamer) ---------- */
+const LIVE={viewers:null,gifts:0,coins:0,comments:0,likes:0};
+let chatQueue=[];
+const CHAT_MAX=140;
+function chatPush(kind,user,txt,extra){
+  chatQueue.push({kind,user:user||'anônimo',txt:txt||'',extra});
+  if(chatQueue.length>60) chatQueue=chatQueue.slice(-60);
+}
+const CHAT_ICON={comment:'💬',gift:'🎁',follow:'💚',join:'👋',like:'❤️'};
+setInterval(()=>{
+  if(!chatQueue.length) return;
+  const box=$('chatBox');
+  const perto = box.scrollHeight-box.scrollTop-box.clientHeight < 60;  // só rola se já estava embaixo
+  const frag=document.createDocumentFragment();
+  for(const c of chatQueue.splice(0)){
+    const d=document.createElement('div');
+    d.className='cm '+c.kind;
+    d.innerHTML='<span class="ic">'+(CHAT_ICON[c.kind]||'•')+'</span>'+
+      '<span class="who">'+esc(c.user)+'</span><span class="txt">'+esc(c.txt)+'</span>';
+    frag.appendChild(d);
+  }
+  box.appendChild(frag);
+  while(box.childElementCount>CHAT_MAX) box.removeChild(box.firstChild);
+  if(perto) box.scrollTop=box.scrollHeight;
+},300);
+function updateLiveStats(){
+  $('stViewers').textContent = LIVE.viewers!=null ? fmtN(LIVE.viewers) : '—';
+  $('stGifts').textContent   = fmtN(LIVE.gifts);
+  $('stCoins').textContent   = fmtN(LIVE.coins);
+  $('stComments').textContent= fmtN(LIVE.comments);
+}
 
 function onGift(ev){
   const user=(ev.user||'').trim(); if(!user) return;
@@ -774,6 +859,8 @@ function onGift(ev){
   const coins=Math.max(1,Math.round(value));
   const avatar=extractAvatar(ev);
   pushFeed(user,giftName,amount,avatar,coins);
+  LIVE.gifts++; LIVE.coins+=coins;
+  chatPush('gift',user,'mandou '+giftName+' ×'+amount+'  ('+coins+' moedas)');
   if(!G.running||G.over){ console.warn('presente fora de partida:',user,coins); return; }
 
   const ship=G.ships.get(user);
@@ -798,7 +885,7 @@ const ACC =[70,58,46,36];
 
 function spawnShip(user,coins,avatar){
   if(activeCount()>=CFG.fleet) return null;
-  const tier=tierForCoins(coins), maxHp=coins*CFG.hpPer;
+  const tier=tierForCoins(coins), maxHp=maxHpFor(coins,tier);
   const f=fame(user); f.bestTier=Math.max(f.bestTier,tier);
   // entra navegando por uma borda
   const edge=pick(['t','b','l','r']);
@@ -815,7 +902,7 @@ function spawnShip(user,coins,avatar){
     tx:x,ty:y,thdg:null,axis:0,
     arena:null,station:0,opponent:null,engaged:false,volleyT:rnd(0.4,1.4),
     readyAt:0, pairedAt:0,           // pausa de reparo / quando o par foi formado
-    patrolA:rnd(0,TAU), patrolSlot:0,
+    patrolA:rnd(0,TAU), patrolSlot:0, waitA:rnd(0,TAU),
     sunk:false,sinkT:0,
     flash:0,healFlash:0,upFlash:0,
     medals:f.medals,kills:f.kills,wins:0,wakeT:0
@@ -835,7 +922,7 @@ function reinforce(s,coins,avatar){
   s.coins+=coins;
   const nt=tierForCoins(s.coins);
   if(nt>before){
-    s.tier=nt; s.maxHp=s.coins*CFG.hpPer; s.hp=s.maxHp; s.upFlash=1;
+    s.tier=nt; s.maxHp=maxHpFor(s.coins,nt); s.hp=s.maxHp; s.upFlash=1;
     s.maxSpd=SPD[nt]; s.turnRate=TURN[nt]; s.accel=ACC[nt];
     fame(s.user).bestTier=Math.max(fame(s.user).bestTier,nt);
     Snd.spawn(nt);
@@ -843,7 +930,7 @@ function reinforce(s,coins,avatar){
     logLine('⬆ '+s.user+' upgrade -> '+TIERS[nt].name+' ('+s.coins+' moedas)');
   }else{
     const was=s.hp;
-    s.maxHp=Math.max(s.maxHp,s.coins*CFG.hpPer);
+    s.maxHp=Math.max(s.maxHp,maxHpFor(s.coins,s.tier));
     s.hp=Math.min(s.maxHp,s.hp+coins*CFG.hpPer);
     s.healFlash=1; Snd.repair();
     floatTxt(s,'+'+fmtN(s.hp-was),'#6ee7a8');
@@ -851,7 +938,15 @@ function reinforce(s,coins,avatar){
   }
 }
 
-const volleyDamage=s=>s.maxHp/CFG.volleys;
+/* Dano depende SÓ do nível — nunca do quanto o navio já foi reparado.
+   Antes era maxHp/salvas, e como cada reparo aumenta o maxHp, um galeão
+   muito reparado chegava a 278 de dano (hit kill em jangada e barco)
+   enquanto a barra do topo prometia 56. Agora o número bate com o HUD. */
+const volleyDamage=s=>(TIERS[s.tier].coinsBase*CFG.hpPer)/CFG.volleys;
+
+/* Vida = moedas x vida_por_moeda, mas com teto de 2x a base do nível: sem isso
+   um galeão de 999 moedas ficava com 9.990 de vida e a batalha durava minutos. */
+const maxHpFor=(coins,tier)=>Math.min(TIERS[tier].coinsBase*CFG.hpPer*2, coins*CFG.hpPer);
 const ballsPerVolley=s=>[1,2,3,5][s.tier];
 
 function sinkShip(s,killer){
@@ -867,7 +962,8 @@ function sinkShip(s,killer){
     const won=TIERS[s.tier].medal, f=fame(killer.user);
     f.medals+=won; f.kills++;
     killer.medals=f.medals; killer.kills=f.kills; killer.wins++;
-    killer.hp=Math.min(killer.maxHp,killer.hp+killer.maxHp*0.10);
+    /* Sem cura automática por vitória: vida só entra por moeda, senão o
+       vencedor se regenera sozinho e a janela de reparo perde a graça. */
     Snd.medal(); floatTxt(killer,'+'+won+' 🏅','#e8c05a');
     bigMsg('🏅 '+killer.user.toUpperCase()+' AFUNDOU '+s.user.toUpperCase()+'  +'+won,TIERS[killer.tier].col);
     logLine('💥 '+killer.user+' afundou '+s.user+' (+'+won+' medalhas, total '+f.medals+')');
@@ -897,7 +993,7 @@ function rematch(){
      desfaz o par: garante que nunca exista duelo eternamente parado. */
   for(let i=pairs.length-1;i>=0;i--){
     const p=pairs[i];
-    if(p.existing && p.a.pairedAt && G.t-p.a.pairedAt>60 && !p.a.engaged && !p.b.engaged){
+    if(p.existing && p.a.pairedAt && G.t-p.a.pairedAt>22 && !p.a.engaged && !p.b.engaged){
       p.a.opponent=null; p.b.opponent=null; p.a.arena=null; p.b.arena=null;
       used.delete(p.a.user); used.delete(p.b.user);
       pairs.splice(i,1);
@@ -924,10 +1020,20 @@ function rematch(){
     p.arena=(p.existing&&p.a.arena!=null&&!taken.has(p.a.arena))?p.a.arena:-1;
     if(p.arena>=0) taken.add(p.arena);
   }
+  /* Arena = a mais PERTO dos dois navios. Antes pegava a primeira livre por
+     índice, o que podia mandar uma dupla do rodapé pro topo do mapa e render
+     15-20s só de viagem antes de qualquer tiro. */
   for(const p of pairs){
     if(p.arena>=0) continue;
-    for(let i=0;i<ARENAS.length;i++) if(!taken.has(i)){ p.arena=i; taken.add(i); break; }
-    if(p.arena<0) p.arena=0;
+    const mx=(p.a.x+p.b.x)/2, my=(p.a.y+p.b.y)/2;
+    let best=-1,bd=Infinity;
+    for(let i=0;i<ARENAS.length;i++){
+      if(taken.has(i)) continue;
+      const d=Math.hypot(ARENAS[i].x-mx,ARENAS[i].y-my);
+      if(d<bd){ bd=d; best=i; }
+    }
+    p.arena = best>=0 ? best : 0;
+    taken.add(p.arena);
   }
   for(const {a,b,existing,arena} of pairs){
     a.arena=arena; b.arena=arena;
@@ -958,7 +1064,17 @@ function stationOf(s){
 function steer(s,dt){
   if(s.opponent && s.arena!=null){
     const st=stationOf(s);
-    s.tx=st.x; s.ty=st.y; s.thdg=st.hdg;
+    const o=G.ships.get(s.opponent);
+    const A=ARENAS[s.arena];
+    if(o && !o.sunk && Math.hypot(s.x-o.x,s.y-o.y) > FIRE_RANGE*0.9){
+      /* Fora de alcance: os DOIS convergem para o centro da arena. Antes cada
+         um ia direto pro seu posto — e os postos ficam a 380px um do outro,
+         então quem chegava primeiro parava com velocidade zero e esperava o
+         outro atravessar o mapa. Era isso que deixava navio imóvel por minutos. */
+      s.tx=A.x; s.ty=A.y; s.thdg=null;
+    }else{
+      s.tx=st.x; s.ty=st.y; s.thdg=st.hdg;   // já perto: assume a formação de bordo
+    }
   }else{
     /* Sem duelo: patrulha. Cada navio tem um PONTO PRÓPRIO — antes todos que
        estavam sem arena circulavam a mesma arena 1 e acabavam empilhados. */
@@ -995,6 +1111,10 @@ function steer(s,dt){
   let target=s.maxSpd*(1-0.55*clamp(Math.abs(diff)/1.4,0,1));
   if(dist<150) target*=dist/150;
   if(dist<26 && s.thdg!=null) target=0;
+  /* Fora de combate o navio NUNCA para. Sem isso ele chegava no ponto de
+     encontro, zerava a velocidade e ficava imóvel esperando o adversário —
+     e um navio prensado numa ilha nunca conseguia se soltar. */
+  if(!s.engaged) target=Math.max(target, s.maxSpd*0.30);
   s.spd += clamp(target-s.spd,-s.accel*1.6*dt,s.accel*dt);
   s.spd = Math.max(0,s.spd);
   s.x += Math.cos(s.hdg)*s.spd*dt;
@@ -1010,7 +1130,12 @@ function steer(s,dt){
     if(d<minD){
       s.x=isl.x+ox/d*minD;
       s.y=isl.y+oy/d*minD;
-      s.spd*=0.55;
+      /* Vira para a tangente (a mais próxima do rumo atual) e mantém marcha:
+         antes ele raspava de frente, perdia toda a velocidade e ficava preso
+         contornando a ilha a 3 px/s por mais de meio minuto. */
+      const t1=Math.atan2(ox,-oy), t2=Math.atan2(-ox,oy);
+      s.hdg = Math.abs(angDiff(t1,s.hdg))<Math.abs(angDiff(t2,s.hdg)) ? t1 : t2;
+      s.spd = Math.max(s.spd*0.85, s.maxSpd*0.40);
     }
   }
 
@@ -1304,12 +1429,6 @@ function drawShip(s){
 }
 
 /* placa: [NÍVEL] Navio de X   🏅medalhas  +  barra de vida  (+ contagem do reparo) */
-const labelRects=[];
-function labelFree(x,y,w,h){
-  for(const r of labelRects)
-    if(x<r[0]+r[2]&&x+w>r[0]&&y<r[1]+r[3]&&y+h>r[1]) return false;
-  return true;
-}
 function drawShipLabel(s){
   if(s.sunk) return;
   const S=SHIP[s.tier];
@@ -1319,11 +1438,10 @@ function drawShipLabel(s){
   const leader = G.topMedalUser===s.user && s.medals>0;
   const blockH=rowH+barH+3+(cooling?17:0)+(leader?50:0);
 
-  let bx=clamp(s.x-bw*0.5,6,W-bw-6);
-  let by=s.y-S.len*SHIP_SCALE*0.5-16-blockH;
-  for(let a=0;a<4 && !labelFree(bx,by,bw,blockH);a++) by-=blockH+7;
-  by=Math.max(by,262);   // não sobe atrás do HUD do topo
-  labelRects.push([bx,by,bw,blockH]);
+  /* Sem desvio de colisão: quando dois navios se cruzavam as placas pulavam
+     pra cima e pra baixo. Deixar simplesmente sobrepor fica mais limpo. */
+  const bx=clamp(s.x-bw*0.5,6,W-bw-6);
+  let by=Math.max(282, s.y-S.len*SHIP_SCALE*0.5-16-blockH);
 
   /* bandeira pirata em cima de quem tem mais medalhas */
   if(leader){
@@ -1596,7 +1714,6 @@ function render(){
   drawBooms();
   drawSplashes();
 
-  labelRects.length=0;
   for(const s of list) drawShipLabel(s);
   drawFloats();
   ctx.restore();
@@ -1826,10 +1943,12 @@ function connect(){
   setConn(false,'conectando…');
   try{
     ws=new WebSocket(url);
-    ws.onopen=()=>{ setConn(true,'conectado'); logLine('✓ conectado como '+USERNAME); };
+    ws.onopen=()=>{ setConn(true,'conectado'); $('chatTitle').classList.add('on');
+                    chatPush('join','sistema','conectado à live de '+USERNAME);
+                    logLine('✓ conectado como '+USERNAME); };
     ws.onmessage=m=>{ try{ handleEvent(JSON.parse(m.data)); }
                       catch(e){ console.error('evento inválido',e,m.data); } };
-    ws.onclose=()=>{ setConn(false,'desconectado');
+    ws.onclose=()=>{ setConn(false,'desconectado'); $('chatTitle').classList.remove('on');
                      if(wantConnect) reconnectTimer=setTimeout(connect,5000); };
     ws.onerror=e=>console.error('erro no WebSocket',e);
   }catch(e){
@@ -1857,8 +1976,10 @@ $('inVol').addEventListener('change',()=>Snd.setVol(clamp((+$('inVol').value||0)
 $('inVolMus').addEventListener('change',()=>Music.setVol(clamp((+$('inVolMus').value||0)/100,0,1)));
 $('btnMusic').onclick=()=>Music.toggle();
 
-const FAKE=['capitao_lu','joaozin','pedr0','mari.s','biel','th41s','lu4na','gab_','rafa77','duda',
-            'kaio','yasmin','vitin','nanda','igor','sofi','murilo','helo','davi','clara'];
+const FAKE=['lu.vzz','_kauan07','mariih.s2','zzgabih','pdr0.xd','itsnanda_','vitin.oficial',
+            'yaya.crz','th4isss','biel.kkj','naah.rs','_dudinha.b','rafa.77x','soficrz_',
+            'muri.lo0','helo.pnk','dav1.zn','clara.mmz','kaio.dcx','yasm1n.z','joao.vtr',
+            'ana.lvs','ped.rock','lariih.dc','gui.mtz','nick.ely','bru.nao7','isaa.blz'];
 const testGift=c=>handleEvent({type:'GIFT',user:pick(FAKE),gift:'Presente',amount:1,diamondCount:c});
 $('btnT1').onclick=()=>testGift(1);
 $('btnT2').onclick=()=>testGift(10);
@@ -1872,10 +1993,23 @@ $('btnFlood').onclick=()=>FAKE.slice(6,18).forEach((u,i)=>setTimeout(()=>
 $('btnRepair').onclick=()=>{ for(const u of [...G.ships.keys()])
   handleEvent({type:'GIFT',user:u,gift:'Presente',amount:1,diamondCount:10}); };
 $('btnFauna').onclick=()=>{ spawnWhale(); spawnGulls(); spawnDolphins(); };
+$('btnChat').onclick=()=>{
+  const frases=['boa sorte pro meu navio!','vamo que vamo','esse galeão ta forte demais',
+                'mandei 100 moedas','kkkkk afundou','sobe pra supremo','meu barco ta quase morrendo',
+                'alguém repara o meu','GG','vamo time'];
+  handleEvent({type:'ROOM_USER',viewerCount:800+((Math.random()*900)|0)});
+  for(let i=0;i<10;i++) setTimeout(()=>{
+    const r=Math.random(), u=pick(FAKE);
+    if(r<0.5)      handleEvent({type:'COMMENT',user:u,message:pick(frases)});
+    else if(r<0.7) handleEvent({type:'JOIN',user:u});
+    else if(r<0.85)handleEvent({type:'FOLLOW',user:u});
+    else           handleEvent({type:'LIKE',user:u,count:1+((Math.random()*30)|0)});
+  }, i*140);
+};
 
 document.addEventListener('pointerdown',()=>{ Snd.init(); Snd.resume(); });
 
-readCfg(); Snd.setVol(0.75); renderQueue(); renderRank();
+readCfg(); Snd.setVol(0.75); renderQueue(); renderRank(); updateLiveStats();
 if(USERNAME&&KEY) connect(); else setConn(false,'desconectado');
 logLine('pronto. configure e clique em Iniciar.');
 </script>
