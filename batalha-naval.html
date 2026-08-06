@@ -63,10 +63,18 @@
   .li u{text-decoration:none;font-weight:900;color:var(--gold);flex:0 0 auto}
   .li .tg{font-size:.82em;padding:0 3px;border-radius:3px;font-weight:900;flex:0 0 auto}
 
-  #bigMsg{position:absolute;bottom:19.5%;left:50%;transform:translateX(-50%);
+  /* Sobe acima do feed e das caixas de fila/ranking. O z-index é essencial:
+     bigMsg vem ANTES delas no HTML, então sem isso elas desenhavam por cima
+     e o aviso de "afundou" ficava escondido atrás do ranking. */
+  #bigMsg{position:absolute;bottom:27%;left:50%;transform:translateX(-50%);
+    z-index:5;
     font-size:clamp(9px,2.7vh,18px);font-weight:900;letter-spacing:.09em;
-    padding:5px 16px;border-radius:7px;white-space:nowrap;opacity:0;
-    transition:opacity .3s;text-transform:uppercase;text-align:center;}
+    padding:6px 18px;border-radius:8px;opacity:0;
+    /* quebra em duas linhas em vez de estourar a moldura: com nome comprido
+       o "nowrap" cortava o troféu de um lado e as medalhas do outro */
+    width:max-content;max-width:90%;white-space:normal;line-height:1.3;
+    transition:opacity .3s;text-transform:uppercase;text-align:center;
+    text-shadow:0 2px 6px rgba(0,0,0,.9);}
   #bigMsg.show{opacity:1}
 
   #endScreen{position:absolute;inset:0;display:none;flex-direction:column;padding:6% 5%;
@@ -138,10 +146,15 @@
     opacity:.55;font-weight:800;margin:2px 0 5px}
   /* presentes numa caixa propria, com altura fixa: assim uma enxurrada de
      comentarios nunca empurra os presentes pra fora da vista */
-  #giftBox{height:34%;min-height:130px;overflow-y:auto;background:#0d0a06;
-    border:1px solid #3a2f16;border-radius:8px;padding:7px;margin-bottom:10px}
+  #giftBox{height:26%;min-height:110px;overflow-y:auto;background:#0d0a06;
+    border:1px solid #3a2f16;border-radius:8px;padding:7px}
   #chatBox{flex:1;overflow-y:auto;background:#080b0f;border:1px solid #1b212a;
-    border-radius:8px;padding:7px;min-height:150px}
+    border-radius:8px;padding:7px;min-height:120px}
+  /* movimentacao da live (entrou / curtiu / seguiu) numa caixa propria e de
+     altura fixa: curtida sozinha enche a tela e enterrava os comentarios */
+  #activityBox{height:24%;min-height:100px;overflow-y:auto;background:#080b0f;
+    border:1px solid #1b212a;border-radius:8px;padding:7px}
+  .box-title.sep{margin-top:11px}
   #giftBox .cm{border-bottom-color:rgba(232,192,90,.10)}
   #giftBox .cm .coin{color:#ffd97a;font-weight:900;flex:0 0 auto;margin-left:auto}
   .cm{display:flex;gap:6px;padding:3px 0;font-size:12px;line-height:1.35;
@@ -191,15 +204,10 @@
 
   <fieldset>
     <legend>Conexão</legend>
-    <div class="grid">
-      <div><label>Username</label><input type="text" id="inUser" placeholder="seu_usuario"></div>
-      <div><label>Key</label><input type="text" id="inKey" placeholder="sua_chave"></div>
-    </div>
-    <div class="row2">
-      <button id="btnConnect">Conectar</button>
-      <div class="status" id="connStatus"><span class="dot"></span><span>desconectado</span></div>
-    </div>
-    <p class="note">Também aceita pela URL: <code>?username=X&amp;key=Y</code></p>
+    <!-- Sem campos de usuário/chave na tela: o jogo se conecta sozinho com o
+         que vem na URL (?username=...&key=...). A chave aparecendo aqui vazava
+         em qualquer print ou compartilhamento de tela da transmissão. -->
+    <div class="status" id="connStatus"><span class="dot"></span><span>desconectado</span></div>
   </fieldset>
 
   <fieldset>
@@ -264,8 +272,10 @@
   </div>
   <div class="box-title">🎁 Últimos presentes</div>
   <div id="giftBox"></div>
-  <div class="box-title">💬 Chat</div>
+  <div class="box-title sep">💬 Comentários</div>
   <div id="chatBox"></div>
+  <div class="box-title sep">👋 Entradas e curtidas</div>
+  <div id="activityBox"></div>
 </div>
 
 <script>
@@ -839,12 +849,16 @@ window.handleEvent=handleEvent;
 const LIVE={viewers:null,gifts:0,coins:0,comments:0,likes:0};
 /* Duas filas separadas: presente vai pra caixa de presentes, o resto pro chat.
    Antes tudo caia junto e os presentes sumiam no meio dos comentários. */
-let chatQueue=[], giftQueue=[];
-const CHAT_MAX=140, GIFT_MAX=60;
+let chatQueue=[], giftQueue=[], actQueue=[];
+const CHAT_MAX=140, GIFT_MAX=60, ACT_MAX=100;
+/* Tres filas independentes: presente, comentario e movimentacao. Uma nao
+   atropela a outra — antes a enxurrada de curtidas enterrava o que a galera
+   realmente escrevia no chat. */
 function chatPush(kind,user,txt,extra){
   const item={kind,user:user||'anônimo',txt:txt||'',extra};
-  if(kind==='gift'){ giftQueue.push(item); if(giftQueue.length>40) giftQueue=giftQueue.slice(-40); }
-  else            { chatQueue.push(item); if(chatQueue.length>60) chatQueue=chatQueue.slice(-60); }
+  if(kind==='gift')        { giftQueue.push(item); if(giftQueue.length>40) giftQueue=giftQueue.slice(-40); }
+  else if(kind==='comment'){ chatQueue.push(item); if(chatQueue.length>60) chatQueue=chatQueue.slice(-60); }
+  else                     { actQueue.push(item);  if(actQueue.length>60)  actQueue=actQueue.slice(-60); }
 }
 const CHAT_ICON={comment:'💬',gift:'🎁',follow:'💚',join:'👋',like:'❤️'};
 /* despeja uma fila numa caixa, sem quebrar a rolagem de quem subiu pra ler */
@@ -868,13 +882,15 @@ setInterval(()=>{
       '<span class="coin">'+fmtN(c.extra&&c.extra.coins||0)+' 🪙</span>';
     return d;
   });
-  flushBox(chatQueue,'chatBox',CHAT_MAX,c=>{
+  const montaLinha=c=>{
     const d=document.createElement('div');
     d.className='cm '+c.kind;
     d.innerHTML='<span class="ic">'+(CHAT_ICON[c.kind]||'•')+'</span>'+
       '<span class="who">'+esc(c.user)+'</span><span class="txt">'+esc(c.txt)+'</span>';
     return d;
-  });
+  };
+  flushBox(chatQueue,'chatBox',CHAT_MAX,montaLinha);
+  flushBox(actQueue,'activityBox',ACT_MAX,montaLinha);
 },300);
 function updateLiveStats(){
   $('stViewers').textContent = LIVE.viewers!=null ? fmtN(LIVE.viewers) : '—';
@@ -1956,7 +1972,6 @@ requestAnimationFrame(loop);
    ========================================================================== */
 const params=new URLSearchParams(location.search);
 let USERNAME=params.get('username')||'', KEY=params.get('key')||'';
-$('inUser').value=USERNAME; $('inKey').value=KEY;
 let ws=null,wantConnect=false,reconnectTimer=null;
 
 function setConn(ok,txt){
@@ -1991,8 +2006,6 @@ function connect(){
 /* ============================================================================
    17. PAINEL
    ========================================================================== */
-$('btnConnect').onclick=()=>{ USERNAME=$('inUser').value.trim(); KEY=$('inKey').value.trim();
-  Snd.init(); Snd.resume(); connect(); };
 $('btnStart').onclick=()=>{ Snd.init(); Snd.resume(); startMatch(); };
 $('btnPause').onclick=()=>{ if(!G.running) return;
   G.paused=!G.paused; $('btnPause').textContent=G.paused?'▶ Retomar':'⏸ Pausar';
