@@ -21,6 +21,11 @@
   #tierBar .t{flex:1;background:rgba(4,10,16,.8);border:1px solid rgba(232,192,90,.28);
     border-radius:7px;padding:4px 2px 5px;text-align:center;line-height:1.2;}
   #tierBar .t .cn{display:block;font-weight:900;color:var(--gold);font-size:1.22em}
+  /* bolinha amarela = "isso aqui é moeda", pra ninguém confundir o número
+     de moedas do nível com posição/ranking */
+  #tierBar .t .coinDot{display:inline-block;width:.5em;height:.5em;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#fff6c9,#ffd83d 55%,#e2a91a);
+    box-shadow:0 0 4px rgba(255,216,61,.75);vertical-align:middle;margin-left:3px}
   #tierBar .t .nm{display:block;font-weight:800}
   #tierBar .t .hp{display:block;opacity:.66;font-size:.82em;white-space:nowrap}
   #tierBar .t .dm{font-weight:800;color:#ff9a6a}
@@ -51,10 +56,14 @@
   #feed .tx span{opacity:.7;font-size:.85em}
   #feed .amt{margin-left:auto;font-weight:900;font-style:italic;color:var(--gold)}
 
-  #queueBox,#rankBox{position:absolute;bottom:1.6%;width:47%;
+  #queueBox,#rankBox{position:absolute;width:47%;
     background:rgba(4,10,16,.82);border:1px solid rgba(232,192,90,.22);
     border-radius:9px;padding:5px 7px;font-size:clamp(5.5px,1.55vh,10px);}
-  #queueBox{left:2.5%} #rankBox{right:2.5%}
+  /* fila embaixo do chip de tempo: no canto inferior esquerdo (onde ela ficava
+     antes) o chat nativo da própria live cobre esse canto na transmissão real,
+     então a fila nunca aparecia pra galera. */
+  #queueBox{top:16.6%;left:2.5%}
+  #rankBox{bottom:1.6%;right:2.5%}
   #queueBox h4,#rankBox h4{margin:0 0 3px;font-size:1em;letter-spacing:.07em;opacity:.72;
     font-weight:800;display:flex;justify-content:space-between}
   .li{display:flex;gap:4px;align-items:center;line-height:1.42}
@@ -175,10 +184,10 @@
   <canvas id="cv" width="1080" height="1920"></canvas>
   <div class="layer">
     <div id="tierBar">
-      <div class="t"><span class="cn">1</span><span class="nm">JANGADA</span><span class="hp">20 vida <b class="dm" id="dm0">·</b></span></div>
-      <div class="t"><span class="cn">10</span><span class="nm">BARCO</span><span class="hp">60 vida <b class="dm" id="dm1">·</b></span></div>
-      <div class="t"><span class="cn">100</span><span class="nm">GALEÃO</span><span class="hp">180 vida <b class="dm" id="dm2">·</b></span></div>
-      <div class="t t4"><span class="cn">1000</span><span class="nm">SUPREMO</span><span class="hp">540 vida <b class="dm" id="dm3">·</b></span></div>
+      <div class="t"><span class="cn">1<i class="coinDot"></i></span><span class="nm">JANGADA</span><span class="hp">20 vida <b class="dm" id="dm0">·</b></span></div>
+      <div class="t"><span class="cn">10<i class="coinDot"></i></span><span class="nm">BARCO</span><span class="hp">60 vida <b class="dm" id="dm1">·</b></span></div>
+      <div class="t"><span class="cn">100<i class="coinDot"></i></span><span class="nm">GALEÃO</span><span class="hp">180 vida <b class="dm" id="dm2">·</b></span></div>
+      <div class="t t4"><span class="cn">1000<i class="coinDot"></i></span><span class="nm">SUPREMO</span><span class="hp">540 vida <b class="dm" id="dm3">·</b></span></div>
     </div>
     <div id="repairHint">🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +10 de vida</div>
     <div id="topRow">
@@ -794,7 +803,7 @@ const G={
   running:false,paused:false,over:false,matchLeft:0,t:0,
   ships:new Map(), queue:[], fame:new Map(),
   balls:[], booms:[], splashes:[], wakes:[], floats:[], debris:[],
-  fauna:[], nextFauna:3, shake:0, topMedalUser:null
+  fauna:[], nextFauna:3, shake:0, topMedalUser:null, idleT:0
 };
 
 function readCfg(){
@@ -837,8 +846,10 @@ function handleEvent(ev){
     case 'COMMENT': LIVE.comments++; chatPush('comment',ev.user,ev.message||''); break;
     case 'FOLLOW':  chatPush('follow',ev.user,'começou a seguir'); break;
     case 'JOIN':    chatPush('join',ev.user,'entrou na live'); break;
-    case 'LIKE':    LIVE.likes+=Number(ev.count)||1;
-                    chatPush('like',ev.user,'mandou '+(ev.count||1)+' curtida'+((ev.count||1)>1?'s':'')); break;
+    case 'LIKE':    { const n=Number(ev.count)||1;
+                    LIVE.likes+=n;
+                    chatPush('like',ev.user,'mandou '+n+' curtida'+(n>1?'s':''));
+                    onLike(ev.user,n); break; }
     case 'ROOM_USER': case 'VIEWERS': {
       /* viewerCount = espectadores AGORA. O backend antes mandava o acumulado
          (totalUser) por engano — 9,7k com 470 assistindo. */
@@ -923,6 +934,30 @@ function onGift(ev){
   if(activeCount()<CFG.fleet && spawnShip(user,coins,avatar)) return;
   G.queue.push({user,coins,avatar}); renderQueue();
   logLine('fila: '+user+' ('+coins+' moedas) — '+G.queue.length+' esperando');
+}
+
+/* ---------- curtidas também valem navio: 100 = Jangada, 1000 = Barco.
+   Sozinha, curtida nunca passa de 99 "moedas" — Galeão e Supremo só saem de
+   presente de verdade. Usa o MESMO caminho do presente (spawna, reforça ou
+   entra na fila), então o navio ganho por curtida se comporta igual a
+   qualquer outro. */
+const likeTotals=new Map(), likeCoinsGiven=new Map();
+function onLike(user,count){
+  user=(user||'').trim(); if(!user||!G.running||G.over) return;
+  const total=(likeTotals.get(user)||0)+count;
+  likeTotals.set(user,total);
+  const earned=Math.min(99,Math.floor(total/100));
+  const delta=earned-(likeCoinsGiven.get(user)||0);
+  if(delta<=0) return;
+  likeCoinsGiven.set(user,earned);
+
+  const ship=G.ships.get(user);
+  if(ship&&!ship.sunk){ reinforce(ship,delta,null); return; }
+  const q=G.queue.find(x=>x.user===user);
+  if(q){ q.coins+=delta; renderQueue(); return; }
+  if(activeCount()<CFG.fleet && spawnShip(user,delta,null)) return;
+  G.queue.push({user,coins:delta,avatar:null}); renderQueue();
+  logLine('fila: '+user+' (+'+delta+' de curtida) — '+G.queue.length+' esperando');
 }
 
 /* ============================================================================
@@ -1012,20 +1047,28 @@ function sinkShip(s,killer){
   if(s.sunk) return;
   s.sunk=true; s.sinkT=0; s.opponent=null; s.engaged=false; s.arena=null;
   Snd.sink(); G.shake=Math.min(0.85,G.shake+0.45);
-  fame(s.user).sunk++;
+  if(!s.isBot) fame(s.user).sunk++;
   for(let i=0;i<9;i++)
     G.debris.push({x:s.x+rnd(-30,30),y:s.y+rnd(-40,40),vx:rnd(-46,46),vy:rnd(-46,46),
       a:rnd(0,TAU),va:rnd(-2,2),t:0,w:rnd(5,13),h:rnd(3,7)});
   for(let i=0;i<6;i++) G.booms.push({x:s.x+rnd(-34,34),y:s.y+rnd(-46,46),t:-i*0.14,s:rnd(0.7,1.5)});
   if(killer&&!killer.sunk){
-    const won=TIERS[s.tier].medal, f=fame(killer.user);
-    f.medals+=won; f.kills++;
-    killer.medals=f.medals; killer.kills=f.kills; killer.wins++;
-    /* Sem cura automática por vitória: vida só entra por moeda, senão o
-       vencedor se regenera sozinho e a janela de reparo perde a graça. */
-    Snd.medal(); floatTxt(killer,'+'+won+' 🏅','#e8c05a');
-    bigMsg('🏅 '+killer.user.toUpperCase()+' AFUNDOU '+s.user.toUpperCase()+'  +'+won,TIERS[killer.tier].col);
-    logLine('💥 '+killer.user+' afundou '+s.user+' (+'+won+' medalhas, total '+f.medals+')');
+    /* Navio de exibição (modo ocioso) nunca soma medalha nem entra no
+       ranking — só serve pra tela não ficar parada, não é jogador de verdade. */
+    if(killer.isBot){
+      Snd.medal();
+      bigMsg('🏴‍☠️ '+killer.user.toUpperCase()+' AFUNDOU '+s.user.toUpperCase(),TIERS[killer.tier].col);
+      logLine('💥 '+killer.user+' afundou '+s.user+' (exibição)');
+    }else{
+      const won=TIERS[s.tier].medal, f=fame(killer.user);
+      f.medals+=won; f.kills++;
+      killer.medals=f.medals; killer.kills=f.kills; killer.wins++;
+      /* Sem cura automática por vitória: vida só entra por moeda, senão o
+         vencedor se regenera sozinho e a janela de reparo perde a graça. */
+      Snd.medal(); floatTxt(killer,'+'+won+' 🏅','#e8c05a');
+      bigMsg('🏅 '+killer.user.toUpperCase()+' AFUNDOU '+s.user.toUpperCase()+'  +'+won,TIERS[killer.tier].col);
+      logLine('💥 '+killer.user+' afundou '+s.user+' (+'+won+' medalhas, total '+f.medals+')');
+    }
     /* pausa de reparo: o vencedor navega um tempo antes do próximo duelo,
        dando janela pra galera mandar moedas e consertar o navio */
     killer.opponent=null; killer.engaged=false; killer.arena=null;
@@ -1406,6 +1449,27 @@ function admitFromQueue(){
   }
   if(G.queue.length>200) G.queue.length=200;
   renderQueue();
+}
+
+/* ---------- modo ocioso: mar vazio 2min solta 2 jangadas de exibição ----------
+   Só serve pra tela nunca ficar parada entre um jogador e outro. Navio de
+   exibição não soma medalha nem aparece no ranking — senão um bot ia liderar
+   o placar da live. */
+const IDLE_SPAWN_AFTER=120;
+const BOT_NAMES=['Fantasma','Corsário Perdido','Vento Norte','Maré Cheia','Sal e Vento','Caveira Solta'];
+function spawnIdleBots(){
+  const need=Math.min(2,CFG.fleet-activeCount());
+  for(let i=0;i<need;i++){
+    const nm='⚓ '+pick(BOT_NAMES)+' '+((Math.random()*90+10)|0);
+    const s=spawnShip(nm,1,null);
+    if(s) s.isBot=true;
+  }
+  if(need>0) logLine('💤 mar vazio — soltando navios de exibição');
+}
+function updateIdle(dt){
+  if(!G.running||G.paused||activeCount()>0||G.queue.length>0){ G.idleT=0; return; }
+  G.idleT+=dt;
+  if(G.idleT>=IDLE_SPAWN_AFTER){ G.idleT=0; spawnIdleBots(); }
 }
 
 /* ============================================================================
@@ -1939,13 +2003,14 @@ function resetMatch(){
   G.ships.clear(); G.queue.length=0; G.fame.clear();
   G.balls.length=0; G.booms.length=0; G.splashes.length=0;
   G.wakes.length=0; G.floats.length=0; G.debris.length=0; G.fauna.length=0;
-  G.shake=0;
+  G.shake=0; G.idleT=0;
   clearInterval(endScrollTimer);
   $('endScreen').classList.remove('show');
   $('gameFrame').classList.remove('ended');
   $('bigMsg').classList.remove('show');
   feedItems=[]; feedQueue=[];
   feedRows.forEach(r=>r.el.classList.remove('on'));
+  likeTotals.clear(); likeCoinsGiven.clear();
   renderQueue(); renderRank(); logLine('↺ limpo');
 }
 
@@ -1958,6 +2023,7 @@ function updateMatch(dt){
   }
   matchAcc+=dt;
   if(matchAcc>0.5){ matchAcc=0; rematch(); admitFromQueue(); }
+  updateIdle(dt);
 }
 
 let lastT=performance.now();
