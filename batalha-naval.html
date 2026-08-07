@@ -22,24 +22,29 @@
     border-radius:7px;padding:4px 2px 5px;text-align:center;line-height:1.2;}
   #tierBar .t .cn{display:block;font-weight:900;color:var(--gold);font-size:1.22em}
   /* bolinha amarela = "isso aqui é moeda", pra ninguém confundir o número
-     de moedas do nível com posição/ranking */
-  #tierBar .t .coinDot{display:inline-block;width:.5em;height:.5em;border-radius:50%;
+     de moedas do nível com posição/ranking — classe genérica, também usada
+     fora da barra de níveis (ex: caixa da fila) */
+  .coinDot{display:inline-block;width:.5em;height:.5em;border-radius:50%;
     background:radial-gradient(circle at 35% 30%,#fff6c9,#ffd83d 55%,#e2a91a);
     box-shadow:0 0 4px rgba(255,216,61,.75);vertical-align:middle;margin-left:3px}
   /* alternativa por curtida, só existe pra Jangada e Barco — Galeão/Supremo
-     ficam com a linha vazia pra os 4 cartões manterem a mesma altura */
-  #tierBar .t .likeEq{display:block;opacity:.6;font-size:.72em;white-space:nowrap;margin-top:1px}
+     ficam com a linha vazia pra os 4 cartões manterem a mesma altura. Cor
+     clara e mais opaca: em cinza apagado ela sumia no cartão escuro. */
+  #tierBar .t .likeEq{display:block;opacity:.95;font-size:.78em;font-weight:700;
+    color:#ffb3c6;white-space:nowrap;margin-top:1px}
   #tierBar .t .nm{display:block;font-weight:800}
   #tierBar .t .hp{display:block;opacity:.66;font-size:.82em;white-space:nowrap}
   #tierBar .t .dm{font-weight:800;color:#ff9a6a}
-  #repairHint{position:absolute;top:8.4%;left:2%;right:2%;text-align:center;
+  /* empurrado pra baixo da barra de níveis, que ficou uma linha mais alta
+     desde que ganhou a linha "ou X curtidas" */
+  #repairHint{position:absolute;top:10.8%;left:2%;right:2%;text-align:center;
     font-size:clamp(5.5px,1.5vh,9.5px);letter-spacing:.02em;color:#8fe6b6;
     background:rgba(4,10,16,.72);border:1px solid rgba(110,231,168,.30);
     border-radius:999px;padding:2px 8px}
   #repairHint b{color:#b6f5d2}
   #tierBar .t.t4{border-color:rgba(170,100,230,.62);box-shadow:0 0 12px rgba(150,80,220,.24) inset}
 
-  #topRow{position:absolute;top:12.2%;left:2.5%;right:2.5%;display:flex;
+  #topRow{position:absolute;top:14.6%;left:2.5%;right:2.5%;display:flex;
     justify-content:space-between;font-size:clamp(6px,1.72vh,11px);}
   .chip{background:rgba(4,10,16,.82);border:1px solid rgba(232,192,90,.26);
     border-radius:999px;padding:3px 10px;font-weight:800;letter-spacing:.04em;
@@ -65,12 +70,15 @@
   /* fila embaixo do chip de tempo: no canto inferior esquerdo (onde ela ficava
      antes) o chat nativo da própria live cobre esse canto na transmissão real,
      então a fila nunca aparecia pra galera. */
-  #queueBox{top:16.6%;left:2.5%}
+  #queueBox{top:19%;left:2.5%}
   #rankBox{bottom:1.6%;right:2.5%}
   #queueBox h4,#rankBox h4{margin:0 0 3px;font-size:1em;letter-spacing:.07em;opacity:.72;
     font-weight:800;display:flex;justify-content:space-between}
   .li{display:flex;gap:4px;align-items:center;line-height:1.42}
   .li i{font-style:normal;opacity:.55;width:1.15em;flex:0 0 auto}
+  /* sobrescreve ".li i": sem isso a bolinha de moeda virava uma barrinha
+     preta esticada (herdava width:1.15em e opacity:.55 do índice da lista) */
+  .li .coinDot{width:.5em;height:.5em;opacity:1}
   .li b{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
   .li u{text-decoration:none;font-weight:900;color:var(--gold);flex:0 0 auto}
   .li .tg{font-size:.82em;padding:0 3px;border-radius:3px;font-weight:900;flex:0 0 auto}
@@ -1899,7 +1907,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function renderQueue(){
   $('qCount').textContent=G.queue.length;
   const b=$('queueBody');
-  if(!G.queue.length){ b.innerHTML='<div class="li" style="opacity:.5"><b>1🪙 ou 100❤️ para jogar</b></div>'; return; }
+  if(!G.queue.length){ b.innerHTML='<div class="li" style="opacity:.7"><b>1<i class="coinDot"></i> ou 100❤️ para jogar</b></div>'; return; }
   b.innerHTML=G.queue.slice(0,4).map((q,i)=>{
     const t=TIERS[tierForCoins(q.coins)];
     return '<div class="li"><i>'+(i+1)+'</i><b>'+esc(q.user)+'</b>'+
