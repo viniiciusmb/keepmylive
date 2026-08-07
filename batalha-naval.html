@@ -26,6 +26,9 @@
   #tierBar .t .coinDot{display:inline-block;width:.5em;height:.5em;border-radius:50%;
     background:radial-gradient(circle at 35% 30%,#fff6c9,#ffd83d 55%,#e2a91a);
     box-shadow:0 0 4px rgba(255,216,61,.75);vertical-align:middle;margin-left:3px}
+  /* alternativa por curtida, só existe pra Jangada e Barco — Galeão/Supremo
+     ficam com a linha vazia pra os 4 cartões manterem a mesma altura */
+  #tierBar .t .likeEq{display:block;opacity:.6;font-size:.72em;white-space:nowrap;margin-top:1px}
   #tierBar .t .nm{display:block;font-weight:800}
   #tierBar .t .hp{display:block;opacity:.66;font-size:.82em;white-space:nowrap}
   #tierBar .t .dm{font-weight:800;color:#ff9a6a}
@@ -184,10 +187,10 @@
   <canvas id="cv" width="1080" height="1920"></canvas>
   <div class="layer">
     <div id="tierBar">
-      <div class="t"><span class="cn">1<i class="coinDot"></i></span><span class="nm">JANGADA</span><span class="hp">20 vida <b class="dm" id="dm0">·</b></span></div>
-      <div class="t"><span class="cn">10<i class="coinDot"></i></span><span class="nm">BARCO</span><span class="hp">60 vida <b class="dm" id="dm1">·</b></span></div>
-      <div class="t"><span class="cn">100<i class="coinDot"></i></span><span class="nm">GALEÃO</span><span class="hp">180 vida <b class="dm" id="dm2">·</b></span></div>
-      <div class="t t4"><span class="cn">1000<i class="coinDot"></i></span><span class="nm">SUPREMO</span><span class="hp">540 vida <b class="dm" id="dm3">·</b></span></div>
+      <div class="t"><span class="cn">1<i class="coinDot"></i></span><span class="likeEq">ou 100❤️</span><span class="nm">JANGADA</span><span class="hp">20 vida <b class="dm" id="dm0">·</b></span></div>
+      <div class="t"><span class="cn">10<i class="coinDot"></i></span><span class="likeEq">ou 1000❤️</span><span class="nm">BARCO</span><span class="hp">60 vida <b class="dm" id="dm1">·</b></span></div>
+      <div class="t"><span class="cn">100<i class="coinDot"></i></span><span class="likeEq">&nbsp;</span><span class="nm">GALEÃO</span><span class="hp">180 vida <b class="dm" id="dm2">·</b></span></div>
+      <div class="t t4"><span class="cn">1000<i class="coinDot"></i></span><span class="likeEq">&nbsp;</span><span class="nm">SUPREMO</span><span class="hp">540 vida <b class="dm" id="dm3">·</b></span></div>
     </div>
     <div id="repairHint">🔧 <b>CONSERTE SEU NAVIO</b> — 1 moeda = +10 de vida</div>
     <div id="topRow">
@@ -1896,7 +1899,7 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 function renderQueue(){
   $('qCount').textContent=G.queue.length;
   const b=$('queueBody');
-  if(!G.queue.length){ b.innerHTML='<div class="li" style="opacity:.45"><b>mande um presente</b></div>'; return; }
+  if(!G.queue.length){ b.innerHTML='<div class="li" style="opacity:.5"><b>1🪙 ou 100❤️ para jogar</b></div>'; return; }
   b.innerHTML=G.queue.slice(0,4).map((q,i)=>{
     const t=TIERS[tierForCoins(q.coins)];
     return '<div class="li"><i>'+(i+1)+'</i><b>'+esc(q.user)+'</b>'+
