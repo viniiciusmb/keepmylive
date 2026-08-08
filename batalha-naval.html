@@ -262,6 +262,11 @@
       <button id="btnReset">↺ Limpar</button>
       <button id="btnMusic">🎵 Música: desligada</button>
     </div>
+    <div class="ck"><input type="checkbox" id="ckAutoClear"><label for="ckAutoClear">Limpar o mar ao encerrar</label></div>
+    <div class="ck"><input type="checkbox" id="ckAutoRestart"><label for="ckAutoRestart">Iniciar nova partida automaticamente</label></div>
+    <div class="grid g3" style="margin-top:9px">
+      <div><label>Reiniciar após (s)</label><input type="number" id="inAutoRestartDelay" value="15" min="5" max="120"></div>
+    </div>
   </fieldset>
 
   <fieldset>
@@ -330,11 +335,16 @@ const W=1080, H=1920;
 
 /* Três arenas de duelo, empilhadas. O eixo de cada combate fica QUASE HORIZONTAL,
    então os dois navios ficam lado a lado e o comprimento deles corre na vertical.
-   É o único arranjo em que 3 duelos cabem num quadro 9:16 sem se sobrepor. */
-const ARENAS=[{x:380,y:540},{x:700,y:965},{x:420,y:1390}];
+   É o único arranjo em que 3 duelos cabem num quadro 9:16 sem se sobrepor.
+   A arena 0 foi descida (era y:540) pra não brigar mais com a barra de níveis
+   + aviso de reparo + caixa da fila, que ficaram mais altas — sem isso os
+   navios duelavam bem atrás dessas caixas e ficava impossível ver o combate. */
+const ARENAS=[{x:380,y:750},{x:700,y:965},{x:420,y:1390}];
 const STATION_R=190;                 // distância de cada navio ao centro da arena
-/* pontos de patrulha separados, um por navio ocioso */
-const PATROL=[{x:250,y:700,r:150},{x:830,y:760,r:150},{x:250,y:1180,r:150},
+/* pontos de patrulha separados, um por navio ocioso — o primeiro ponto foi
+   afastado da arena 0 (que desceu), senão os navios ociosos ficavam
+   patrulhando em cima do duelo. */
+const PATROL=[{x:220,y:1020,r:150},{x:830,y:760,r:150},{x:250,y:1180,r:150},
               {x:830,y:1180,r:150},{x:540,y:930,r:170},{x:540,y:1480,r:150}];
 const AXIS_TILT=25*Math.PI/180;      // inclinação máxima do eixo do duelo
 
@@ -809,7 +819,8 @@ const Music = {
 /* ============================================================================
    5. ESTADO
    ========================================================================== */
-const CFG={fleet:6,volleys:18,rate:1.4,hpPer:10,repair:22,matchMin:45,fair:true};
+const CFG={fleet:6,volleys:18,rate:1.4,hpPer:10,repair:22,matchMin:45,fair:true,
+  autoClear:false,autoRestart:false,restartDelay:15};
 const G={
   running:false,paused:false,over:false,matchLeft:0,t:0,
   ships:new Map(), queue:[], fame:new Map(),
@@ -825,6 +836,9 @@ function readCfg(){
   CFG.repair  = clamp(+$('inRepair').value||0,0,120);
   CFG.matchMin= clamp(+$('inMatch').value||0,0,480);
   CFG.fair    = $('ckFair').checked;
+  CFG.autoClear   = $('ckAutoClear').checked;
+  CFG.autoRestart = $('ckAutoRestart').checked;
+  CFG.restartDelay= clamp(+$('inAutoRestartDelay').value||15,5,120);
   /* dano por salva = vida / salvas — mostrado na barra de niveis */
   for(let t=0;t<4;t++){
     const dmg=(TIERS[t].power*CFG.hpPer)/CFG.volleys;
@@ -1947,6 +1961,7 @@ function updateHUD(dt){
 }
 
 let endScrollTimer=null;
+let autoRestartTimer=null;
 function autoScrollEnd(){
   clearInterval(endScrollTimer);
   const el=$('endList'); el.scrollTop=0;
@@ -1992,6 +2007,7 @@ function buildEndScreen(){
    15. PARTIDA + LOOP
    ========================================================================== */
 function startMatch(){
+  clearTimeout(autoRestartTimer);
   Snd.init(); Snd.resume(); readCfg();
   G.running=true; G.paused=false; G.over=false;
   G.matchLeft=CFG.matchMin>0?CFG.matchMin*60:0;
@@ -2008,8 +2024,20 @@ function endMatch(){
   G.running=false; G.over=true; Music.stop(); Snd.fanfare();
   $('bigMsg').classList.remove('show');
   buildEndScreen(); logLine('⏹ partida encerrada');
+  /* Limpa o mar (navios/fila) sem mexer nas medalhas — a tela de ranking
+     cobre o jogo inteiro, então dá pra arrumar o mar por baixo sem ninguém ver. */
+  if(CFG.autoClear){
+    G.ships.clear(); G.queue.length=0; G.idleT=0;
+    renderQueue(); logLine('↺ mar limpo automaticamente');
+  }
+  if(CFG.autoRestart){
+    clearTimeout(autoRestartTimer);
+    logLine('⏱ nova partida automática em '+CFG.restartDelay+'s');
+    autoRestartTimer=setTimeout(startMatch,CFG.restartDelay*1000);
+  }
 }
 function resetMatch(){
+  clearTimeout(autoRestartTimer);
   G.running=false; G.paused=false; G.over=false; Music.stop();
   G.ships.clear(); G.queue.length=0; G.fame.clear();
   G.balls.length=0; G.booms.length=0; G.splashes.length=0;
@@ -2104,7 +2132,8 @@ $('btnPause').onclick=()=>{ if(!G.running) return;
 $('btnEnd').onclick=()=>{ if(G.running||G.ships.size) endMatch(); };
 $('btnReset').onclick=()=>resetMatch();
 
-['inFleet','inVolleys','inRate','inHpPer','inRepair','inMatch','ckFair']
+['inFleet','inVolleys','inRate','inHpPer','inRepair','inMatch','ckFair',
+ 'ckAutoClear','ckAutoRestart','inAutoRestartDelay']
   .forEach(id=>$(id).addEventListener('change',readCfg));
 $('inVol').addEventListener('change',()=>Snd.setVol(clamp((+$('inVol').value||0)/100,0,1)));
 $('inVolMus').addEventListener('change',()=>Music.setVol(clamp((+$('inVolMus').value||0)/100,0,1)));
